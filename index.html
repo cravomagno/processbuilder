@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construtor de Processos — Enops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <div class="caso-bar">
+    <div>
+      <div class="caso-nome" id="casoNome">Caso</div>
+      <div class="caso-meta" id="casoMeta"></div>
+    </div>
+    <div class="caso-actions">
+      <button class="btn-ghost-inverse" id="btnGerarDossie">Gerar<br>dossiê</button>
+      <button class="btn-ghost-inverse" id="btnSalvarRascunho">Salvar rascunho<br>do caso</button>
+      <button class="btn-ghost-inverse" id="btnCarregarRascunho">Carregar<br>rascunho</button>
+      <button class="btn-ghost-inverse" id="btnNovoCaso">Novo<br>caso</button>
+      <input type="file" id="inputCarregarRascunho" accept="application/json,.json" style="display:none" />
+    </div>
+  </div>
+
+  <nav class="fase-nav" id="faseNav"></nav>
+
+  <!-- Fase 1 — Diagnóstico e Viabilidade -->
+  <section class="fase-view" id="fase-view-diagnostico">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 1 — Diagnóstico e Viabilidade</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="diagnostico" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-diagnostico-abertura"></div>
+    <div id="fase-root-diagnostico-gut"></div>
+    <div id="fase-root-diagnostico-ishikawa"></div>
+    <div id="fase-root-diagnostico-porques"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 2 — Governança e Compliance (módulo RACI) -->
+  <section class="fase-view" id="fase-view-governanca">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 2 — Governança e Compliance</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="governanca" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-governanca"></div>
+    <div id="fase-root-governanca-alcadas"></div>
+    <div id="fase-root-governanca-segregacao"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 3 — Modelagem do Processo -->
+  <section class="fase-view" id="fase-view-modelagem">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 3 — Modelagem do Processo</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="modelagem" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-modelagem"></div>
+    <div id="fase-root-modelagem-fluxograma"></div>
+    <div id="fase-root-modelagem-pop"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 4 — Auditoria, Riscos e Controles -->
+  <section class="fase-view" id="fase-view-auditoria">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 4 — Auditoria, Riscos e Controles</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="auditoria" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-auditoria"></div>
+    <div id="fase-root-auditoria-plano"></div>
+    <div id="fase-root-auditoria-regrasdiv"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 5 — Sistemas, Tecnologia e Documentação -->
+  <section class="fase-view" id="fase-view-sistemas">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 5 — Sistemas, Tecnologia e Documentação</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="sistemas" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-sistemas"></div>
+    <div id="fase-root-sistemas-aquisicao"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 6 — Piloto e Gestão de Mudança -->
+  <section class="fase-view" id="fase-view-piloto">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 6 — Piloto e Gestão de Mudança</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="piloto" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-piloto"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+  <!-- Fase 7 — Implantação e Estabelecimento -->
+  <section class="fase-view" id="fase-view-implantacao">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 7 — Implantação e Estabelecimento</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge">Aberta</span>
+        <button class="fase-docs-btn" data-fase="implantacao" type="button"><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div id="fase-root-implantacao-kpis"></div>
+    <div id="fase-root-implantacao-checklist"></div>
+    <div id="fase-root-implantacao-encerramento"></div>
+    <div class="fase-fechamento">
+      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
+</div>
+
+<div class="docs-view" id="docsFaseOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="docsFaseBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1 id="docsFaseTitulo">Documentação</h1>
+      <p id="docsFaseSubtitulo">Manual de uso das ferramentas desta fase</p>
+    </div>
+  </div>
+  <div id="docsFaseSlot"></div>
+</div>
+
+<div class="toast" id="appToast"></div>
+
+<!-- ============================================================
+     Template do módulo RACI (Fase 2 — Governança e Compliance)
+     Adaptado de matriz-raci-builder-v7.html, ids prefixados com
+     "raci-" para não colidir com o shell. Salvar/Carregar rascunho
+     foram removidos daqui — essa função subiu para o nível do Caso
+     (barra superior). "Novo projeto" virou "Limpar matriz" porque,
+     neste contexto, só limpa os dados desta fase, não o caso todo.
+     ============================================================ -->
+<template id="raci-template">
+<div class="shell" id="raci-toolView">
+
+  <header class="app-header">
+    <div class="app-header-info">
+      <h3>Matriz RACI</h3>
+      <p>Cruze atividades e papéis para deixar claro quem executa, quem aprova, quem é consultado e quem só é informado em cada uma.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="sidebar-section">
+        <h2>Papéis</h2>
+        <p class="hint">A área fica em evidência; nome e cargo aparecem em segundo plano.</p>
+        <ul class="item-list" id="raci-rolesList"></ul>
+        <div class="add-form">
+          <input id="raci-roleAreaInput" type="text" placeholder="Área (obrigatório)" maxlength="60" />
+          <div class="add-form-sub">
+            <input id="raci-roleNomeInput" type="text" placeholder="Nome" maxlength="60" />
+            <input id="raci-roleCargoInput" type="text" placeholder="Cargo" maxlength="60" />
+          </div>
+          <button class="btn btn-secondary" id="raci-addRoleBtn">Adicionar papel</button>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <h2>Atividades</h2>
+        <p class="hint">Título curto e evidente; a descrição fica em segundo plano.</p>
+        <ul class="item-list" id="raci-activitiesList"></ul>
+        <div class="add-form">
+          <input id="raci-activityTitleInput" type="text" placeholder="Título da atividade (máx. 50 caracteres)" maxlength="50" />
+          <textarea id="raci-activityDescInput" rows="2" placeholder="Descrição da atividade (opcional)"></textarea>
+          <button class="btn btn-secondary" id="raci-addActivityBtn">Adicionar atividade</button>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost" id="raci-resetBtn">Limpar matriz RACI</button>
+      </div>
+    </div>
+
+    <div class="main-col">
+      <div class="panel matrix-panel">
+        <div class="matrix-panel-head">
+          <h2>Matriz</h2>
+          <div class="header-controls">
+            <select id="raci-variantSelect" class="variant-select"></select>
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Preenchimento</span><span id="raci-progressPct">0%</span></div>
+              <div class="progress-track"><div class="progress-fill" id="raci-progressFill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <p class="rule-hint">Toda atividade precisa de exatamente um <b>Aprovador (A)</b> e ao menos um <b>Responsável (R)</b>. Clique em uma célula para atribuir um papel.</p>
+
+        <div id="raci-emptyState" class="empty-state" style="display:none">
+          <h3>Comece adicionando um papel e uma atividade</h3>
+          <p>Use os painéis à esquerda para montar a estrutura da sua matriz.</p>
+        </div>
+
+        <div id="raci-matrixScroll" class="matrix-scroll" style="display:none">
+          <table class="matrix" id="raci-matrixTable"></table>
+        </div>
+
+        <div class="validation-box" id="raci-validationBox"></div>
+      </div>
+
+      <div class="panel legend-panel">
+        <div class="wheel" id="raci-wheel"></div>
+        <div class="legend-list" id="raci-legendList"></div>
+      </div>
+
+      <div class="panel export-bar">
+        <p class="privacy-note">Todos os dados ficam apenas neste navegador — nada é enviado a servidores externos, em linha com as diretrizes de segurança da informação. A ferramenta funciona mesmo sem conexão com a internet.</p>
+        <div class="export-actions">
+          <button class="btn btn-secondary" id="raci-exportExcelBtn">Exportar Excel</button>
+          <button class="btn btn-primary" id="raci-exportPdfBtn">Exportar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="raci-toast"></div>
+</template>
+
+<!-- ============================================================
+     Template do módulo genérico de tarefas/entregáveis (fases
+     ainda sem ferramenta auxiliar especializada).
+     ============================================================ -->
+<template id="placeholder-template">
+<div class="placeholder-panel">
+  <h3>Tarefas</h3>
+  <ul class="placeholder-tarefas"></ul>
+  <div class="placeholder-add-row">
+    <input class="placeholder-add-input" type="text" placeholder="Nova tarefa desta fase" maxlength="120" />
+    <button class="btn btn-secondary placeholder-add-btn">Adicionar</button>
+  </div>
+</div>
+<div class="placeholder-panel placeholder-entregaveis">
+  <h3>Entregáveis (um por linha)</h3>
+  <textarea class="placeholder-entregaveis-text" placeholder="Ex.: Diagnóstico consolidado do processo"></textarea>
+  <p class="placeholder-note">Ferramenta auxiliar especializada desta fase ainda não implementada — este é um registro simples de tarefas e entregáveis, evolui em iteração futura.</p>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Matriz de Alçadas (Fase 2 — Governança e
+     Compliance).
+     ============================================================ -->
+<template id="alcadas-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Matriz de Alçadas</h3></div>
+  <p class="gut-scale">
+    <span>Cada critério (ex.: "Aprovação de compras") agrupa suas próprias faixas — o limite não precisa ser em R$: pode ser prazo, quantidade, nível de risco etc. Responsável e Escala para são escolhidos entre os papéis já cadastrados na Matriz RACI acima.</span>
+  </p>
+  <div class="add-row">
+    <input id="alcadas-addInput" type="text" list="alcadas-criterios" placeholder="Critério — novo ou já existente (ex.: Aprovação de compras)" maxlength="120" />
+    <button class="btn btn-secondary" id="alcadas-addBtn">Adicionar faixa</button>
+  </div>
+  <datalist id="alcadas-criterios"></datalist>
+  <ul class="alcadas-lista" id="alcadas-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Segregação de Funções (Fase 2 — Governança e
+     Compliance).
+     ============================================================ -->
+<template id="segregacao-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Segregação de Funções</h3></div>
+  <p class="gut-scale">
+    <span>Defina pares de atividades que não deveriam ficar sob responsabilidade do mesmo papel (ex.: quem solicita não deveria aprovar). Atividades são escolhidas entre as já cadastradas na Matriz RACI acima; o conflito é detectado automaticamente comparando os papéis com R ou A em cada uma.</span>
+  </p>
+  <button class="btn btn-secondary" id="segregacao-addBtn" style="margin-bottom:12px;">+ Adicionar par de atividades</button>
+  <ul class="riscos-lista" id="segregacao-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo 5W2H (Fase 3 — Modelagem do Processo).
+     ============================================================ -->
+<template id="w2h-template">
+<div class="w2h-panel">
+  <div class="w2h-head tool-head">
+    <h3>Plano de ação (5W2H)</h3>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Completude</span><span id="w2h-progressPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="w2h-progressFill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <p class="rule-hint">Cada ação vira uma linha da tabela no PDF de fechamento. Só o campo <b>O quê</b> é obrigatório para criar — preencha o resto no próprio card.</p>
+  <div class="add-row">
+    <input id="w2h-addInput" type="text" placeholder="O quê — nova ação" maxlength="140" />
+    <button class="btn btn-secondary" id="w2h-addBtn">Adicionar ação</button>
+  </div>
+  <ul class="w2h-lista" id="w2h-lista"></ul>
+  <div class="validation-box" id="w2h-validationBox"></div>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Fluxograma do Processo (Fase 3 — Modelagem
+     do Processo).
+     ============================================================ -->
+<template id="fluxograma-template">
+<div class="riscos-panel fluxograma-panel">
+  <div class="tool-head"><h3>Fluxograma do Processo</h3></div>
+  <p class="rule-hint">Um caso pode ter mais de um fluxo (ex.: "Fluxo de Compras", "Fluxo de Devolução") — crie um novo fluxo com um título e alterne entre eles pelas abas. Dentro de cada fluxo, monte as raias (uma por papel/área) e depois as etapas — o diagrama se desenha sozinho a partir da lista. Raia é escolhida entre os papéis já cadastrados na Matriz RACI da Governança, ou pode ser digitada livremente.</p>
+
+  <div class="fluxograma-tabs" id="fluxo-tabs"></div>
+  <div class="add-row">
+    <input id="fluxo-novoFluxoInput" type="text" placeholder="Nome do novo fluxo (ex.: Fluxo de Devolução)" maxlength="80" />
+    <button class="btn btn-secondary" id="fluxo-novoFluxoBtn">Adicionar fluxo</button>
+  </div>
+
+  <div class="fluxograma-fluxo-head" id="fluxo-head">
+    <button class="btn btn-ghost" id="fluxo-renomearFluxoBtn">Renomear este fluxo</button>
+    <button class="btn btn-ghost" id="fluxo-removerFluxoBtn">Remover este fluxo</button>
+  </div>
+
+  <div class="fluxograma-colunas">
+    <div class="fluxograma-coluna">
+      <h4 class="fluxograma-subtitulo">Raias</h4>
+      <div class="add-row">
+        <input id="fluxo-raiaNomeInput" type="text" placeholder="Nome da raia (ex.: Compras)" maxlength="60" />
+        <button class="btn btn-secondary" id="fluxo-raiaAddBtn">Adicionar raia</button>
+      </div>
+      <ul class="riscos-lista fluxograma-lista-scroll" id="fluxo-raiasLista"></ul>
+    </div>
+    <div class="fluxograma-coluna">
+      <h4 class="fluxograma-subtitulo">Etapas</h4>
+      <div class="add-row">
+        <input id="fluxo-etapaTituloInput" type="text" placeholder="Título da etapa" maxlength="100" />
+        <button class="btn btn-secondary" id="fluxo-etapaAddBtn">Adicionar etapa</button>
+      </div>
+      <ul class="riscos-lista fluxograma-lista-scroll" id="fluxo-etapasLista"></ul>
+    </div>
+  </div>
+
+  <h4 class="fluxograma-subtitulo">Prévia do diagrama</h4>
+  <div class="fluxograma-preview" id="fluxo-svgWrap"></div>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo POPs / Instruções de Trabalho (Fase 3 —
+     Modelagem do Processo).
+     ============================================================ -->
+<template id="pop-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>POPs / Instruções de Trabalho</h3></div>
+  <p class="gut-scale">
+    <span>Procedimento operacional por etapa do processo. Etapa vinculada é escolhida entre as já cadastradas no Fluxograma acima; Responsável pela execução é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+  </p>
+  <div class="add-row">
+    <input id="pop-addInput" type="text" placeholder="Título do procedimento (ex.: Como emitir pedido de compra)" maxlength="140" />
+    <button class="btn btn-secondary" id="pop-addBtn">Adicionar procedimento</button>
+  </div>
+  <ul class="riscos-lista" id="pop-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Termo de Abertura (Fase 1 — Diagnóstico e
+     Viabilidade).
+     ============================================================ -->
+<template id="abertura-template">
+<div class="porques-panel abertura-panel">
+  <div class="tool-head"><h3>Termo de Abertura</h3></div>
+  <p class="rule-hint">Documento inicial que delimita o processo antes do diagnóstico começar — o quê, até onde, quem está envolvido e o que define sucesso.</p>
+
+  <label class="treinamento-date-wrap" style="margin-bottom:10px;">
+    <span>Objetivo</span>
+    <textarea id="abertura-objetivoInput" class="abertura-objetivo" rows="3" maxlength="600" placeholder="O que este processo/projeto pretende resolver ou entregar"></textarea>
+  </label>
+
+  <div class="abertura-grid">
+    <label class="treinamento-date-wrap">
+      <span>Prazo alvo</span>
+      <input id="abertura-prazoInput" type="date" />
+    </label>
+    <label class="treinamento-date-wrap">
+      <span>Patrocinador</span>
+      <select id="abertura-patrocinadorSelect"></select>
+    </label>
+  </div>
+
+  <div class="abertura-blocos">
+    <div class="ishikawa-categoria">
+      <h5>Escopo — dentro</h5>
+      <ul class="ishikawa-causas-lista" id="abertura-escopoDentroLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="abertura-escopoDentroInput" placeholder="Novo item" maxlength="140" />
+        <button type="button" id="abertura-escopoDentroBtn">+</button>
+      </div>
+    </div>
+    <div class="ishikawa-categoria">
+      <h5>Escopo — fora</h5>
+      <ul class="ishikawa-causas-lista" id="abertura-escopoForaLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="abertura-escopoForaInput" placeholder="Novo item" maxlength="140" />
+        <button type="button" id="abertura-escopoForaBtn">+</button>
+      </div>
+    </div>
+    <div class="ishikawa-categoria">
+      <h5>Critérios de sucesso</h5>
+      <ul class="ishikawa-causas-lista" id="abertura-criteriosLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="abertura-criteriosInput" placeholder="Novo critério" maxlength="140" />
+        <button type="button" id="abertura-criteriosBtn">+</button>
+      </div>
+    </div>
+    <div class="ishikawa-categoria">
+      <h5>Stakeholders</h5>
+      <ul class="ishikawa-causas-lista" id="abertura-stakeholdersLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="abertura-stakeholdersInput" placeholder="Nome/área" maxlength="140" />
+        <button type="button" id="abertura-stakeholdersBtn">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Termo de Encerramento (Fase 7 — Implantação
+     e Estabelecimento).
+     ============================================================ -->
+<template id="encerramento-template">
+<div class="porques-panel abertura-panel">
+  <div class="tool-head"><h3>Termo de Encerramento</h3></div>
+  <p class="rule-hint">Documento final da implantação — resultados alcançados, critérios de sucesso do Termo de Abertura reavaliados, lições aprendidas e pendências remanescentes.</p>
+
+  <label class="treinamento-date-wrap" style="margin-bottom:10px;">
+    <span>Resultados alcançados</span>
+    <textarea id="encerramento-resultadosInput" class="abertura-objetivo" rows="3" maxlength="800" placeholder="O que foi efetivamente entregue/alcançado com a implantação"></textarea>
+  </label>
+
+  <label class="treinamento-date-wrap" style="max-width:220px;margin-bottom:16px;">
+    <span>Data de encerramento</span>
+    <input id="encerramento-dataInput" type="date" />
+  </label>
+
+  <h4 class="fluxograma-subtitulo">Critérios de sucesso (do Termo de Abertura)</h4>
+  <ul class="encerramento-criterios" id="encerramento-criteriosLista"></ul>
+
+  <div class="abertura-blocos">
+    <div class="ishikawa-categoria">
+      <h5>Lições aprendidas</h5>
+      <ul class="ishikawa-causas-lista" id="encerramento-licoesLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="encerramento-licoesInput" placeholder="Nova lição aprendida" maxlength="200" />
+        <button type="button" id="encerramento-licoesBtn">+</button>
+      </div>
+    </div>
+    <div class="ishikawa-categoria">
+      <h5>Pendências remanescentes</h5>
+      <ul class="ishikawa-causas-lista" id="encerramento-pendenciasLista"></ul>
+      <div class="ishikawa-add-causa">
+        <input id="encerramento-pendenciasInput" placeholder="Nova pendência" maxlength="200" />
+        <button type="button" id="encerramento-pendenciasBtn">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Matriz GUT (Fase 1 — Diagnóstico e Viabilidade).
+     ============================================================ -->
+<template id="gut-template">
+<div class="gut-panel">
+  <div class="tool-head"><h3>Matriz GUT</h3></div>
+  <p class="gut-scale">
+    <span><b>Escala 1–5:</b></span>
+    <span><b>G</b>ravidade — impacto se nada for feito</span>
+    <span><b>U</b>rgência — prazo disponível para agir</span>
+    <span><b>T</b>endência — se o problema piora com o tempo</span>
+    <span>Score = G × U × T — ordenado do mais crítico ao menos crítico</span>
+  </p>
+  <div class="add-row">
+    <input id="gut-addInput" type="text" placeholder="Problema ou causa a priorizar" maxlength="160" />
+    <button class="btn btn-secondary" id="gut-addBtn">Adicionar</button>
+  </div>
+  <ul class="gut-lista" id="gut-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Diagrama de Ishikawa / 6M (Fase 1 —
+     Diagnóstico e Viabilidade).
+     ============================================================ -->
+<template id="ishikawa-template">
+<div class="porques-panel ishikawa-panel">
+  <div class="tool-head"><h3>Diagrama de Ishikawa (6M)</h3></div>
+  <p class="rule-hint">Escolha um problema já cadastrado na Matriz GUT (ou escreva um novo) e mapeie as possíveis causas em cada uma das 6 categorias — Método, Mão de obra, Máquina, Material, Meio ambiente e Medida.</p>
+  <div class="add-form">
+    <select id="ishikawa-gutSelect"></select>
+    <div class="add-form-sub">
+      <input id="ishikawa-problemaInput" type="text" placeholder="Problema a mapear" maxlength="200" />
+      <button class="btn btn-secondary" id="ishikawa-addBtn">Adicionar diagrama</button>
+    </div>
+  </div>
+  <ul class="porques-lista" id="ishikawa-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo 5 Porquês (Fase 1 — Diagnóstico e Viabilidade).
+     ============================================================ -->
+<template id="porques-template">
+<div class="porques-panel">
+  <div class="tool-head"><h3>5 Porquês</h3></div>
+  <p class="rule-hint">Escolha um problema já cadastrado na Matriz GUT (ou escreva um novo) e vá perguntando "por quê" até chegar na causa raiz — nem sempre precisa dos 5 níveis.</p>
+  <div class="add-form">
+    <select id="porques-gutSelect"></select>
+    <div class="add-form-sub">
+      <input id="porques-problemaInput" type="text" placeholder="Problema a investigar" maxlength="200" />
+      <button class="btn btn-secondary" id="porques-addBtn">Adicionar análise</button>
+    </div>
+  </div>
+  <ul class="porques-lista" id="porques-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Matriz de Riscos (Fase 4 — Auditoria,
+     Riscos e Controles).
+     ============================================================ -->
+<template id="riscos-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Matriz de Riscos</h3></div>
+  <p class="gut-scale">
+    <span><b>Escala 1–5:</b></span>
+    <span><b>P</b>robabilidade — chance de o risco se concretizar</span>
+    <span><b>I</b>mpacto — dano se ele acontecer</span>
+    <span>Score = P × I — ordenado do risco mais alto ao mais baixo</span>
+  </p>
+  <div class="add-row">
+    <input id="riscos-addInput" type="text" placeholder="Descrição do risco" maxlength="160" />
+    <button class="btn btn-secondary" id="riscos-addBtn">Adicionar risco</button>
+  </div>
+  <ul class="riscos-lista" id="riscos-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Plano de Auditoria (Fase 4 — Auditoria,
+     Riscos e Controles).
+     ============================================================ -->
+<template id="audplano-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Plano de Auditoria</h3></div>
+  <p class="gut-scale">
+    <span>Defina o que será verificado, o método e tamanho da amostra, a periodicidade da checagem e o prazo para resolver não conformidades encontradas. Risco relacionado é escolhido entre os riscos já cadastrados na Matriz de Riscos acima; Responsável pela verificação é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+  </p>
+  <div class="add-row">
+    <input id="audplano-addInput" type="text" placeholder="O que será auditado" maxlength="160" />
+    <button class="btn btn-secondary" id="audplano-addBtn">Adicionar item</button>
+  </div>
+  <ul class="riscos-lista" id="audplano-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Regras de Divergência/Exceção (Fase 4 —
+     Auditoria, Riscos e Controles).
+     ============================================================ -->
+<template id="regrasdiv-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Regras de Divergência/Exceção</h3></div>
+  <p class="gut-scale">
+    <span>Catálogo de tipos de divergência ou exceção que podem aparecer em qualquer auditoria, com severidade, prazo de resolução e escalonamento. Responsável e Escala para são escolhidos entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+  </p>
+  <div class="add-row">
+    <input id="regrasdiv-addInput" type="text" placeholder="Tipo de divergência/exceção (ex.: Nota fiscal divergente)" maxlength="140" />
+    <button class="btn btn-secondary" id="regrasdiv-addBtn">Adicionar regra</button>
+  </div>
+  <ul class="riscos-lista" id="regrasdiv-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Matriz de Rastreabilidade (Fase 5 — Sistemas,
+     Tecnologia e Documentação).
+     ============================================================ -->
+<template id="rastreabilidade-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Matriz de Rastreabilidade</h3></div>
+  <p class="gut-scale">
+    <span>Cada linha rastreia um campo ou dado do início ao fim do processo. Origem e destino são escolhidos entre as etapas já cadastradas no Fluxograma do Processo; Responsável é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+  </p>
+  <div class="add-row">
+    <input id="rastreabilidade-addInput" type="text" placeholder="Campo ou dado a rastrear (ex.: Valor da cotação)" maxlength="140" />
+    <button class="btn btn-secondary" id="rastreabilidade-addBtn">Adicionar item</button>
+  </div>
+  <ul class="riscos-lista" id="rastreabilidade-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Sistemas — Aquisição/Desenvolvimento (Fase 5
+     — Sistemas, Tecnologia e Documentação).
+     ============================================================ -->
+<template id="sistemas-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Sistemas (Aquisição/Desenvolvimento)</h3></div>
+  <p class="gut-scale">
+    <span>Cada sistema envolvido no processo — seja adquirido de um fornecedor ou desenvolvido internamente — com investimento, período de teste/piloto e status de aprovação. Responsável é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+  </p>
+  <div class="add-row">
+    <input id="sistemas-addInput" type="text" placeholder="Nome do sistema" maxlength="100" />
+    <button class="btn btn-secondary" id="sistemas-addBtn">Adicionar sistema</button>
+  </div>
+  <ul class="riscos-lista" id="sistemas-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Checklist de Implantação (Fase 7 —
+     Implantação e Estabelecimento).
+     ============================================================ -->
+<template id="checklist-template">
+<div class="checklist-panel">
+  <div class="checklist-head tool-head">
+    <h3>Checklist de Implantação</h3>
+    <span class="checklist-resumo" id="checklist-resumo"></span>
+  </div>
+  <div class="add-row">
+    <input id="checklist-addInput" type="text" placeholder="Item de verificação" maxlength="160" />
+    <button class="btn btn-secondary" id="checklist-addBtn">Adicionar item</button>
+  </div>
+  <ul class="checklist-lista" id="checklist-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo KPIs / Indicadores (Fase 7 — Implantação e
+     Estabelecimento).
+     ============================================================ -->
+<template id="kpis-template">
+<div class="kpis-panel">
+  <div class="tool-head"><h3>KPIs / Indicadores</h3></div>
+  <p class="gut-scale">
+    <span>Status calculado automaticamente comparando <b>Valor atual</b> com <b>Meta</b>, conforme a direção do indicador.</span>
+  </p>
+  <div class="add-row">
+    <input id="kpis-addInput" type="text" placeholder="Nome do indicador" maxlength="140" />
+    <button class="btn btn-secondary" id="kpis-addBtn">Adicionar indicador</button>
+  </div>
+  <ul class="kpis-lista" id="kpis-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Template do módulo Plano de Treinamento (Fase 6 — Piloto e
+     Gestão de Mudança).
+     ============================================================ -->
+<template id="treinamento-template">
+<div class="treinamento-panel">
+  <div class="tool-head"><h3>Plano de Treinamento por Perfil</h3></div>
+  <div class="add-row">
+    <input id="treinamento-addInput" type="text" placeholder="Perfil / público-alvo" maxlength="100" />
+    <button class="btn btn-secondary" id="treinamento-addBtn">Adicionar</button>
+  </div>
+  <ul class="treinamento-lista" id="treinamento-lista"></ul>
+</div>
+</template>
+
+<!-- ============================================================
+     Documentação por fase — manual do usuário. Um <template> por
+     fase, cada um com seu próprio .docs-layout (toc + seções),
+     clonado por js/core/docs-fase.js dentro do overlay compartilhado
+     #docsFaseOverlay. Exemplo corrido usado em todas as fases:
+     "Processo de Compras".
+     ============================================================ -->
+
+<template id="docs-fase-diagnostico">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-diag-abertura" class="active">Termo de Abertura</button>
+    <button data-target="doc-diag-gut">Matriz GUT</button>
+    <button data-target="doc-diag-ishikawa">Diagrama de Ishikawa</button>
+    <button data-target="doc-diag-porques">5 Porquês</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as 4 ferramentas desta fase se conectam:</b> o Termo de Abertura delimita o que você vai diagnosticar antes de olhar qualquer problema específico — sem ele, é fácil investigar a coisa errada. Com o escopo fechado, a Matriz GUT lista todos os problemas percebidos dentro desse escopo e prioriza qual atacar primeiro. Só então o Diagrama de Ishikawa e os 5 Porquês investigam a causa raiz <i>daquele</i> problema prioritário — nessa ordem, porque investigar causa raiz de um problema pouco relevante é esforço jogado fora.
+      <ol>
+        <li>Termo de Abertura — define o que está dentro/fora do diagnóstico.</li>
+        <li>Matriz GUT — lista e prioriza os problemas encontrados dentro desse escopo.</li>
+        <li>Diagrama de Ishikawa e/ou 5 Porquês — investigam a causa raiz do(s) problema(s) mais críticos da GUT.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-diag-abertura">
+      <h2>Termo de Abertura</h2>
+      <p class="lead">O documento que delimita o processo antes de o diagnóstico começar: o que será resolvido, até onde vai, quem está envolvido e o que define sucesso — o "contrato" inicial do trabalho.</p>
+      <p>Preencha o Termo de Abertura logo no início do caso. Ele não é reavaliado sozinho — mas os <b>Critérios de sucesso</b> cadastrados aqui reaparecem automaticamente no Termo de Encerramento, lá na Fase 7, para você conferir um por um se foram atingidos. É por isso que a qualidade do que você escreve aqui hoje determina se, no final, você vai conseguir provar (ou não) que o processo funcionou.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Objetivo</th><td>Texto longo</td><td>O que este processo pretende resolver ou entregar. Deve responder "o que muda" e, se possível, "de quanto para quanto".</td></tr>
+            <tr><th>Prazo alvo</th><td>Data</td><td>Até quando a padronização deve estar pronta.</td></tr>
+            <tr><th>Patrocinador</th><td>Select</td><td><b>Retroalimentação:</b> lista de papéis já cadastrados na Matriz RACI (Fase 2 — Governança). Só aparece populada depois de cadastrar papéis lá — se você ainda não chegou na Fase 2, pode voltar aqui depois para preencher.</td></tr>
+            <tr><th>Escopo — dentro</th><td>Lista livre (+)</td><td>O que este processo cobre, etapa por etapa.</td></tr>
+            <tr><th>Escopo — fora</th><td>Lista livre (+)</td><td>O que fica de fora, para não gerar expectativa errada nem invadir processo de outra área.</td></tr>
+            <tr><th>Critérios de sucesso</th><td>Lista livre (+)</td><td>O que define que o processo foi implantado com sucesso, de forma verificável. <b>Retroalimentação:</b> cada item reaparece no Termo de Encerramento (Fase 7) para reavaliação.</td></tr>
+            <tr><th>Stakeholders</th><td>Lista livre (+)</td><td>Pessoas ou áreas interessadas ou impactadas pela mudança.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>O Objetivo precisa de um verbo de mudança + uma métrica, sempre que possível — "reduzir X de A para B", "eliminar Y", "padronizar Z em todas as unidades". Uma frase como "melhorar o processo de compras" não dá pra medir depois.</li>
+          <li>Escreva os Critérios de sucesso como se fossem perguntas de "sim ou não" que alguém vai responder na Fase 7 — "prazo médio ≤ 5 dias" é verificável; "processo mais eficiente" não é.</li>
+          <li>Liste em Escopo — fora tudo que alguém possa razoavelmente perguntar "isso está incluído?" — evita retrabalho de expectativa mais adiante.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Objetivo vago, sem meta numérica ou prazo — impossível saber se o processo "deu certo" no fim.</li>
+          <li>Confundir Escopo com Critérios de sucesso (escopo é "o que é abordado"; critério é "como saber se funcionou").</li>
+          <li>Esquecer um Stakeholder que será diretamente afetado pela mudança de responsabilidades — isso costuma gerar resistência só quando o processo já está pronto.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático — Processo de Compras</h3>
+      <ol class="steps">
+        <li><b>Objetivo:</b><p>"Padronizar o fluxo de compras da requisição até a emissão do pedido, reduzindo o prazo médio de 12 para 5 dias úteis."</p></li>
+        <li><b>Prazo alvo:</b><p>Data-alvo daqui a 3 meses.</p></li>
+        <li><b>Patrocinador:</b><p>Selecionar "COO · Diretor", já cadastrado na Matriz RACI.</p></li>
+        <li><b>Escopo — dentro:</b><p>"Requisição interna", "Cotação com fornecedores", "Emissão de pedido de compra".</p></li>
+        <li><b>Escopo — fora:</b><p>"Pagamento ao fornecedor" (fica com o Financeiro).</p></li>
+        <li><b>Critérios de sucesso:</b><p>"Prazo médio ≤ 5 dias úteis", "Zero pedido de compra sem 3 cotações".</p></li>
+        <li><b>Stakeholders:</b><p>"Área de Compras", "Fornecedores homologados", "Financeiro".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-diag-gut">
+      <h2>Matriz GUT</h2>
+      <p class="lead">Prioriza problemas antes de investigar a causa raiz, cruzando três escalas de 1 a 5. Sem essa priorização, é comum gastar a fase inteira investigando um problema secundário enquanto o mais grave fica de lado.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><b>G — Gravidade</b><span>Impacto se nada for feito.</span></div>
+        <div class="concept-card"><b>U — Urgência</b><span>Prazo disponível para agir.</span></div>
+        <div class="concept-card"><b>T — Tendência</b><span>Se o problema piora com o tempo.</span></div>
+      </div>
+      <p style="margin-top:12px;"><b>Score = G × U × T</b> — a lista se reordena sozinha do problema mais crítico para o menos crítico; não há reordenação manual.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Problema/causa</th><td>Texto</td><td>Descrição curta do problema a priorizar — deve ser um problema real observado, não uma opinião.</td></tr>
+            <tr><th>G, U, T</th><td>Select (1–5)</td><td>Notas nas três escalas, sempre comparando com os outros problemas da mesma lista. Novo item nasce com G=U=T=3.</td></tr>
+            <tr><th>Score</th><td>Badge calculado</td><td>G×U×T, colorido por faixa: ≥60 alta prioridade (vermelho), ≥20 média (âmbar), abaixo disso baixa (verde).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Cadastre pelo menos 3-4 problemas antes de pontuar qualquer um — a GUT só funciona bem quando há o que comparar entre si.</li>
+          <li>Pontue relativamente: se dois problemas têm a mesma gravidade, dê a mesma nota; reserve 4-5 para os poucos problemas de fato mais graves da lista.</li>
+          <li>Escreva o problema como um fato observável ("pedidos sem 3 cotações saem 1x por semana"), não como uma causa ou uma solução.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Dar nota 5 em tudo "porque tudo é urgente" — isso zera a utilidade da priorização.</li>
+          <li>Cadastrar o mesmo problema disfarçado de duas formas diferentes, inflando a lista sem necessidade.</li>
+          <li>Confundir sintoma com problema — "fornecedor atrasa entrega" pode ser sintoma de "não existe SLA formal com fornecedor", que é o problema de fato a investigar.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>"Pedido de compra sem cotação"</b><p>G=5, U=4, T=4 → Score 80 — alta prioridade.</p></li>
+        <li><b>"Fornecedor não homologado usado por engano"</b><p>G=3, U=3, T=2 → Score 18 — baixa prioridade.</p></li>
+      </ol>
+      <p><b>Retroalimentação:</b> qualquer problema cadastrado aqui pode ser reaproveitado no Diagrama de Ishikawa e nos 5 Porquês, através do seletor "escolher um problema da Matriz GUT" — evita redigitar o mesmo texto e garante que você está investigando o problema certo.</p>
+    </section>
+
+    <section class="docs-section" id="doc-diag-ishikawa">
+      <h2>Diagrama de Ishikawa (6M)</h2>
+      <p class="lead">Para o problema mais crítico (normalmente vindo da Matriz GUT), mapeia possíveis causas em 6 categorias fixas — ajuda a não esquecer nenhuma frente de causa antes de sair desenhando solução.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><b>Método</b><span>Como o trabalho é feito.</span></div>
+        <div class="concept-card"><b>Mão de obra</b><span>Pessoas envolvidas.</span></div>
+        <div class="concept-card"><b>Máquina</b><span>Equipamentos e sistemas.</span></div>
+        <div class="concept-card"><b>Material</b><span>Insumos utilizados.</span></div>
+        <div class="concept-card"><b>Meio ambiente</b><span>Contexto/ambiente de trabalho.</span></div>
+        <div class="concept-card"><b>Medida</b><span>Indicadores e formas de medir.</span></div>
+      </div>
+      <div class="doc-table-wrap" style="margin-top:12px;">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Escolher problema da GUT</th><td>Select (opcional)</td><td><b>Retroalimentação:</b> copia o texto de um problema já cadastrado na Matriz GUT para o campo Problema abaixo.</td></tr>
+            <tr><th>Problema</th><td>Texto</td><td>Título do diagrama — pode ser digitado direto, sem depender da GUT.</td></tr>
+            <tr><th>Nova causa (por categoria)</th><td>Texto + botão "+"</td><td>Adiciona uma causa dentro de uma das 6 categorias — escreva a causa de forma específica e verificável.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Preencha pelo menos 2 ou 3 categorias com causas reais — um diagrama com só uma categoria preenchida raramente reflete a realidade toda.</li>
+          <li>Escreva causas específicas e checáveis: "não existe checklist obrigatório antes de emitir o pedido" é melhor que "falta de organização".</li>
+          <li>Não pule as categorias "difíceis" (Meio ambiente, Medida) — muitas vezes a causa raiz real está ali, não nas categorias óbvias.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Escrever uma solução no lugar de uma causa — "deveríamos comprar um sistema novo" é solução, não causa.</li>
+          <li>Registrar 1 única causa e considerar o diagrama concluído.</li>
+          <li>Usar frases genéricas demais para servir de causa de qualquer problema ("comunicação ruim", "falta de atenção") — se a causa vale pra qualquer processo, provavelmente não é a causa real deste.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Problema:</b><p>"Pedido de compra sem cotação" (escolhido da GUT).</p></li>
+        <li><b>Método:</b><p>"Não existe checklist obrigatório antes de emitir o pedido."</p></li>
+        <li><b>Mão de obra:</b><p>"Comprador novo não treinado no processo."</p></li>
+        <li><b>Medida:</b><p>"Não há indicador que aponte pedidos emitidos sem cotação."</p></li>
+      </ol>
+      <p>No PDF de fechamento, isso vira o desenho da espinha de peixe, com as 6 categorias e a quantidade de causas de cada uma.</p>
+    </section>
+
+    <section class="docs-section" id="doc-diag-porques">
+      <h2>5 Porquês</h2>
+      <p class="lead">Aprofunda numa causa raiz partindo de um problema, perguntando "por quê" repetidamente — até 5 níveis fixos, nem sempre é preciso chegar ao último.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Escolher problema da GUT</th><td>Select (opcional)</td><td><b>Retroalimentação:</b> mesmo mecanismo do Ishikawa — copia o texto de um problema da Matriz GUT.</td></tr>
+            <tr><th>Problema</th><td>Texto</td><td>Título da análise.</td></tr>
+            <tr><th>Por quê 1 a Por quê 5</th><td>Texto (5 campos fixos)</td><td>Cada resposta aprofunda na anterior, sempre respondendo "por quê" da resposta de cima. Pode parar antes do 5º nível.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>Causa raiz identificada</b> é calculada sozinha: é a última resposta preenchida na cadeia, não necessariamente a do nível 5.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Pare quando chegar numa causa que a organização pode de fato mudar (um processo, uma regra, um sistema) — essa é uma causa raiz "controlável".</li>
+          <li>Use o 5 Porquês depois do Ishikawa, aprofundando especificamente a causa mais promissora que apareceu lá — os dois se complementam, um mapeia amplitude, o outro profundidade.</li>
+          <li>Releia a cadeia inteira ao final: cada "por quê" deveria realmente responder a pergunta da linha de cima.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Parar no primeiro ou segundo "por quê" — raramente já é causa raiz, geralmente ainda é sintoma.</li>
+          <li>A cadeia terminar apontando para uma pessoa específica ("o comprador esqueceu") em vez de um processo ou sistema — é sinal de que ainda não se chegou na causa raiz real.</li>
+          <li>Preencher os 5 níveis só para "completar o formulário", sem cada resposta derivar logicamente da anterior.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Problema:</b><p>"Pedido de compra sem cotação."</p></li>
+        <li><b>Por quê 1:</b><p>"Porque o comprador pulou a etapa de cotação."</p></li>
+        <li><b>Por quê 2:</b><p>"Porque não existe bloqueio no processo para isso."</p></li>
+        <li><b>Por quê 3:</b><p>"Porque o processo nunca foi formalizado." — causa raiz identificada aqui, mesmo sem preencher os níveis 4 e 5.</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-governanca">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-gov-raci-conceito" class="active">RACI — Conceito</button>
+    <button data-target="doc-gov-raci-como-usar">RACI — Como usar</button>
+    <button data-target="doc-gov-raci-variacoes">RACI — Variações</button>
+    <button data-target="doc-gov-raci-faq">RACI — Perguntas frequentes</button>
+    <button data-target="doc-gov-alcadas">Matriz de Alçadas</button>
+    <button data-target="doc-gov-segregacao">Segregação de Funções</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as 3 ferramentas desta fase se conectam:</b> a Matriz RACI vem primeiro porque define os papéis e atividades que as outras duas reaproveitam — sem papéis cadastrados na RACI, os seletores de responsável da Matriz de Alçadas e da Segregação de Funções aparecem vazios. Depois de fechar a RACI, use a Matriz de Alçadas para formalizar limites de aprovação e a Segregação de Funções para revisar se essa distribuição de responsabilidades não criou conflitos de controle interno.
+      <ol>
+        <li>Matriz RACI — quem faz o quê em cada atividade do processo.</li>
+        <li>Matriz de Alçadas — até que limite cada papel decide sozinho, e quem assume acima disso.</li>
+        <li>Segregação de Funções — confere se a distribuição acima não deixou a mesma pessoa solicitar e aprovar a mesma coisa.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-gov-raci-conceito">
+      <h2>O que é uma matriz RACI</h2>
+      <p class="lead">RACI é uma forma de deixar explícito quem faz, quem decide, quem opina e quem só precisa saber — para cada atividade de um processo ou projeto. É a primeira ferramenta desta fase; Matriz de Alçadas e Segregação de Funções, mais abaixo, dependem dos papéis e atividades cadastrados aqui.</p>
+      <p>A matriz cruza <b>atividades</b> (linhas) com <b>papéis ou pessoas</b> (colunas). Em cada célula, uma letra descreve o tipo de envolvimento daquele papel naquela atividade.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><span class="code" style="background:var(--c-r)">R</span><b>Responsible</b><span>Executa a atividade. Pode haver mais de um por linha.</span></div>
+        <div class="concept-card"><span class="code" style="background:var(--c-a)">A</span><b>Accountable</b><span>Responde pelo resultado. Exatamente um por linha — a regra de ouro do RACI.</span></div>
+        <div class="concept-card"><span class="code" style="background:var(--c-c)">C</span><b>Consulted</b><span>É ouvido antes da decisão. Comunicação de mão dupla.</span></div>
+        <div class="concept-card"><span class="code" style="background:var(--c-i)">I</span><b>Informed</b><span>É avisado depois do fato. Comunicação de mão única.</span></div>
+      </div>
+      <p style="margin-top:16px">A regra mais importante é a do <b>A único</b>: se duas pessoas aprovam a mesma entrega, decisões podem se contradizer e, na prática, ninguém responde de fato pelo resultado. A ferramenta verifica isso automaticamente enquanto você preenche.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Antes de atribuir códigos, pergunte para cada atividade: "se isso der errado, quem responde?" — essa pessoa é o A. "Quem efetivamente executa a tarefa?" — essas são os R.</li>
+          <li>Use C com moderação: um C em toda linha para "informar educadamente" gera ruído e dificulta ver quem de fato precisa opinar antes da decisão.</li>
+          <li>Toda atividade precisa de pelo menos um R e exatamente um A — se sobrar alguma sem essas duas peças, a matriz não está pronta para orientar o processo de verdade.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar o mesmo papel como A em quase toda atividade "pra simplificar" — isso costuma esconder que a responsabilidade real deveria estar distribuída.</li>
+          <li>Deixar atividades sem nenhum R — significa que, na prática, ninguém sabe que precisa executar aquilo.</li>
+          <li>Confundir C (opinião antes da decisão) com I (aviso depois do fato) — trocar os dois muda quem tem poder de influenciar o resultado.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-gov-raci-como-usar">
+      <h2>Como usar a Matriz RACI</h2>
+      <p class="lead">Passo a passo entre começar do zero e ter um arquivo pronto para compartilhar.</p>
+      <ol class="steps">
+        <li><div><b>Nomeie o projeto e escolha a variante.</b><p>No topo da ferramenta, edite o título, uma descrição opcional e selecione RACI, RASCI ou RACI-VS conforme a complexidade do seu processo.</p></div></li>
+        <li><div><b>Cadastre os papéis.</b><p>Preencha a Área (obrigatória) e, se quiser, o Nome e o Cargo de quem ocupa o papel — veja como cada campo se comporta logo abaixo.</p></div></li>
+        <li><div><b>Cadastre as atividades.</b><p>Dê um Título curto e, se for útil, uma Descrição livre — a matriz mostra apenas uma prévia dela.</p></div></li>
+        <li><div><b>Preencha a matriz.</b><p>Clique em qualquer célula para abrir o seletor colorido e escolher o código correspondente. Clicar fora ou apertar Esc fecha sem alterar nada.</p></div></li>
+        <li><div><b>Acompanhe as pendências.</b><p>O painel abaixo da matriz aponta, em tempo real, atividades sem Aprovador, com mais de um Aprovador, sem Responsável, ou papéis que ainda não foram usados.</p></div></li>
+        <li><div><b>Exporte ou feche a fase.</b><p>Use PDF/Excel para exportar só esta matriz, ou o botão "Fechar fase (gerar PDF)" no topo da fase para registrar o fechamento oficial no caso.</p></div></li>
+      </ol>
+
+      <p style="font-size:13.5px;color:var(--ink-soft);max-width:70ch;margin-top:14px">
+        Esta matriz faz parte de um caso maior. Para salvar/retomar o trabalho, use <b>Salvar rascunho do caso</b> na barra superior do app — ele guarda o caso inteiro, incluindo esta matriz.
+      </p>
+
+      <h3 style="font-size:14.5px;font-weight:600;margin:22px 0 4px">Campos de papéis e de atividades</h3>
+      <p style="font-size:13.5px;color:var(--ink-soft);max-width:70ch;margin-bottom:2px">Cada papel e cada atividade tem um campo em evidência e campos de apoio, menores — assim a matriz fica legível mesmo com informações mais completas por trás de cada célula.</p>
+
+      <p style="font-size:12.5px;font-weight:600;color:var(--ink-soft);margin:16px 0 2px">Papéis</p>
+      <div class="concept-grid">
+        <div class="concept-card"><span class="field-tag req">Obrigatório</span><b>Área</b><span>Departamento, time ou função responsável. É o texto em destaque nas colunas da matriz e no cabeçalho dos arquivos exportados.</span></div>
+        <div class="concept-card"><span class="field-tag opt">Opcional</span><b>Nome</b><span>Nome de quem ocupa o papel. Aparece menor, numa segunda linha, junto ao cargo.</span></div>
+        <div class="concept-card"><span class="field-tag opt">Opcional</span><b>Cargo</b><span>Cargo ou função da pessoa. Também aparece na segunda linha, discreto.</span></div>
+      </div>
+
+      <p style="font-size:12.5px;font-weight:600;color:var(--ink-soft);margin:16px 0 2px">Atividades</p>
+      <div class="concept-grid">
+        <div class="concept-card"><span class="field-tag req">Obrigatório</span><b>Título</b><span>Texto curto (até 50 caracteres) que identifica a linha na matriz — precisa caber numa única linha legível.</span></div>
+        <div class="concept-card"><span class="field-tag opt">Opcional</span><b>Descrição</b><span>Texto livre, sem limite de tamanho. Na matriz mostra uma prévia de até 100 caracteres, em fonte menor; o texto completo sai sem cortes no PDF e no Excel exportados.</span></div>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-gov-raci-variacoes">
+      <h2>Variações da matriz</h2>
+      <p class="lead">A ferramenta suporta três variantes. Cada uma acrescenta uma distinção que o RACI puro não captura.</p>
+
+      <div class="variant-block">
+        <h3>RACI — a forma clássica</h3>
+        <p class="when">Use quando os quatro papéis básicos (executar, aprovar, consultar, informar) já descrevem bem o processo. É o ponto de partida recomendado para a maioria dos casos.</p>
+      </div>
+
+      <div class="variant-block">
+        <h3>RASCI — quando existe um papel de apoio</h3>
+        <p class="when">Acrescenta <b>S (Suporte)</b>: alguém que ajuda operacionalmente quem executa, sem ser o executor principal nem apenas um consultado.</p>
+      </div>
+
+      <div class="variant-block">
+        <h3>RACI-VS — quando há verificação e homologação formais</h3>
+        <p class="when">Acrescenta <b>V (Verifica)</b>, quem confere se o trabalho atende aos requisitos, e <b>S (Autoriza)</b>, quem formaliza a aprovação final — comum em ambientes regulados, auditoria e qualidade.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-gov-raci-faq">
+      <h2>Perguntas frequentes sobre a RACI</h2>
+      <details class="faq-item"><summary>Por que só pode haver um Aprovador (A) por atividade?</summary><div class="faq-answer">Porque essa é a regra que existe para eliminar ambiguidade de autoridade. Se duas pessoas aprovam a mesma entrega, as decisões podem se contradizer e, na prática, ninguém responde de fato pelo resultado.</div></details>
+      <details class="faq-item"><summary>Qual a diferença entre Responsável (R) e Aprovador (A)?</summary><div class="faq-answer">R executa o trabalho; A responde pelo resultado perante a organização.</div></details>
+      <details class="faq-item"><summary>Meus dados ficam salvos entre sessões?</summary><div class="faq-answer">Sim — o caso inteiro (todas as fases, incluindo esta matriz) é salvo automaticamente neste navegador. Para levar o trabalho para outro computador ou guardar uma cópia de segurança, use "Salvar rascunho do caso" na barra superior.</div></details>
+      <details class="faq-item"><summary>Qual a diferença entre o rascunho do caso e exportar em PDF/Excel?</summary><div class="faq-answer">O rascunho (.json) guarda o caso inteiro, editável, para continuar exatamente de onde parou. PDF e Excel são o resultado final desta matriz, formatado para leitura ou aprovação.</div></details>
+      <details class="faq-item"><summary>O que muda quando eu "fecho" esta fase?</summary><div class="faq-answer">É gerado um PDF formal com o cabeçalho do caso, a matriz completa e o campo "Aprovado por" — preenchido automaticamente a partir do papel com código A nesta mesma matriz. Reabrir a fase não apaga esse histórico; fechar de novo gera uma nova versão.</div></details>
+      <details class="faq-item"><summary>Por que os papéis têm três campos — Área, Nome e Cargo?</summary><div class="faq-answer">A Área organiza a matriz de verdade, por isso fica em destaque; Nome e Cargo ajudam a lembrar quem exatamente ocupa aquele papel.</div></details>
+    </section>
+
+    <section class="docs-section" id="doc-gov-alcadas">
+      <h2>Matriz de Alçadas</h2>
+      <p class="lead">Define, para cada critério, faixas de limite e quem aprova dentro e acima de cada faixa. O critério não precisa ser financeiro — pode ser prazo, quantidade, nível de risco etc.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Critério</th><td>Texto com autocompletar</td><td>Nome do critério (ex.: "Aprovação de compras"). Digitar um nome já usado agrupa a faixa junto das outras do mesmo critério.</td></tr>
+            <tr><th>Limite</th><td>Número (opcional)</td><td>Teto da faixa. Vazio significa "sem limite" (última faixa, sem teto).</td></tr>
+            <tr><th>Unidade</th><td>Texto livre</td><td>R$, dias, unidades — o que fizer sentido para o critério.</td></tr>
+            <tr><th>Responsável nesta faixa</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+            <tr><th>Escala para (acima do limite)</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI — quem assume se o valor passar deste limite.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>As faixas de um mesmo Critério ficam agrupadas visualmente (título automático) e ordenadas do menor para o maior Limite.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Cubra a faixa inteira, do menor ao infinito: a última faixa de cada critério deve ficar com Limite vazio, senão existe um valor acima do qual nada foi previsto e ninguém sabe quem aprova.</li>
+          <li>Cada faixa acima deve ter um Responsável em nível hierárquico igual ou maior que a faixa anterior — normalmente o mesmo papel indicado como "Escala para" da faixa de baixo.</li>
+          <li>Use o Responsável desta faixa consistente com o que a Matriz RACI já diz sobre quem aprova aquela atividade — as duas ferramentas devem contar a mesma história.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Deixar um "buraco" entre faixas (ex.: uma até 5.000, a próxima só a partir de 10.000) — o intervalo entre 5.000 e 10.000 fica sem responsável definido.</li>
+          <li>Definir Escala para apontando pra um papel que, na Matriz RACI, não tem nenhuma relação de A/Aprovador com aquele tipo de atividade.</li>
+          <li>Usar sempre R$ como Unidade mesmo quando o critério real é outra coisa (prazo, quantidade, nível de risco) — isso confunde quem lê o PDF depois.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático — Critério "Aprovação de compras"</h3>
+      <ol class="steps">
+        <li><b>Faixa 1:</b><p>Limite 5.000, Unidade "R$", Responsável "Comprador".</p></li>
+        <li><b>Faixa 2:</b><p>Limite 50.000, Unidade "R$", Responsável "Gerente UN", Escala para "COO".</p></li>
+        <li><b>Faixa 3:</b><p>Limite vazio (sem teto), Responsável "COO", Escala para "CFO".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-gov-segregacao">
+      <h2>Segregação de Funções</h2>
+      <p class="lead">Identifica pares de atividades que não deveriam ficar sob a responsabilidade do mesmo papel — por exemplo, quem solicita não deveria ser quem aprova.</p>
+      <p>O conflito <b>não é uma escolha manual</b>: ele é calculado automaticamente comparando, nas duas atividades escolhidas, quais papéis têm R (Responsável) ou A (Aprovador) na Matriz RACI.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Atividade A</th><td>Select</td><td><b>Retroalimentação:</b> atividades já cadastradas na Matriz RACI.</td></tr>
+            <tr><th>Atividade B</th><td>Select</td><td>Mesma lista, exclui a atividade já escolhida em A.</td></tr>
+            <tr><th>Justificativa</th><td>Texto (opcional)</td><td>Anotação livre sobre por que este par é sensível.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>Badge "Conflito" / "Sem conflito":</b> aparece automaticamente. Se algum papel tiver R ou A nas duas atividades, o badge fica vermelho e uma linha lista o(s) papel(is) conflitante(s). Se a Matriz RACI mudar depois, o status é recalculado sozinho na próxima vez que a tela abrir.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Cadastre pelo menos os pares clássicos de controle interno: quem solicita x quem aprova; quem executa o pagamento x quem concilia a conta; quem cadastra o fornecedor x quem aprova o pagamento a ele.</li>
+          <li>Se um par der "Conflito", isso é o resultado esperado da ferramenta funcionando — a decisão de aceitar o risco ou mudar a RACI é sua, registrada na Justificativa.</li>
+          <li>Revise esta lista de novo depois de qualquer mudança na RACI — o cálculo é automático, mas só roda quando você abre esta tela.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Cadastrar só pares que você já sabe que "não vão dar conflito", só para preencher a lista — isso não protege o processo de nada.</li>
+          <li>Ignorar um badge "Conflito" sem registrar na Justificativa por que ele foi aceito assim mesmo — dificulta uma auditoria posterior entender a decisão.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Atividade A:</b><p>"Requisição de compra".</p></li>
+        <li><b>Atividade B:</b><p>"Aprovação de compra".</p></li>
+        <li><b>Resultado:</b><p>Se o mesmo papel (ex.: Comprador) tiver R nas duas, aparece o badge "Conflito" — sinal de que vale revisar a RACI para separar essas responsabilidades.</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-modelagem">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-mod-w2h" class="active">Plano de ação (5W2H)</button>
+    <button data-target="doc-mod-fluxo">Fluxograma do Processo</button>
+    <button data-target="doc-mod-pop">POPs / Instruções de Trabalho</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as 3 ferramentas desta fase se conectam:</b> o 5W2H registra as decisões de modelagem como ações com dono e prazo, mas é o Fluxograma que efetivamente desenha o processo — normalmente você usa os dois em paralelo, um alimentando o outro. Depois que o fluxo tem etapas definidas, os POPs documentam o "como fazer" de cada etapa que precisar de instrução detalhada. Não é preciso escrever um POP para toda etapa — só para aquelas onde a forma de execução não é óbvia ou varia de pessoa para pessoa.
+      <ol>
+        <li>Fluxograma do Processo — desenha o processo ponta a ponta, com raias por papel.</li>
+        <li>5W2H — registra as ações necessárias para implementar o desenho acima.</li>
+        <li>POPs — detalha o passo a passo das etapas do fluxo que precisam de instrução escrita.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-mod-w2h">
+      <h2>Plano de ação (5W2H)</h2>
+      <p class="lead">Transforma decisões de modelagem em ações concretas, com dono e prazo, seguindo o método O quê / Por quê / Quem / Quando / Onde / Como / Quanto custa.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>O quê</th><td>Texto</td><td>Único campo obrigatório para criar a ação — o resto é preenchido depois, no próprio card.</td></tr>
+            <tr><th>Feito</th><td>Checkbox</td><td>Marca a ação como concluída.</td></tr>
+            <tr><th>Por quê, Quem, Quando, Onde, Como, Quanto custa</th><td>Texto livre</td><td>"Quando" é texto livre (não é campo de data) — aceita "até 30/09" ou "2ª quinzena de outubro".</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>A barra de <b>Completude</b> mostra a % de ações com todos os campos preenchidos; a caixa de validação avisa quais ações ainda não têm Quem ou Quando definidos.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>"O quê" deve ser uma ação com verbo no infinitivo ("padronizar", "criar", "eliminar"), não uma constatação do problema.</li>
+          <li>"Quem" deve ser uma pessoa ou papel específico, nunca uma área inteira — uma ação sem dono claro raramente é executada.</li>
+          <li>"Quando" precisa ser verificável mais tarde — mesmo sendo texto livre, escreva algo como "até 30/09", não "em breve" ou "assim que possível".</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Deixar "Quem" ou "Quando" em branco "para preencher depois" — a caixa de validação existe justamente para pegar isso antes do fechamento da fase.</li>
+          <li>Registrar ações genéricas demais ("melhorar comunicação") que ninguém sabe quando considerar concluídas.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>O quê:</b><p>"Padronizar formulário de requisição de compra".</p></li>
+        <li><b>Quem:</b><p>"Analista de Planejamento".</p></li>
+        <li><b>Quando:</b><p>"até 30/09".</p></li>
+        <li><b>Como:</b><p>"Criar template único no sistema".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-mod-fluxo">
+      <h2>Fluxograma do Processo</h2>
+      <p class="lead">Desenha o processo ponta a ponta em raias (uma por papel/área) e etapas. O diagrama é 100% automático — nada se arrasta na tela, ele se monta sozinho a partir das listas de Raias e Etapas.</p>
+      <p>Um caso pode ter mais de um fluxo (ex.: "Fluxo de Compras" e "Fluxo de Devolução") — cada um vive em sua própria aba, com suas próprias raias e etapas.</p>
+      <h3 style="font-size:14.5px;margin-top:14px;">Abas de fluxo</h3>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Controle</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Nome do novo fluxo + Adicionar fluxo</th><td>Cria uma nova aba de fluxo dentro do mesmo caso.</td></tr>
+            <tr><th>Renomear este fluxo</th><td>Renomeia a aba ativa.</td></tr>
+            <tr><th>Remover este fluxo</th><td>Apaga a aba ativa e todas as suas raias/etapas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:14px;">Raias</h3>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Nome da raia</th><td>Texto</td><td>Ex.: "Comprador", "Sistema", "Cliente externo".</td></tr>
+            <tr><th>Papel</th><td>Select (opcional)</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança. Ao escolher um papel, o Nome da raia é preenchido sozinho se ainda estiver vazio.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Botões por raia: <b>▲</b> mover para cima, <b>▼</b> mover para baixo (a ordem define a posição vertical no diagrama), <b>Remover</b>.</p>
+      <h3 style="font-size:14.5px;margin-top:14px;">Etapas</h3>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Título da etapa</th><td>Texto</td><td>Nome curto da etapa.</td></tr>
+            <tr><th>Tipo</th><td>Select: Início / Etapa / Decisão / Fim</td><td>Define quais campos aparecem a seguir.</td></tr>
+            <tr><th>Raia</th><td>Select</td><td>Uma das raias já criadas neste fluxo.</td></tr>
+            <tr><th>Próxima etapa</th><td>Select (só para Início/Etapa)</td><td>Para onde o fluxo segue depois desta etapa.</td></tr>
+            <tr><th>Ramo Sim / Ramo Não + rótulos</th><td>Select + texto (só para Decisão)</td><td>Os dois caminhos possíveis a partir de uma decisão, cada um com rótulo editável (padrão "Sim"/"Não").</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Botões por etapa: <b>▲ / ▼</b> reordenam (a ordem define a posição horizontal no diagrama), <b>Remover</b>. A <b>Prévia do diagrama</b> abaixo das duas listas se redesenha sozinha a cada mudança, com setas e rótulos de decisão.</p>
+      <p><b>Retroalimentação:</b> as etapas cadastradas aqui alimentam os POPs (mais abaixo nesta mesma fase) e a Matriz de Rastreabilidade (Fase 5) — nessas ferramentas, o select "Etapa vinculada" mostra as etapas de todos os fluxos, agrupadas pelo nome do fluxo de origem.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Crie uma raia por papel que efetivamente age no processo, não por área inteira — se "Financeiro" abrange 3 pessoas com funções diferentes, considere raias mais específicas.</li>
+          <li>Toda etapa de "Decisão" deve ter os dois ramos (Sim e Não) apontando para algo — uma decisão sem um dos ramos preenchido é um fluxo incompleto.</li>
+          <li>Use o mesmo nome de raia que já existe na Matriz RACI (escolhendo pelo select) — mantém o fluxograma e a RACI contando a mesma história de responsabilidades.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Etapas do tipo "Etapa" ou "Início" sem "Próxima etapa" definida — o fluxo fica com uma ponta solta que não chega a lugar nenhum.</li>
+          <li>Mais de uma etapa "Início" no mesmo fluxo — dificulta saber por onde o processo realmente começa.</li>
+          <li>Misturar duas variações de processo muito diferentes no mesmo fluxo em vez de criar um segundo fluxo (aba) — deixa o diagrama confuso com decisões que na prática nunca coexistem.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático — Fluxo de Compras</h3>
+      <ol class="steps">
+        <li><b>Raias:</b><p>"Requisitante" (papel: Unidade de Negócios), "Comprador" (papel: Planejamento), "Aprovador" (papel: Gerente UN).</p></li>
+        <li><b>Início:</b><p>"Requisição criada" — raia Requisitante.</p></li>
+        <li><b>Etapa:</b><p>"Cotar com 3 fornecedores" — raia Comprador.</p></li>
+        <li><b>Decisão:</b><p>"Valor acima de R$ 5.000?" — raia Aprovador. Ramo Sim → "Aprovação do COO"; Ramo Não → "Emitir pedido".</p></li>
+        <li><b>Fim:</b><p>"Pedido enviado ao fornecedor".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-mod-pop">
+      <h2>POPs / Instruções de Trabalho</h2>
+      <p class="lead">Procedimento operacional padrão de uma etapa específica do processo — o "como fazer" documentado passo a passo.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Título do procedimento</th><td>Texto</td><td>Nome do POP.</td></tr>
+            <tr><th>Versão</th><td>Texto curto</td><td>Ex.: "1.0" — controle de revisões do procedimento.</td></tr>
+            <tr><th>Etapa vinculada</th><td>Select</td><td><b>Retroalimentação:</b> etapas já cadastradas no Fluxograma acima, agrupadas por fluxo.</td></tr>
+            <tr><th>Responsável pela execução</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+            <tr><th>Instruções / passo a passo</th><td>Texto longo</td><td>Descrição detalhada de como executar a etapa.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Escreva as instruções numeradas, uma ação por linha — quem nunca fez a etapa deveria conseguir executá-la só lendo o POP.</li>
+          <li>Priorize POPs para etapas onde diferentes pessoas fariam de formas diferentes se não houvesse um padrão — é aí que o documento realmente evita retrabalho e erro.</li>
+          <li>Atualize a Versão sempre que o conteúdo mudar de forma relevante, para que o histórico de revisões faça sentido no PDF exportado.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Escrever o POP em nível muito alto ("processar o pedido") sem detalhar o passo a passo real — não ajuda ninguém a executar de fato.</li>
+          <li>Criar um POP para toda e qualquer etapa do fluxo, mesmo as triviais — dilui a atenção dos POPs que realmente importam.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Título:</b><p>"Como emitir pedido de compra" — Versão "1.0".</p></li>
+        <li><b>Etapa vinculada:</b><p>"Emitir pedido" (do Fluxo de Compras).</p></li>
+        <li><b>Responsável:</b><p>"Comprador".</p></li>
+        <li><b>Instruções:</b><p>"1. Confirmar as 3 cotações anexadas. 2. Preencher o pedido no sistema. 3. Enviar para aprovação conforme a Matriz de Alçadas."</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-auditoria">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-aud-riscos" class="active">Matriz de Riscos</button>
+    <button data-target="doc-aud-plano">Plano de Auditoria</button>
+    <button data-target="doc-aud-regras">Regras de Divergência/Exceção</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as 3 ferramentas desta fase se conectam:</b> a Matriz de Riscos mapeia e prioriza os riscos do processo, com seus controles preventivos e detectivos. O Plano de Auditoria transforma os riscos mais críticos em rotinas concretas de verificação (o quê, como, com que frequência). As Regras de Divergência/Exceção preparam de antemão o que fazer quando uma auditoria (ou o dia a dia) encontrar algo fora do padrão — sem essas regras prontas, cada divergência encontrada exige decidir na hora o que fazer, o que gera inconsistência.
+      <ol>
+        <li>Matriz de Riscos — o que pode dar errado, com que gravidade, e como isso é mitigado.</li>
+        <li>Plano de Auditoria — como e com que frequência os riscos mais críticos são verificados na prática.</li>
+        <li>Regras de Divergência/Exceção — o que fazer quando uma verificação encontra algo errado.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-aud-riscos">
+      <h2>Matriz de Riscos</h2>
+      <p class="lead">Semelhante à Matriz GUT da Fase 1, mas focada em risco: cruza Probabilidade × Impacto e já pede, para cada risco, os controles que o mitigam.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><b>P — Probabilidade</b><span>Chance de o risco se concretizar.</span></div>
+        <div class="concept-card"><b>I — Impacto</b><span>Dano se ele acontecer.</span></div>
+      </div>
+      <div class="doc-table-wrap" style="margin-top:12px;">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Risco</th><td>Texto</td><td>Descrição do risco — um evento que pode acontecer, não o problema que já aconteceu.</td></tr>
+            <tr><th>P, I</th><td>Select (1–5)</td><td>Notas de probabilidade e impacto, comparando com os outros riscos da lista. Novo item nasce com P=I=3.</td></tr>
+            <tr><th>Score</th><td>Badge calculado</td><td>P×I, colorido por faixa: ≥16 risco alto (vermelho), ≥6 médio (âmbar), abaixo baixo (verde). Lista reordena sozinha do maior para o menor.</td></tr>
+            <tr><th>Controle preventivo</th><td>Texto</td><td>O que evita que o risco aconteça.</td></tr>
+            <tr><th>Controle detectivo</th><td>Texto</td><td>O que permite perceber se o risco já aconteceu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Todo risco relevante deveria ter os dois tipos de controle: algo que reduza a chance de acontecer (preventivo) e algo que avise se aconteceu mesmo assim (detectivo). Um risco alto sem nenhum dos dois é uma exposição real do processo.</li>
+          <li>Escreva o risco como um evento futuro possível ("pagamento em duplicidade pode ocorrer"), não como algo que já é sabido que aconteceu — isso é assunto para Regras de Divergência/Exceção.</li>
+          <li>Priorize registrar controle preventivo/detectivo primeiro nos riscos com Score alto — são os que mais precisam de mitigação concreta.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Deixar Controle preventivo/detectivo em branco em riscos de Score alto — a matriz identificou o risco mas não fez nada a respeito dele.</li>
+          <li>Escrever o mesmo controle genérico ("mais atenção da equipe") para riscos muito diferentes — controles vagos não são verificáveis depois.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Risco:</b><p>"Pagamento em duplicidade ao fornecedor" — P=3, I=5 → Score 15 (médio).</p></li>
+        <li><b>Controle preventivo:</b><p>"Conferência do número da nota fiscal antes do pagamento".</p></li>
+        <li><b>Controle detectivo:</b><p>"Conciliação mensal de pagamentos x notas fiscais".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-aud-plano">
+      <h2>Plano de Auditoria</h2>
+      <p class="lead">Define o que será verificado, com que método, com que amostra, com que frequência, e o prazo para resolver o que for encontrado errado.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>O que será auditado</th><td>Texto</td><td>Objeto da verificação.</td></tr>
+            <tr><th>Risco relacionado</th><td>Select</td><td><b>Retroalimentação:</b> riscos já cadastrados na Matriz de Riscos acima.</td></tr>
+            <tr><th>Método de amostragem</th><td>Select</td><td>Amostragem estatística / Verificação integral (100%) / Por exceção-denúncia.</td></tr>
+            <tr><th>Tamanho da amostra</th><td>Texto livre</td><td>Ex.: "10% dos lançamentos".</td></tr>
+            <tr><th>Periodicidade da verificação</th><td>Select</td><td>Mensal / Trimestral / Semestral / Anual.</td></tr>
+            <tr><th>Prazo p/ resolver não conformidade</th><td>Número (dias)</td><td>Quantos dias após encontrar o problema ele deve ser resolvido.</td></tr>
+            <tr><th>Responsável pela verificação</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Priorize criar um item de auditoria para cada risco com Score alto cadastrado na Matriz de Riscos — é o vínculo que garante que o risco não fica só "documentado", passa a ser verificado de fato.</li>
+          <li>Tamanho da amostra deve ser proporcional ao risco: risco alto pede amostra maior ou verificação integral; risco baixo pode justificar amostragem menor.</li>
+          <li>O Prazo p/ resolver não conformidade deve ser realista para o Responsável indicado conseguir agir — prazos curtos demais tendem a ser ignorados na prática.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Criar itens de auditoria sem vincular a nenhum Risco relacionado — perde-se a rastreabilidade de por que aquilo está sendo verificado.</li>
+          <li>Definir "Verificação integral (100%)" para tudo, mesmo quando não há risco que justifique o esforço.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>O que será auditado:</b><p>"Pedidos de compra sem 3 cotações".</p></li>
+        <li><b>Método:</b><p>"Amostragem estatística" — Tamanho "10% dos pedidos do mês".</p></li>
+        <li><b>Periodicidade:</b><p>"Mensal" — Prazo "5 dias" — Responsável "Controller".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-aud-regras">
+      <h2>Regras de Divergência/Exceção</h2>
+      <p class="lead">Catálogo de tipos de problema que podem aparecer numa auditoria, com severidade e cadeia de escalonamento já definidas de antemão.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Tipo de divergência/exceção</th><td>Texto</td><td>Ex.: "Nota fiscal com valor divergente do pedido".</td></tr>
+            <tr><th>Severidade</th><td>Select: Baixa / Média / Alta</td><td>Mostrada como badge colorido no topo do card.</td></tr>
+            <tr><th>Prazo para resolução</th><td>Número (dias)</td><td>Quantos dias para resolver esta divergência.</td></tr>
+            <tr><th>Responsável pela resolução</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+            <tr><th>Escala para (se não resolvido no prazo)</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI — quem assume se o prazo estourar.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Cadastre aqui os tipos de divergência que você já sabe que vão aparecer, pela experiência com o processo — o objetivo é que quando acontecer de novo, já exista uma regra pronta em vez de decidir na hora.</li>
+          <li>A Severidade deve refletir o impacto real se não for resolvido — Alta para o que pode gerar prejuízo financeiro ou reputacional, Baixa para o que é só um ajuste operacional.</li>
+          <li>Sempre defina "Escala para" — sem uma escalada prevista, uma divergência de severidade Alta pode ficar parada indefinidamente se o Responsável não conseguir resolver a tempo.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar tudo como Severidade Alta "por precaução" — isso invalida a priorização e faz todo o resto parecer igualmente urgente.</li>
+          <li>Cadastrar um tipo de divergência genérico demais ("erro no processo") que não ajuda a reconhecer qual regra aplicar quando o caso real aparecer.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Tipo:</b><p>"Nota fiscal com valor divergente do pedido" — Severidade "Alta".</p></li>
+        <li><b>Prazo:</b><p>"2 dias" — Responsável "Comprador" — Escala para "Controller".</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-sistemas">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-sis-rastreabilidade" class="active">Matriz de Rastreabilidade</button>
+    <button data-target="doc-sis-sistemas">Sistemas (Aquisição/Desenvolvimento)</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as 2 ferramentas desta fase se conectam:</b> a Matriz de Rastreabilidade garante que os dados do processo (já desenhado na Fase 3) sejam confiáveis do início ao fim — sem depender de nenhum sistema específico ainda existir. A ferramenta Sistemas entra quando parte da parametrização exige comprar ou desenvolver algo — e o que ficou definido na Rastreabilidade (quais dados, quais regras de validação) é o requisito que esse sistema precisa atender.
+      <ol>
+        <li>Matriz de Rastreabilidade — quais dados importam, de onde vêm, para onde vão e com que regra de validação.</li>
+        <li>Sistemas — o que precisa ser adquirido ou desenvolvido para sustentar essa rastreabilidade na prática.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-sis-rastreabilidade">
+      <h2>Matriz de Rastreabilidade</h2>
+      <p class="lead">Garante que todo campo ou dado importante do processo possa ser rastreado do início ao fim — de onde vem, para onde vai, em que sistema é registrado e com que regra de validação.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Campo ou dado rastreado</th><td>Texto</td><td>Ex.: "Valor da cotação".</td></tr>
+            <tr><th>Etapa de origem</th><td>Select</td><td><b>Retroalimentação:</b> etapas já cadastradas no Fluxograma (Fase 3), agrupadas por fluxo.</td></tr>
+            <tr><th>Sistema onde é parametrizado</th><td>Texto livre</td><td>Ex.: "SAP, planilha, ERP...".</td></tr>
+            <tr><th>Regra de validação</th><td>Texto livre</td><td>Ex.: "Obrigatório, numérico, maior que zero".</td></tr>
+            <tr><th>Etapa de destino</th><td>Select</td><td><b>Retroalimentação:</b> mesmas etapas do Fluxograma.</td></tr>
+            <tr><th>Responsável</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Priorize os dados que aparecem em mais de uma etapa do fluxo, ou que alimentam decisão/aprovação — são os que mais precisam de regra de validação clara.</li>
+          <li>A Regra de validação deve ser objetiva o bastante para ser implementada num sistema ou checada manualmente sem ambiguidade — "obrigatório, numérico, maior que zero" funciona; "preencher corretamente" não.</li>
+          <li>Sempre que possível, a Etapa de origem e destino devem vir do Fluxograma (não digitadas à mão) — garante que a rastreabilidade reflete o processo desenhado de fato.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Rastrear todo campo possível do processo, mesmo os pouco relevantes — dilui a atenção dos dados que realmente precisam de controle.</li>
+          <li>Deixar Regra de validação em branco — sem ela, este item só documenta o caminho do dado, sem proteger sua qualidade.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Campo:</b><p>"Valor da cotação".</p></li>
+        <li><b>Origem → Destino:</b><p>"Cotar com 3 fornecedores" → "Emitir pedido" (etapas do Fluxo de Compras).</p></li>
+        <li><b>Sistema:</b><p>"Planilha de cotações" — Regra: "Obrigatório, numérico, maior que zero" — Responsável: "Comprador".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-sis-sistemas">
+      <h2>Sistemas (Aquisição/Desenvolvimento)</h2>
+      <p class="lead">Para quando o processo depende de comprar um sistema pronto de terceiros ou desenvolver algo internamente — acompanha investimento, período de teste e aprovação.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Nome do sistema</th><td>Texto</td><td>Título do card.</td></tr>
+            <tr><th>Tipo</th><td>Select: Aquisição (terceirizado) / Desenvolvimento (interno)</td><td>Muda os campos seguintes.</td></tr>
+            <tr><th>Fornecedor</th><td>Texto</td><td>Só aparece quando Tipo = Aquisição; some sozinho se mudar para Desenvolvimento.</td></tr>
+            <tr><th>Investimento estimado</th><td>Texto livre</td><td>Ex.: "R$ 50.000,00".</td></tr>
+            <tr><th>Início / Fim do teste-piloto</th><td>Data</td><td>Período de avaliação antes da adoção definitiva.</td></tr>
+            <tr><th>Status</th><td>Select: Em avaliação / Em teste / Aprovado / Reprovado / Em produção</td><td>Badge colorido no topo do card.</td></tr>
+            <tr><th>Responsável</th><td>Select</td><td><b>Retroalimentação:</b> papéis da Matriz RACI da Governança.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Só mude o Status para "Aprovado" depois que o período de teste/piloto de fato confirmou que o sistema atende às regras de validação definidas na Matriz de Rastreabilidade.</li>
+          <li>Defina um período de teste realista — curto demais não revela problemas reais de uso; longo demais atrasa a implantação sem necessidade.</li>
+          <li>Registre o Investimento mesmo em desenvolvimento interno (custo de horas da equipe, por exemplo) — ajuda a justificar a decisão depois.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar "Em produção" sem ter passado por "Em teste" — pula a validação que a própria ferramenta foi desenhada para registrar.</li>
+          <li>Deixar um sistema "Reprovado" na lista sem nenhuma decisão registrada sobre o que substituiu ou vai substituir aquela necessidade.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Nome:</b><p>"Módulo de cotação eletrônica" — Tipo "Aquisição (terceirizado)" — Fornecedor "CotaFácil Sistemas".</p></li>
+        <li><b>Investimento:</b><p>"R$ 18.000,00/ano" — Teste de 01/10 a 31/10.</p></li>
+        <li><b>Status:</b><p>"Em teste" — Responsável "SoftwareHouse".</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-piloto">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-pil-treinamento" class="active">Plano de Treinamento</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Por que esta fase existe:</b> antes de implantar o processo desenhado para toda a operação, o piloto testa numa escala pequena e controlada se ele funciona na prática — e o treinamento é o que garante que quem vai operar o piloto realmente sabe como fazer. Um piloto sem treinamento formal mistura dois problemas diferentes se algo der errado: "o processo está mal desenhado" ou "as pessoas não foram capacitadas"?
+    </div>
+
+    <section class="docs-section" id="doc-pil-treinamento">
+      <h2>Plano de Treinamento por Perfil</h2>
+      <p class="lead">Valida o novo modelo com um grupo controlado, capacitando cada perfil envolvido antes de expandir para toda a operação.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Perfil / público-alvo</th><td>Texto</td><td>Ex.: "Compradores".</td></tr>
+            <tr><th>Status</th><td>2 botões: Pendente / Concluído</td><td>Não é um select — é um grupo de botões de alternância.</td></tr>
+            <tr><th>Conteúdo do treinamento</th><td>Texto</td><td>O que será ensinado.</td></tr>
+            <tr><th>Início / Término</th><td>Data</td><td>Período do treinamento.</td></tr>
+            <tr><th>Carga horária</th><td>Número (horas)</td><td>Duração total.</td></tr>
+            <tr><th>Responsável</th><td>Texto livre</td><td>Único "Responsável" do app que não é vinculado à Matriz RACI — é digitado livremente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Um badge automático <b>"No prazo"</b> (azul) ou <b>"Atrasado"</b> (vermelho) aparece comparando a Data de Término com hoje, enquanto o status não for "Concluído".</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Crie um treinamento por perfil que executa uma parte diferente do processo — não é preciso treinar todo mundo junto no mesmo conteúdo se as funções são diferentes.</li>
+          <li>O Conteúdo do treinamento deve remeter diretamente às etapas do Fluxograma e aos POPs da Fase 3 — o treinamento existe para ensinar exatamente o que foi desenhado, não uma versão genérica do processo.</li>
+          <li>Só marque "Concluído" depois que a lista de presença de fato confirmar quem participou — isso é o que sustenta a evidência de capacitação no PDF de fechamento.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar "Concluído" sem nenhum participante registrado na lista de presença.</li>
+          <li>Deixar a Carga horária ou o período em branco — sem isso, não há como provar depois que a capacitação de fato ocorreu.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:14px;">Lista de presença (bloco Participantes)</h3>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Botão</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Nome + CPF + Adicionar</th><td>Inclui um participante manualmente.</td></tr>
+            <tr><th>Baixar modelo (.xlsx)</th><td>Baixa uma planilha modelo com colunas Nome/CPF para preencher fora do app.</td></tr>
+            <tr><th>Importar lista (.xlsx)</th><td>Importa em lote os participantes a partir da planilha preenchida.</td></tr>
+            <tr><th>Gerar lista de presença (PDF)</th><td>Gera um PDF avulso, separado do PDF de fechamento da fase, pronto para imprimir e colher assinaturas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Perfil:</b><p>"Compradores" — Conteúdo: "Novo fluxo de cotação e emissão de pedido" — 05/10 a 06/10 — Carga horária "4h" — Responsável "Analista de Planejamento".</p></li>
+        <li><b>Participantes:</b><p>Baixar o modelo .xlsx, preencher com os 8 compradores, importar de volta.</p></li>
+        <li><b>No dia do treinamento:</b><p>Gerar a lista de presença em PDF e colher as assinaturas.</p></li>
+      </ol>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-implantacao">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-imp-checklist" class="active">Checklist de Implantação</button>
+    <button data-target="doc-imp-kpis">KPIs / Indicadores</button>
+    <button data-target="doc-imp-encerramento">Termo de Encerramento</button>
+    <button data-target="doc-imp-gatilho">Reabertura de novo ciclo</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Como as ferramentas desta fase se conectam:</b> o Checklist confirma que os pré-requisitos concretos de implantação estão prontos (sistemas em produção, treinamentos feitos). Os KPIs medem, já em operação real, se o processo entrega o que prometeu. O Termo de Encerramento fecha o ciclo, reavaliando os Critérios de sucesso definidos desde a Fase 1 — e a Reabertura de novo ciclo decide o que acontece depois: se o processo continua só sendo monitorado, ou se um novo ciclo de melhoria é necessário.
+      <ol>
+        <li>Checklist de Implantação — os pré-requisitos estão todos prontos?</li>
+        <li>KPIs / Indicadores — o processo, já em operação, está performando dentro da meta?</li>
+        <li>Termo de Encerramento — os critérios definidos na Fase 1 foram atingidos, e o que falta?</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-imp-checklist">
+      <h2>Checklist de Implantação</h2>
+      <p class="lead">Últimos itens de verificação antes de considerar o processo definitivamente implantado.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Item de verificação</th><td>Texto</td><td>O que precisa ser conferido.</td></tr>
+            <tr><th>Status</th><td>3 botões: Pendente / Conforme / Não conforme</td><td>Não é select — é um grupo de botões de alternância.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>O resumo no topo ("n de total itens conformes") é calculado automaticamente.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Use este checklist para os pré-requisitos concretos de "ir ao ar" — treinamentos concluídos (Fase 6), sistemas em produção (Fase 5), POPs publicados (Fase 3) — não para reabrir discussões de desenho já fechadas em fases anteriores.</li>
+          <li>Só feche esta fase quando todos os itens realmente críticos estiverem "Conforme" — itens "Pendente" ou "Não conforme" no fechamento indicam risco real de implantar algo incompleto.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar "Conforme" sem checar de fato, só para destravar o fechamento da fase.</li>
+          <li>Criar itens tão genéricos ("processo está pronto") que não dá pra saber o que exatamente foi verificado.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>"Treinamento de todos os compradores concluído"</b><p>Status "Conforme".</p></li>
+        <li><b>"Sistema de cotação em produção"</b><p>Status "Pendente".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-imp-kpis">
+      <h2>KPIs / Indicadores</h2>
+      <p class="lead">Acompanha ao longo do tempo se o processo está performando dentro da meta — cada indicador guarda um histórico de leituras, não só um valor atual.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Indicador</th><td>Texto</td><td>Nome do KPI.</td></tr>
+            <tr><th>Meta</th><td>Número</td><td>Valor-alvo do indicador.</td></tr>
+            <tr><th>Unidade</th><td>Texto livre</td><td>Ex.: "%", "dias".</td></tr>
+            <tr><th>Direção</th><td>Select: Quanto maior melhor / Quanto menor melhor</td><td>Define como o status "Dentro/Fora da meta" é calculado.</td></tr>
+            <tr><th>Periodicidade</th><td>Select</td><td>Diária / Semanal / Quinzenal / Mensal.</td></tr>
+            <tr><th>Válido até</th><td>Data</td><td>Depois dessa data, o indicador ganha um badge "Expirado" (apenas um alerta visual).</td></tr>
+            <tr><th>Data + Valor da leitura + Registrar leitura</th><td>Data, número, botão</td><td>Adiciona um novo ponto ao histórico do indicador.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>O badge <b>"Dentro da meta" / "Fora da meta" / "Sem dados"</b> compara a leitura mais recente com a Meta, respeitando a Direção. O gráfico de tendência mostra as leituras ao longo do tempo com a Meta como referência tracejada; por padrão só as 5 leituras mais recentes aparecem na lista (botão "Ver histórico completo" expande as demais).</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Escolha indicadores que já existiam como Critérios de sucesso no Termo de Abertura (Fase 1) — assim os KPIs medem exatamente o que o processo prometeu entregar, e o Termo de Encerramento tem dados reais para reavaliar aqueles critérios.</li>
+          <li>Registre leituras com uma periodicidade que você realmente vai manter — um indicador "Mensal" com uma única leitura em 6 meses não serve para monitorar nada.</li>
+          <li>Defina a Meta a partir da linha de base medida no Diagnóstico (Fase 1), não um número arbitrário — assim ela reflete uma melhoria real, não uma expectativa desconectada do ponto de partida.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Cadastrar o indicador e nunca mais voltar para registrar novas leituras — ele fica travado em "Sem dados" ou com uma leitura antiga.</li>
+          <li>Escolher a Direção errada (ex.: marcar "Quanto maior, melhor" para um indicador de prazo, que deveria diminuir) — inverte o cálculo de "Dentro/Fora da meta".</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Indicador:</b><p>"Prazo médio do ciclo de compra" — Meta "5" — Unidade "dias" — Direção "Quanto menor, melhor".</p></li>
+        <li><b>Leituras:</b><p>01/10 → 9 dias (Fora da meta); 15/10 → 6 dias; 30/10 → 4,5 dias (Dentro da meta).</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-imp-encerramento">
+      <h2>Termo de Encerramento</h2>
+      <p class="lead">Documento final da implantação. Sincroniza automaticamente os Critérios de sucesso definidos no Termo de Abertura (Fase 1) para você reavaliar um por um, além de registrar lições aprendidas e pendências.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Resultados alcançados</th><td>Texto longo</td><td>O que foi efetivamente entregue com a implantação.</td></tr>
+            <tr><th>Data de encerramento</th><td>Data</td><td>Quando o processo foi dado por encerrado.</td></tr>
+            <tr><th>Critérios de sucesso</th><td>Lista somente leitura + Status (select)</td><td><b>Retroalimentação:</b> o texto vem do Termo de Abertura e não pode ser editado nem removido aqui — só o Status: Não avaliado / Atingido / Parcialmente atingido / Não atingido.</td></tr>
+            <tr><th>Lições aprendidas</th><td>Lista livre (+)</td><td>O que ficou de aprendizado para os próximos ciclos.</td></tr>
+            <tr><th>Pendências remanescentes</th><td>Lista livre (+)</td><td>O que ainda falta resolver mesmo após o encerramento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>Importante:</b> a lista de Critérios se atualiza sozinha toda vez que esta ferramenta é reaberta — um critério novo adicionado no Termo de Abertura aparece aqui como "Não avaliado"; um removido lá some daqui também. O status já marcado num critério existente nunca se perde.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Avalie cada Critério com base em dados reais (os KPIs registrados acima, ou o Checklist) — não em impressão geral. Se um critério dizia "prazo médio ≤ 5 dias", confira a leitura mais recente do KPI correspondente antes de marcar Atingido.</li>
+          <li>Registre pelo menos uma Lição aprendida mesmo quando tudo correu bem — o que funcionou também vale para o próximo ciclo ou processo.</li>
+          <li>Toda Pendência remanescente deveria, idealmente, ter um responsável e prazo claros — mesmo que este documento não tenha esses campos, escreva isso dentro do próprio texto da pendência.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Marcar critérios como "Não avaliado" até o fim, sem nunca de fato reavaliá-los — o Termo de Encerramento perde sua função de fechar o ciclo com uma resposta real.</li>
+          <li>Fechar o processo com pendências relevantes sem registrá-las aqui — elas somem do radar assim que a fase é fechada.</li>
+        </ul>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:18px;">Exemplo prático</h3>
+      <ol class="steps">
+        <li><b>Critério "Prazo médio ≤ 5 dias úteis":</b><p>Status "Atingido".</p></li>
+        <li><b>Critério "Zero pedido de compra sem 3 cotações":</b><p>Status "Parcialmente atingido".</p></li>
+        <li><b>Lições aprendidas:</b><p>"Treinamento devia ter começado 2 semanas antes do piloto".</p></li>
+        <li><b>Pendências:</b><p>"Migrar histórico de pedidos antigos para o novo sistema".</p></li>
+      </ol>
+    </section>
+
+    <section class="docs-section" id="doc-imp-gatilho">
+      <h2>Reabertura de novo ciclo</h2>
+      <p class="lead">Ao clicar em "Fechar fase (gerar PDF)" nesta última fase, o app oferece a opção de abrir um novo ciclo do mesmo processo — por exemplo, uma revisão anual.</p>
+      <p>Se você aceitar, é criada uma cópia do caso com um nome sugerido (ex.: "Processo de Compras — Ciclo 2"), permitindo recomeçar o acompanhamento das 7 fases sem perder o histórico e os PDFs do ciclo anterior.</p>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<script src="js/lib/jspdf.embed.js"></script>
+<script src="js/lib/jspdf-autotable.embed.js"></script>
+<script src="js/lib/exceljs.embed.js"></script>
+<script src="js/core/toast.js"></script>
+<script src="js/core/caso-state.js"></script>
+<script src="js/core/docs-fase.js"></script>
+<script src="js/core/fechamento.js"></script>
+<script src="js/core/dossie.js"></script>
+<script src="js/core/nav.js"></script>
+<script src="js/modules/raci-module.js"></script>
+<script src="js/modules/alcadas-module.js"></script>
+<script src="js/modules/segregacao-module.js"></script>
+<script src="js/modules/placeholder-module.js"></script>
+<script src="js/modules/w2h-module.js"></script>
+<script src="js/modules/fluxograma-module.js"></script>
+<script src="js/modules/pop-module.js"></script>
+<script src="js/modules/abertura-module.js"></script>
+<script src="js/modules/encerramento-module.js"></script>
+<script src="js/modules/gut-module.js"></script>
+<script src="js/modules/ishikawa-module.js"></script>
+<script src="js/modules/porques-module.js"></script>
+<script src="js/modules/riscos-module.js"></script>
+<script src="js/modules/plano-auditoria-module.js"></script>
+<script src="js/modules/regras-divergencia-module.js"></script>
+<script src="js/modules/rastreabilidade-module.js"></script>
+<script src="js/modules/sistemas-module.js"></script>
+<script src="js/modules/checklist-module.js"></script>
+<script src="js/modules/kpis-module.js"></script>
+<script src="js/modules/treinamento-module.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
