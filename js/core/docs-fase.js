@@ -8,6 +8,7 @@ window.DocsFase = (function(){
   "use strict";
 
   var el = null;
+  var origemAberta = null;
 
   function buildElRefs(){
     return {
@@ -31,7 +32,7 @@ window.DocsFase = (function(){
     });
   }
 
-  function abrir(faseId, tituloFase, subtitulo){
+  function abrir(faseId, tituloFase, subtitulo, origemEl){
     var tpl = document.getElementById("docs-fase-" + faseId);
     if(!tpl) return;
     el.slot.innerHTML = "";
@@ -39,16 +40,16 @@ window.DocsFase = (function(){
     el.titulo.textContent = tituloFase || "Documentação";
     el.subtitulo.textContent = subtitulo || "";
     wireToc(el.slot);
-    var shell = document.querySelector(".app-shell");
-    if(shell) shell.style.display = "none";
+    origemAberta = origemEl || document.querySelector(".app-shell");
+    if(origemAberta) origemAberta.style.display = "none";
     el.overlay.style.display = "block";
     window.scrollTo(0, 0);
   }
 
   function fechar(){
     el.overlay.style.display = "none";
-    var shell = document.querySelector(".app-shell");
-    if(shell) shell.style.display = "";
+    if(origemAberta) origemAberta.style.display = "";
+    origemAberta = null;
   }
 
   function init(){

@@ -7,6 +7,77 @@
   padding:20px 24px 64px;
 }
 
+/* ---------- Tela inicial (sem caso salvo ainda) ---------- */
+.landing-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.landing-card{
+  max-width:480px;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-md);
+  padding:40px 36px 28px;
+  text-align:center;
+}
+.landing-card .eyebrow{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--brand);
+  margin:0 0 12px;
+}
+.landing-card h1{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:27px;
+  font-weight:700;
+  margin:0 0 14px;
+  color:var(--ink);
+}
+.landing-lede{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  line-height:1.55;
+  margin:0 0 28px;
+}
+.landing-actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:18px;
+}
+.landing-btn{
+  justify-content:center;
+  padding:14px 20px;
+  font-size:14.5px;
+  border-radius:var(--radius-md);
+}
+.landing-docs-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:transparent;
+  border:none;
+  color:var(--ink-soft);
+  font-size:12.5px;
+  font-weight:600;
+  padding:7px 10px;
+  border-radius:var(--radius-sm);
+}
+.landing-docs-btn:hover{color:var(--brand);background:var(--brand-tint);}
+.landing-docs-btn .q{
+  width:16px;height:16px;border-radius:50%;
+  border:1px solid currentColor;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;flex:none;
+}
+
 /* ---------- Barra superior do caso ---------- */
 .caso-bar{
   background:var(--brand-dark);

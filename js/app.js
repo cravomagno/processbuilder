@@ -6,7 +6,7 @@
 (function(){
   "use strict";
 
-  var caso = window.CasoState.carregarCasoLocalStorage() || window.CasoState.novoCaso("Implantação de Novo Processo");
+  var caso = window.CasoState.carregarCasoLocalStorage();
 
   var faseIds = window.CasoState.FASES_BACKBONE.map(function(f){ return f.id; });
 
@@ -266,7 +266,52 @@
     });
   }
 
+  function wireLanding(){
+    var landing = document.getElementById("landingScreen");
+    var shell = document.querySelector(".app-shell");
+    shell.style.display = "none";
+    landing.style.display = "flex";
+
+    document.getElementById("landingNovoBtn").addEventListener("click", function(){
+      var nome = window.prompt("Nome do novo processo:", "Novo processo");
+      if(nome === null) return;
+      nome = nome.trim();
+      if(!nome) return;
+      var novo = window.CasoState.novoCaso(nome, {semRaciPadrao: true});
+      window.CasoState.salvarCasoLocalStorage(novo);
+      location.reload();
+    });
+
+    document.getElementById("landingCarregarBtn").addEventListener("click", function(){
+      document.getElementById("landingInputCarregar").click();
+    });
+    document.getElementById("landingInputCarregar").addEventListener("change", function(e){
+      var file = e.target.files && e.target.files[0];
+      if(!file) return;
+      window.CasoState.importarRascunhoDeArquivo(file, function(casoCarregado, err){
+        if(err){
+          window.alert("Esse arquivo não parece ser um rascunho válido.");
+          return;
+        }
+        window.CasoState.salvarCasoLocalStorage(casoCarregado);
+        location.reload();
+      });
+      e.target.value = "";
+    });
+
+    document.getElementById("landingDocsBtn").addEventListener("click", function(){
+      if(!window.DocsFase) return;
+      window.DocsFase.abrir("geral", "Documentação", "Visão geral do sistema", landing);
+    });
+
+    if(window.DocsFase) window.DocsFase.init();
+  }
+
   function boot(){
+    if(!caso){
+      wireLanding();
+      return;
+    }
     montarNavTabs();
     montarFases();
     wireCasoBar();

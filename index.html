@@ -12,6 +12,20 @@
 </head>
 <body>
 
+<div id="landingScreen" class="landing-screen" style="display:none">
+  <div class="landing-card">
+    <p class="eyebrow">Enops · Consultoria interna de processos</p>
+    <h1>Construtor de Processos</h1>
+    <p class="landing-lede">Guia a implantação de um processo do diagnóstico ao encerramento, em 7 fases — com ferramentas próprias, documentação de apoio em cada uma e fechamento em PDF a cada etapa.</p>
+    <div class="landing-actions">
+      <button class="btn btn-primary landing-btn" id="landingNovoBtn" type="button">Iniciar novo processo</button>
+      <button class="btn btn-secondary landing-btn" id="landingCarregarBtn" type="button">Carregar processo</button>
+    </div>
+    <input type="file" id="landingInputCarregar" accept="application/json,.json" style="display:none" />
+    <button class="landing-docs-btn" id="landingDocsBtn" type="button"><span class="q">?</span> Documentação</button>
+  </div>
+</div>
+
 <div class="app-shell">
 
   <div class="caso-bar">
@@ -742,6 +756,59 @@
      #docsFaseOverlay. Exemplo corrido usado em todas as fases:
      "Processo de Compras".
      ============================================================ -->
+
+<template id="docs-fase-geral">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-geral-conceito" class="active">O que é este sistema</button>
+    <button data-target="doc-geral-botoes">Os botões desta tela</button>
+    <button data-target="doc-geral-docs">Documentação de cada ferramenta</button>
+  </nav>
+  <div>
+
+    <section class="docs-section" id="doc-geral-conceito">
+      <h2>O que é o Construtor de Processos</h2>
+      <p class="lead">Uma ferramenta para estruturar, documentar e acompanhar a implantação de um processo do zero — do diagnóstico inicial até o encerramento formal — em 7 fases fixas, cada uma com suas próprias ferramentas de apoio.</p>
+      <p>Cada fase representa uma etapa da consultoria interna de processos: <b>1. Diagnóstico e Viabilidade</b>, <b>2. Governança e Compliance</b>, <b>3. Modelagem do Processo</b>, <b>4. Auditoria, Riscos e Controles</b>, <b>5. Sistemas, Tecnologia e Documentação</b>, <b>6. Piloto e Gestão de Mudança</b> e <b>7. Implantação e Estabelecimento</b>. Dentro de cada fase, você preenche ferramentas específicas (matrizes, planos, checklists, fluxogramas) que se conectam entre si — o que você cadastra numa fase costuma reaparecer, pronto para reutilizar, nas fases seguintes.</p>
+      <div class="concept-grid">
+        <div class="concept-card"><b>Um caso</b><span>É o processo que você está construindo agora — tem nome próprio, e guarda o preenchimento das 7 fases.</span></div>
+        <div class="concept-card"><b>Fechar uma fase</b><span>Gera um PDF formal daquela fase, registra a versão e permite reabrir para corrigir depois, se precisar.</span></div>
+        <div class="concept-card"><b>Dossiê consolidado</b><span>Reúne todas as fases já fechadas de um caso num único PDF, a qualquer momento.</span></div>
+      </div>
+      <p style="margin-top:14px">Tudo fica salvo só neste navegador — nenhum dado é enviado a servidor nenhum. Para levar um caso para outro computador, ou guardar uma cópia de segurança, use "Salvar rascunho do caso" dentro do app (gera um arquivo <code>.json</code>) e "Carregar processo" para trazê-lo de volta, aqui ou em qualquer outro computador com este mesmo site aberto.</p>
+    </section>
+
+    <section class="docs-section" id="doc-geral-botoes">
+      <h2>Os botões desta tela</h2>
+      <p class="lead">Esta tela aparece porque ainda não há nenhum processo salvo neste navegador. Ela some sozinha assim que você tiver um caso ativo — nas próximas vezes que abrir o site, vai direto para o processo em andamento.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Botão</th><th>O que faz</th></tr></thead>
+          <tbody>
+            <tr><th>Iniciar novo processo</th><td>Pede um nome e cria um caso novo, em branco, com as 7 fases prontas para preencher. É a mesma função do botão "Novo caso" que fica na barra superior do app, disponível a qualquer momento — inclusive para quem acompanha vários processos diferentes ao mesmo tempo, cada um em seu próprio arquivo.</td></tr>
+            <tr><th>Carregar processo</th><td>Abre o seletor de arquivos do seu computador para importar um caso salvo anteriormente (arquivo <code>.json</code> baixado por "Salvar rascunho do caso"). É a mesma função do botão "Carregar rascunho" da barra superior do app.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Se você já trabalhou neste processo antes em outro computador ou navegador, use "Carregar processo" — não "Iniciar novo processo" — para não perder o que já foi preenchido.</li>
+          <li>Salve um rascunho (.json) periodicamente enquanto trabalha; é sua cópia de segurança, já que os dados vivem só neste navegador.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-geral-docs">
+      <h2>Documentação de cada ferramenta</h2>
+      <p class="lead">Você não precisa decorar como cada ferramenta funciona — cada uma tem sua própria documentação embutida.</p>
+      <p>Depois de entrar num processo, repare que cada uma das 7 fases tem um botão <b>"? Documentação"</b> no canto da tela — ele explica o conceito de cada ferramenta daquela fase, o que cada campo e cada botão faz, boas práticas, erros comuns a evitar e um exemplo prático completo. A Matriz RACI (Fase 2 — Governança) tem sua documentação reunida ali mesmo, incluindo variações (RACI, RASCI, RACI-VS) e perguntas frequentes.</p>
+      <p>Use essa documentação sempre que tiver dúvida sobre o que escrever em um campo — ela foi pensada para dar segurança de que você está preenchendo cada ferramenta da forma que realmente sustenta a construção do processo, não só "para preencher".</p>
+    </section>
+
+  </div>
+</div>
+</template>
 
 <template id="docs-fase-diagnostico">
 <div class="docs-layout">
