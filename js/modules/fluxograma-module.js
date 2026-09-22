@@ -39,6 +39,15 @@ window.FluxogramaModule = (function(){
   var MARGIN = 24, RAIA_LABEL_W = 92, RAIA_H = 100, COL_W = 150;
   var NODE_W = 120, NODE_H = 46, DEC_SIZE = 64, EVT_R = 16;
 
+  /* Cores fixas por tipo de nó e por ramo de decisão — Início (verde),
+     Fim (vermelho, quadrado), Decisão (losango, amarelo escuro), Ramo
+     Sim (verde) / Ramo Não (vermelho) na linha e no rótulo. */
+  var COR_INICIO_FILL = "#DFF3EA", COR_INICIO_STROKE = "#1E8E64", COR_INICIO_RGB = [30,142,100], COR_INICIO_FILL_RGB = [223,243,234];
+  var COR_FIM_FILL = "#FBE2DD", COR_FIM_STROKE = "#D9432B", COR_FIM_RGB = [217,67,43], COR_FIM_FILL_RGB = [251,226,221];
+  var COR_DECISAO_FILL = "#E8C34D", COR_DECISAO_STROKE = "#A9800B", COR_DECISAO_RGB = [169,128,11], COR_DECISAO_FILL_RGB = [232,195,77];
+  var COR_RAMO_SIM = "#1E8E64", COR_RAMO_SIM_RGB = [30,142,100];
+  var COR_RAMO_NAO = "#D9432B", COR_RAMO_NAO_RGB = [217,67,43];
+
   var state = null;
   var el = null;
   var onChange = null;
@@ -112,7 +121,7 @@ window.FluxogramaModule = (function(){
 
     var raiasOut = raias.map(function(r, i){
       var y0 = MARGIN + i * RAIA_H;
-      return {id: r.id, nome: r.nome || "(sem nome)", y0: y0, yCenter: y0 + RAIA_H/2, h: RAIA_H};
+      return {id: r.id, nome: r.nome || "(sem nome)", raciRoleNome: r.raciRoleNome || "", y0: y0, yCenter: y0 + RAIA_H/2, h: RAIA_H};
     });
 
     var ySemRaia = MARGIN + nRaias * RAIA_H;
@@ -144,28 +153,107 @@ window.FluxogramaModule = (function(){
       if(e.tipo === "decisao"){
         if(e.ramoSimId){
           var destS = noPorId(layout, e.ramoSimId);
-          if(destS) conexoes.push({de: orig, para: destS, rotulo: e.ramoSimRotulo || "Sim"});
+          if(destS) conexoes.push({de: orig, para: destS, rotulo: e.ramoSimRotulo || "Sim", cor: COR_RAMO_SIM, corRgb: COR_RAMO_SIM_RGB});
         }
         if(e.ramoNaoId){
           var destN = noPorId(layout, e.ramoNaoId);
-          if(destN) conexoes.push({de: orig, para: destN, rotulo: e.ramoNaoRotulo || "Não"});
+          if(destN) conexoes.push({de: orig, para: destN, rotulo: e.ramoNaoRotulo || "Não", cor: COR_RAMO_NAO, corRgb: COR_RAMO_NAO_RGB});
         }
       } else if(e.tipo !== "fim" && e.proximoId){
         var dest = noPorId(layout, e.proximoId);
-        if(dest) conexoes.push({de: orig, para: dest, rotulo: null});
+        if(dest) conexoes.push({de: orig, para: dest, rotulo: null, cor: null, corRgb: null});
       }
     });
     return conexoes;
   }
 
-  /* Caminho ortogonal: sai do centro-direita da origem, cotovelo no
-     meio do caminho, entra sempre pelo centro-esquerda do destino —
-     por isso a seta final é sempre horizontal, não precisa girar. */
+  /* Caminho ortogonal.
+     - Se o destino está numa coluna adiante da origem (fluxo seguindo
+       em frente, o caso comum): sai pelo centro-direita da origem.
+     - Se o destino está numa coluna ANTERIOR à da origem (uma volta —
+       fluxo circular tipo "Verifica Melhoria" voltando pra "Desenvolve"):
+       sai pelo centro-ESQUERDA da origem, espelhando a lógica de saída.
+     - Mesma raia: cotovelo no meio do caminho; entra pelo lado do
+       destino oposto ao lado de onde a linha saiu (esquerda se veio
+       da direita/fluxo em frente; direita se veio da esquerda/volta).
+     - Raias diferentes: entra pelo TOPO do destino se a origem está
+       numa raia acima, ou por BAIXO se está numa raia abaixo — não
+       muda com a direção horizontal, só a lateral de saída muda.
+     Isso evita que conexões entre raias diferentes, ou voltas de
+     fluxo circular, cortem por cima de nós de outras raias no meio
+     do caminho. `entrada` diz qual orientação a ponta da seta precisa
+     ter (SVG e PDF usam isso). */
   function caminhoOrtogonal(de, para){
-    var p0 = {x: de.cx + de.w/2, y: de.cy};
-    var p3 = {x: para.cx - para.w/2, y: para.cy};
-    var midX = (p0.x + p3.x) / 2;
-    return [p0, {x: midX, y: p0.y}, {x: midX, y: p3.y}, p3];
+    var indoParaTras = para.cx < de.cx;
+    var p0 = indoParaTras ? {x: de.cx - de.w/2, y: de.cy} : {x: de.cx + de.w/2, y: de.cy};
+
+    if(de.cy === para.cy){
+      var p3 = indoParaTras ? {x: para.cx + para.w/2, y: para.cy} : {x: para.cx - para.w/2, y: para.cy};
+      var midX = (p0.x + p3.x) / 2;
+      return {
+        pontos: [p0, {x: midX, y: p0.y}, {x: midX, y: p3.y}, p3],
+        entrada: indoParaTras ? "direita" : "esquerda",
+        rotuloPos: {x: midX, y: p0.y}
+      };
+    }
+    var porCima = de.cy < para.cy;
+    var entryY = porCima ? (para.cy - para.h/2) : (para.cy + para.h/2);
+    /* O trecho horizontal não atravessa no centro vertical da raia de
+       origem (onde ficam os centros de outras caixas dessa raia) — em
+       vez disso, "rente à borda", numa faixa livre entre o topo/fundo
+       da raia e o corpo das caixas. Reduz a chance de a linha passar
+       por baixo de outra caixa no meio do caminho. */
+    var relegoBorda = RAIA_H/2 - 16;
+    var yTravessia = porCima ? (de.cy + relegoBorda) : (de.cy - relegoBorda);
+    /* A linha anda um trecho reto (stepOut) se afastando da caixa antes
+       de virar na vertical — sem isso, a virada acontecia colada na
+       borda da caixa, parecendo um "gancho" preso nela. */
+    var stepOut = 16;
+    var stepX = indoParaTras ? (p0.x - stepOut) : (p0.x + stepOut);
+    return {
+      pontos: [p0, {x: stepX, y: p0.y}, {x: stepX, y: yTravessia}, {x: para.cx, y: yTravessia}, {x: para.cx, y: entryY}],
+      entrada: porCima ? "cima" : "baixo",
+      rotuloPos: {x: (stepX + para.cx) / 2, y: yTravessia}
+    };
+  }
+
+  function pontaSetaSvg(tip, entrada, cor){
+    var pts;
+    if(entrada === "cima"){
+      pts = (tip.x-4)+","+(tip.y-9)+" "+(tip.x+4)+","+(tip.y-9)+" "+tip.x+","+tip.y;
+    } else if(entrada === "baixo"){
+      pts = (tip.x-4)+","+(tip.y+9)+" "+(tip.x+4)+","+(tip.y+9)+" "+tip.x+","+tip.y;
+    } else if(entrada === "direita"){
+      pts = (tip.x+9)+","+(tip.y-4)+" "+(tip.x+9)+","+(tip.y+4)+" "+tip.x+","+tip.y;
+    } else {
+      pts = (tip.x-9)+","+(tip.y-4)+" "+(tip.x-9)+","+(tip.y+4)+" "+tip.x+","+tip.y;
+    }
+    return '<polygon points="'+pts+'" fill="'+cor+'"/>';
+  }
+
+  function desenharSetaPdf(doc, tip, entrada, corRgb){
+    doc.setFillColor(corRgb[0], corRgb[1], corRgb[2]);
+    if(entrada === "cima"){
+      doc.triangle(tip.x-4, tip.y-9, tip.x+4, tip.y-9, tip.x, tip.y, "F");
+    } else if(entrada === "baixo"){
+      doc.triangle(tip.x-4, tip.y+9, tip.x+4, tip.y+9, tip.x, tip.y, "F");
+    } else if(entrada === "direita"){
+      doc.triangle(tip.x+8, tip.y-4, tip.x+8, tip.y+4, tip.x, tip.y, "F");
+    } else {
+      doc.triangle(tip.x-8, tip.y-4, tip.x-8, tip.y+4, tip.x, tip.y, "F");
+    }
+  }
+
+  /* Mede a largura de um texto em pixels (canvas, mais preciso que
+     contar caracteres) — usada para dimensionar a caixa do rótulo de
+     um ramo de decisão no tamanho exato do texto, sem estourar nem
+     sobrar espaço à toa. */
+  var _medCanvas = null;
+  function medirLarguraTexto(texto, fontSizePx){
+    if(!_medCanvas) _medCanvas = document.createElement("canvas");
+    var ctx = _medCanvas.getContext("2d");
+    ctx.font = fontSizePx + "px sans-serif";
+    return ctx.measureText(String(texto || "")).width;
   }
 
   function quebrarPorCaracteres(texto, maxChars, maxLinhas){
@@ -213,6 +301,9 @@ window.FluxogramaModule = (function(){
     layout.raias.forEach(function(r){
       svg.push('<rect x="0" y="'+r.y0+'" width="'+layout.largura+'" height="'+r.h+'" fill="none" stroke="var(--border)" stroke-width="1"/>');
       svg.push('<text x="8" y="'+(r.yCenter+3)+'" font-size="11" font-weight="700" fill="var(--ink-soft)">'+escapeXml(r.nome)+'</text>');
+      if(r.raciRoleNome){
+        svg.push('<text x="8" y="'+(r.yCenter+16)+'" font-size="9" font-weight="400" fill="var(--ink-faint)">'+escapeXml(r.raciRoleNome)+'</text>');
+      }
     });
     if(layout.temSemRaia){
       svg.push('<rect x="0" y="'+layout.ySemRaia+'" width="'+layout.largura+'" height="'+RAIA_H+'" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>');
@@ -220,30 +311,39 @@ window.FluxogramaModule = (function(){
     }
 
     conexoes.forEach(function(c){
-      var pts = caminhoOrtogonal(c.de, c.para);
+      var caminho = caminhoOrtogonal(c.de, c.para);
+      var pts = caminho.pontos;
+      var cor = c.cor || "var(--ink-faint)";
       var pontosStr = pts.map(function(p){ return p.x+","+p.y; }).join(" ");
-      svg.push('<polyline points="'+pontosStr+'" fill="none" stroke="var(--ink-faint)" stroke-width="1.4"/>');
-      var tip = pts[3];
-      svg.push('<polygon points="'+(tip.x-9)+','+(tip.y-4)+' '+(tip.x-9)+','+(tip.y+4)+' '+tip.x+','+tip.y+'" fill="var(--ink-faint)"/>');
+      svg.push('<polyline points="'+pontosStr+'" fill="none" stroke="'+cor+'" stroke-width="1.4"/>');
+      var tip = pts[pts.length-1];
+      svg.push(pontaSetaSvg(tip, caminho.entrada, cor));
       if(c.rotulo){
-        var midX = pts[1].x, topY = pts[0].y;
-        svg.push('<rect x="'+(midX-18)+'" y="'+(topY-17)+'" width="36" height="14" rx="3" fill="var(--surface)" stroke="var(--border)" stroke-width="0.8"/>');
-        svg.push('<text x="'+midX+'" y="'+(topY-7)+'" font-size="9" text-anchor="middle" fill="var(--ink-soft)">'+escapeXml(c.rotulo)+'</text>');
+        var midX = caminho.rotuloPos.x, topY = caminho.rotuloPos.y;
+        var largura = Math.max(28, medirLarguraTexto(c.rotulo, 9) + 14);
+        svg.push('<rect x="'+(midX-largura/2)+'" y="'+(topY-17)+'" width="'+largura+'" height="14" rx="3" fill="var(--surface)" stroke="'+cor+'" stroke-width="0.8"/>');
+        svg.push('<text x="'+midX+'" y="'+(topY-7)+'" font-size="9" text-anchor="middle" fill="'+cor+'">'+escapeXml(c.rotulo)+'</text>');
       }
     });
 
     layout.etapas.forEach(function(n){
       var tituloTag = '<title>'+escapeXml(tipoLabel(n.tipo)+": "+n.titulo)+'</title>';
-      if(n.tipo === "inicio" || n.tipo === "fim"){
-        svg.push('<circle cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.w/2)+'" fill="var(--brand-tint)" stroke="var(--brand)" stroke-width="'+(n.tipo === "fim" ? 2.6 : 1.4)+'">'+tituloTag+'</circle>');
-        var linhasEvt = quebrarPorCaracteres(n.titulo, 16, 2);
-        linhasEvt.forEach(function(linha, i){
+      if(n.tipo === "inicio"){
+        svg.push('<circle cx="'+n.cx+'" cy="'+n.cy+'" r="'+(n.w/2)+'" fill="'+COR_INICIO_FILL+'" stroke="'+COR_INICIO_STROKE+'" stroke-width="1.4">'+tituloTag+'</circle>');
+        var linhasIni = quebrarPorCaracteres(n.titulo, 16, 2);
+        linhasIni.forEach(function(linha, i){
           svg.push('<text x="'+n.cx+'" y="'+(n.cy + n.w/2 + 12 + i*11)+'" font-size="9" text-anchor="middle" fill="var(--ink)">'+escapeXml(linha)+'</text>');
+        });
+      } else if(n.tipo === "fim"){
+        svg.push('<rect x="'+(n.cx-n.w/2)+'" y="'+(n.cy-n.h/2)+'" width="'+n.w+'" height="'+n.h+'" rx="4" fill="'+COR_FIM_FILL+'" stroke="'+COR_FIM_STROKE+'" stroke-width="2.6">'+tituloTag+'</rect>');
+        var linhasFim = quebrarPorCaracteres(n.titulo, 16, 2);
+        linhasFim.forEach(function(linha, i){
+          svg.push('<text x="'+n.cx+'" y="'+(n.cy + n.h/2 + 12 + i*11)+'" font-size="9" text-anchor="middle" fill="var(--ink)">'+escapeXml(linha)+'</text>');
         });
       } else if(n.tipo === "decisao"){
         var half = n.w/2;
         var pts = [n.cx+","+(n.cy-half), (n.cx+half)+","+n.cy, n.cx+","+(n.cy+half), (n.cx-half)+","+n.cy].join(" ");
-        svg.push('<polygon points="'+pts+'" fill="var(--brand-tint)" stroke="var(--brand)" stroke-width="1.4">'+tituloTag+'</polygon>');
+        svg.push('<polygon points="'+pts+'" fill="'+COR_DECISAO_FILL+'" stroke="'+COR_DECISAO_STROKE+'" stroke-width="1.4">'+tituloTag+'</polygon>');
         var linhasDec = quebrarPorCaracteres(n.titulo, 11, 3);
         linhasDec.forEach(function(linha, i){
           var y = n.cy - (linhasDec.length-1)*5.5 + i*11 + 3;
@@ -371,7 +471,8 @@ window.FluxogramaModule = (function(){
       papelSelect.addEventListener("change", function(){
         raia.raciRoleId = papelSelect.value;
         var role = roleById(papelSelect.value);
-        if(role){ raia.raciRoleNome = roleLabel(role); raia.nome = raia.nome || roleLabel(role); }
+        raia.raciRoleNome = role ? roleLabel(role) : "";
+        if(role && !raia.nome) raia.nome = roleLabel(role);
         renderAll();
       });
       grid.appendChild(papelSelect);
@@ -665,6 +766,11 @@ window.FluxogramaModule = (function(){
       doc.setFont("helvetica","bold"); doc.setFontSize(8.5*Math.max(escala,0.75));
       doc.setTextColor(100,108,122);
       doc.text(r.nome, px(6), py(r.yCenter)+3);
+      if(r.raciRoleNome){
+        doc.setFont("helvetica","normal"); doc.setFontSize(7*Math.max(escala,0.75));
+        doc.setTextColor(140,148,160);
+        doc.text(r.raciRoleNome, px(6), py(r.yCenter)+13);
+      }
     });
     if(layout.temSemRaia){
       doc.setDrawColor(218,223,230); doc.setLineWidth(0.6);
@@ -675,32 +781,45 @@ window.FluxogramaModule = (function(){
     }
 
     conexoes.forEach(function(c){
-      var pts = caminhoOrtogonal(c.de, c.para).map(function(p){ return {x: px(p.x), y: py(p.y)}; });
-      doc.setDrawColor(120,128,140); doc.setLineWidth(1);
+      var caminho = caminhoOrtogonal(c.de, c.para);
+      var pts = caminho.pontos.map(function(p){ return {x: px(p.x), y: py(p.y)}; });
+      var corRgb = c.corRgb || [120,128,140];
+      doc.setDrawColor(corRgb[0], corRgb[1], corRgb[2]); doc.setLineWidth(1);
       for(var i=0; i<pts.length-1; i++){ doc.line(pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y); }
-      var tip = pts[3];
-      doc.setFillColor(120,128,140);
-      doc.triangle(tip.x-8, tip.y-4, tip.x-8, tip.y+4, tip.x, tip.y, "F");
+      var tip = pts[pts.length-1];
+      desenharSetaPdf(doc, tip, caminho.entrada, corRgb);
       if(c.rotulo){
         doc.setFont("helvetica","normal"); doc.setFontSize(7.5*Math.max(escala,0.75));
-        doc.setTextColor(80,88,100);
-        doc.text(c.rotulo, pts[1].x, pts[0].y - 5, {align:"center"});
+        doc.setTextColor(corRgb[0], corRgb[1], corRgb[2]);
+        doc.text(c.rotulo, px(caminho.rotuloPos.x), py(caminho.rotuloPos.y) - 5, {align:"center"});
       }
     });
 
     layout.etapas.forEach(function(n){
       var cx = px(n.cx), cy = py(n.cy), w = n.w*escala, h = n.h*escala;
-      doc.setFillColor(225,229,240);
-      doc.setDrawColor(43,58,103);
-      doc.setLineWidth(n.tipo === "fim" ? 1.6 : 1.1);
 
-      if(n.tipo === "inicio" || n.tipo === "fim"){
+      if(n.tipo === "inicio"){
+        doc.setFillColor(COR_INICIO_FILL_RGB[0],COR_INICIO_FILL_RGB[1],COR_INICIO_FILL_RGB[2]);
+        doc.setDrawColor(COR_INICIO_RGB[0],COR_INICIO_RGB[1],COR_INICIO_RGB[2]);
+        doc.setLineWidth(1.1);
         doc.circle(cx, cy, w/2, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(8*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
-        var linhasEvt = quebrarPorCaracteres(n.titulo, 16, 2);
-        doc.text(linhasEvt, cx, cy + w/2 + 12, {align:"center"});
+        var linhasIni = quebrarPorCaracteres(n.titulo, 16, 2);
+        doc.text(linhasIni, cx, cy + w/2 + 12, {align:"center"});
+      } else if(n.tipo === "fim"){
+        doc.setFillColor(COR_FIM_FILL_RGB[0],COR_FIM_FILL_RGB[1],COR_FIM_FILL_RGB[2]);
+        doc.setDrawColor(COR_FIM_RGB[0],COR_FIM_RGB[1],COR_FIM_RGB[2]);
+        doc.setLineWidth(1.6);
+        doc.roundedRect(cx-w/2, cy-h/2, w, h, 2, 2, "FD");
+        doc.setFont("helvetica","normal"); doc.setFontSize(8*Math.max(escala,0.75));
+        doc.setTextColor(28,36,48);
+        var linhasFim = quebrarPorCaracteres(n.titulo, 16, 2);
+        doc.text(linhasFim, cx, cy + h/2 + 12, {align:"center"});
       } else if(n.tipo === "decisao"){
+        doc.setFillColor(COR_DECISAO_FILL_RGB[0],COR_DECISAO_FILL_RGB[1],COR_DECISAO_FILL_RGB[2]);
+        doc.setDrawColor(COR_DECISAO_RGB[0],COR_DECISAO_RGB[1],COR_DECISAO_RGB[2]);
+        doc.setLineWidth(1.1);
         var half = w/2;
         doc.triangle(cx-half, cy, cx+half, cy, cx, cy-half, "FD");
         doc.triangle(cx-half, cy, cx+half, cy, cx, cy+half, "FD");
@@ -709,6 +828,9 @@ window.FluxogramaModule = (function(){
         var linhasDec = quebrarPorCaracteres(n.titulo, 11, 3);
         doc.text(linhasDec, cx, cy - (linhasDec.length-1)*4.5 + 3, {align:"center"});
       } else {
+        doc.setFillColor(225,229,240);
+        doc.setDrawColor(43,58,103);
+        doc.setLineWidth(1.1);
         doc.roundedRect(cx-w/2, cy-h/2, w, h, 4, 4, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(8.5*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
