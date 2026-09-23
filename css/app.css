@@ -579,6 +579,30 @@
   padding:7px 9px; resize:vertical; background:var(--surface);
 }
 .abertura-objetivo:focus{outline:2px solid var(--brand-tint);border-color:var(--brand);}
+
+/* ---------- Campo de texto rico (negrito/itálico/sublinhado/tachado/listas) ---------- */
+.richtext-wrap{width:100%;}
+.richtext-toolbar{
+  display:flex; gap:2px; flex-wrap:wrap;
+  border:1px solid var(--border); border-bottom:none;
+  border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+  background:var(--surface-alt); padding:4px;
+}
+.richtext-btn{
+  width:26px; height:26px; border:1px solid transparent; border-radius:var(--radius-sm);
+  background:transparent; color:var(--ink); font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.richtext-btn:hover{background:var(--surface); border-color:var(--border);}
+.richtext-editor{
+  width:100%; min-height:96px; max-height:420px; overflow-y:auto;
+  font-family:inherit; font-size:12.5px; line-height:1.5;
+  border:1px solid var(--border); border-radius:0 0 var(--radius-sm) var(--radius-sm);
+  padding:7px 9px; background:var(--surface);
+}
+.richtext-editor:focus{outline:2px solid var(--brand-tint);border-color:var(--brand);}
+.richtext-editor ul, .richtext-editor ol{margin:4px 0 4px 20px;padding:0;}
+.richtext-editor[data-placeholder]:empty:before{content:attr(data-placeholder);color:var(--ink-faint);}
 .abertura-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
 .abertura-grid input, .abertura-grid select{
   border:1px solid var(--border); border-radius:var(--radius-sm);

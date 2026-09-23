@@ -174,20 +174,18 @@ window.PopModule = (function(){
 
     li.appendChild(grid);
 
-    var conteudoWrap = document.createElement("label");
+    var conteudoWrap = document.createElement("div");
     conteudoWrap.className = "treinamento-date-wrap";
     conteudoWrap.style.marginTop = "10px";
     var conteudoSpan = document.createElement("span");
     conteudoSpan.textContent = "Instruções / passo a passo";
     conteudoWrap.appendChild(conteudoSpan);
-    var conteudoInput = document.createElement("textarea");
-    conteudoInput.className = "abertura-objetivo";
-    conteudoInput.rows = 4;
-    conteudoInput.maxLength = 2000;
-    conteudoInput.placeholder = "Descreva o procedimento passo a passo";
-    conteudoInput.value = item.conteudo || "";
-    conteudoInput.addEventListener("change", function(){ item.conteudo = conteudoInput.value.trim(); renderAll(); });
-    conteudoWrap.appendChild(conteudoInput);
+    var richtextContainer = document.createElement("div");
+    conteudoWrap.appendChild(richtextContainer);
+    window.RichText.montarEditor(richtextContainer, item.conteudo || "", function(html){
+      item.conteudo = html;
+      renderAll();
+    }, {placeholder: "Descreva o procedimento passo a passo"});
     li.appendChild(conteudoWrap);
 
     return li;
@@ -275,13 +273,8 @@ window.PopModule = (function(){
       doc.text("Etapa: " + (item.etapaTexto || "—") + "   •   Responsável: " + (item.responsavelNome || "—"), 40, y);
       y += 14;
 
-      doc.setFont("helvetica","normal"); doc.setFontSize(9);
-      doc.setTextColor(60,66,78);
-      var conteudoLinhas = doc.splitTextToSize(item.conteudo || "(sem instruções registradas)", pageW - 80);
-      conteudoLinhas.forEach(function(linha){
-        if(y > pageH - 40){ doc.addPage(); y = 40; }
-        doc.text(linha, 40, y);
-        y += 12;
+      y = window.RichText.desenharNoDoc(doc, item.conteudo, 40, y, pageW - 80, pageH, {
+        fontSize: 9, lineHeight: 12.5, cor: [60,66,78], vazio: "(sem instruções registradas)"
       });
     });
 
