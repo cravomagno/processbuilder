@@ -4,6 +4,31 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.5] — 23/09/2026
+
+Sexta publicação. Foco: revisão completa da formatação de todos os PDFs gerados pela solução (fechamento de fase e Dossiê consolidado), a partir de PDFs reais exportados do caso "Controle de Agregados" e de pontos apontados diretamente sobre eles — com duas rodadas de correção a partir dos seus testes reais dentro do app (estouro de texto no Fluxograma, lista numerada sumindo no PDF, bloco "Aprovado por", página própria por ferramenta) — **testada e validada por você em 23/09/2026**.
+
+### Adicionado
+
+- **Cabeçalho e rodapé padronizados em todos os PDFs**: cabeçalho com brasão da empresa, título, versão e data/hora completa (dia + horário) na primeira página do fechamento de fase e na capa/cada página de fase do Dossiê; rodapé com linha de contexto (caso — fase), data/hora de geração e **"Página N de M"** em absolutamente todas as páginas de qualquer PDF gerado.
+- Novo módulo reutilizável `js/core/pdf-doc.js` — infraestrutura compartilhada de cabeçalho/rodapé/paginação/título de seção, usada tanto pelo fechamento de fase quanto pelo Dossiê (mesmo princípio de módulo compartilhado já usado no RichText e na geometria do Fluxograma).
+- Brasão da empresa embutido (`js/core/logo-data.js`) para uso no cabeçalho dos PDFs — carregado localmente (sem depender de internet ou de o app estar publicado).
+- **Bloco de aprovação reformulado e depois removido**: "Aprovado por" deixou de ser uma linha solta no fim da página (virou um bloco com linha divisória, rótulo e valor em destaque) e, numa segunda rodada a seu pedido, foi **removido de todos os documentos** (fechamento de fase e Dossiê, inclusive a tabela-resumo da capa) — funcionalidade não utilizada no momento; o cálculo interno continua existindo (histórico de fechamentos), só não é mais impresso.
+- **Cada ferramenta agora começa numa página própria** no PDF de fechamento de fase e em cada página de fase do Dossiê — nenhuma ferramenta divide página com outra, evitando qualquer mistura de conteúdo entre elas.
+- **Novo título de seção para cada ferramenta**: rótulo pequeno (caso + fase) em caixa alta na cor de destaque, uma barra vertical colorida, o nome da ferramenta em negrito e uma linha divisória — a mesma identidade visual do cabeçalho principal, repetida em escala menor no início de cada ferramenta.
+
+### Corrigido
+
+- **Título do Fluxograma desconectado do diagrama entre páginas**: tanto o título de seção ("Fluxograma do Processo") quanto o título de cada fluxo ("Fluxo: Nome") agora calculam a altura real do diagrama *antes* de decidir se quebram a página — título e desenho sempre ficam juntos, nunca mais um em cada página (superado depois pela página própria por ferramenta, que resolve isso de forma ainda mais direta).
+- **Texto ilegível nas POPs vindo de conteúdo colado do Word**: marcadores decorativos (Wingdings/Webdings) ou emojis colados no campo "Instruções / passo a passo" apareciam como caracteres quebrados no PDF (ex.: "Ø=ÞÒ") — agora qualquer caractere fora do alfabeto suportado pela fonte do PDF vira um marcador neutro ("•"), nunca um glifo ilegível.
+- **Texto do Fluxograma estourando para fora da caixa da etapa**: a quebra de linha usava contagem de caracteres, que não sabia que a fonte tinha um tamanho mínimo diferente da caixa quando o diagrama era escalado para baixo (muitas raias). Agora a quebra mede a largura real do texto no PDF — nunca mais ultrapassa a borda da caixa.
+- **Formatação de lista (numerada/com marcadores) sumindo no PDF**: causa raiz confirmada — o leitor do conteúdo do campo de texto rico só reconhecia listas/parágrafos no nível superior do conteúdo; quando o navegador aninhava a lista mais fundo (ex.: dentro de mais de um `<div>` envolvendo outros parágrafos ao redor), ela virava texto corrido, sem números nem quebra de linha nenhuma. Reescrito para percorrer a árvore inteira recursivamente — reconhece listas e parágrafos em qualquer profundidade de aninhamento, não só no nível superior.
+- Respiro visual entre POPs (linha divisória + espaçamento maior entre um procedimento e o próximo) e entre o cabeçalho de cada POP (título/etapa/responsável) e o texto das instruções.
+
+### Testado
+
+- Harness headless (chamadas diretas às funções de desenho + `doc.output()`, sem acionar o download real) cobrindo: Fluxograma de 6 raias forçando quebra de página, POP com 10 parágrafos incluindo negrito/itálico/caractere fora do alfabeto/emoji, título de etapa longo sem espaços quebráveis, lista `<ol>/<li>` real, e texto com `\n` literal dentro de um único bloco — PDF de fechamento de fase e Dossiê inspecionados página a página em cada rodada.
+
 ## [v1.4] — 23/09/2026
 
 Quinta publicação. Foco: campo de texto rico no procedimento operacional (POP), Fase 3 — Modelagem.

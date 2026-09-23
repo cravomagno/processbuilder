@@ -256,6 +256,34 @@ window.FluxogramaModule = (function(){
     return ctx.measureText(String(texto || "")).width;
   }
 
+  /* Quebra de linha pela LARGURA REAL do texto no jsPDF (doc.getTextWidth,
+     medido na fonte/tamanho já ativos), em vez de contagem de caracteres —
+     usada só no PDF, onde o tamanho da fonte é escalado (`escala`) junto
+     com a caixa. Contagem de caracteres não sabia disso e deixava o texto
+     estourar pra fora da caixa quando o diagrama era escalado pra baixo
+     (fonte com piso mínimo de 75%, caixa encolhendo livremente). */
+  function quebrarPorLargura(doc, texto, maxWidth, maxLinhas){
+    var palavras = String(texto || "").split(/\s+/).filter(Boolean);
+    var linhas = [], atual = "";
+    palavras.forEach(function(p){
+      var tentativa = atual ? atual + " " + p : p;
+      if(doc.getTextWidth(tentativa) > maxWidth && atual){
+        linhas.push(atual);
+        atual = p;
+      } else {
+        atual = tentativa;
+      }
+    });
+    if(atual) linhas.push(atual);
+    if(linhas.length > maxLinhas){
+      linhas = linhas.slice(0, maxLinhas);
+      var ultima = linhas[maxLinhas - 1];
+      while(doc.getTextWidth(ultima + "…") > maxWidth && ultima.length > 1){ ultima = ultima.slice(0, -1); }
+      linhas[maxLinhas - 1] = ultima + "…";
+    }
+    return linhas.length ? linhas : [""];
+  }
+
   function quebrarPorCaracteres(texto, maxChars, maxLinhas){
     var palavras = String(texto || "").split(/\s+/).filter(Boolean);
     var linhas = [], atual = "";
@@ -805,7 +833,7 @@ window.FluxogramaModule = (function(){
         doc.circle(cx, cy, w/2, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(8*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
-        var linhasIni = quebrarPorCaracteres(n.titulo, 16, 2);
+        var linhasIni = quebrarPorLargura(doc, n.titulo, COL_W*escala - 10, 2);
         doc.text(linhasIni, cx, cy + w/2 + 12, {align:"center"});
       } else if(n.tipo === "fim"){
         doc.setFillColor(COR_FIM_FILL_RGB[0],COR_FIM_FILL_RGB[1],COR_FIM_FILL_RGB[2]);
@@ -814,7 +842,7 @@ window.FluxogramaModule = (function(){
         doc.roundedRect(cx-w/2, cy-h/2, w, h, 2, 2, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(8*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
-        var linhasFim = quebrarPorCaracteres(n.titulo, 16, 2);
+        var linhasFim = quebrarPorLargura(doc, n.titulo, COL_W*escala - 10, 2);
         doc.text(linhasFim, cx, cy + h/2 + 12, {align:"center"});
       } else if(n.tipo === "decisao"){
         doc.setFillColor(COR_DECISAO_FILL_RGB[0],COR_DECISAO_FILL_RGB[1],COR_DECISAO_FILL_RGB[2]);
@@ -825,7 +853,7 @@ window.FluxogramaModule = (function(){
         doc.triangle(cx-half, cy, cx+half, cy, cx, cy+half, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(7.5*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
-        var linhasDec = quebrarPorCaracteres(n.titulo, 11, 3);
+        var linhasDec = quebrarPorLargura(doc, n.titulo, w*0.62, 3);
         doc.text(linhasDec, cx, cy - (linhasDec.length-1)*4.5 + 3, {align:"center"});
       } else {
         doc.setFillColor(225,229,240);
@@ -834,12 +862,28 @@ window.FluxogramaModule = (function(){
         doc.roundedRect(cx-w/2, cy-h/2, w, h, 4, 4, "FD");
         doc.setFont("helvetica","normal"); doc.setFontSize(8.5*Math.max(escala,0.75));
         doc.setTextColor(28,36,48);
-        var linhasEtp = quebrarPorCaracteres(n.titulo, 16, 2);
+        var linhasEtp = quebrarPorLargura(doc, n.titulo, w - 10, 2);
         doc.text(linhasEtp, cx, cy - (linhasEtp.length-1)*5 + 3, {align:"center"});
       }
     });
 
     return offY + layout.altura*escala + 12;
+  }
+
+  /* Altura mínima necessária para o título do PRIMEIRO fluxo + seu
+     diagrama, como bloco atômico — usada por fechamento.js para decidir
+     se a seção "Fluxograma do Processo" cabe no restante da página
+     ANTES de desenhar esse título (mesma causa raiz corrigida dentro de
+     desenharNoDoc, só que um nível acima: o título de seção também
+     precisa saber a altura real, não uma estimativa fixa). */
+  function alturaMinimaPrimeiroBloco(docState, larguraDisponivel){
+    if(!docState || !docState.fluxos || !docState.fluxos.length) return 16;
+    var fluxo = docState.fluxos[0];
+    var etapas = fluxo.etapas || [];
+    if(!etapas.length) return 16 + 16;
+    var layout = calcularLayout(fluxo.raias || [], etapas);
+    var escala = Math.min(1, larguraDisponivel / layout.largura);
+    return 16 + layout.altura * escala;
   }
 
   function desenharNoDoc(doc, docState, startY){
@@ -855,25 +899,46 @@ window.FluxogramaModule = (function(){
     }
 
     docState.fluxos.forEach(function(fluxo, idx){
-      if(idx > 0){
-        y += 10;
-        if(y > pageH - 100){ doc.addPage(); y = 40; }
-        doc.setDrawColor(218,223,230); doc.setLineWidth(0.8);
-        doc.line(40, y, pageW - 40, y);
-        y += 16;
+      var raias = fluxo.raias || [];
+      var etapas = fluxo.etapas || [];
+
+      /* Altura real do diagrama calculada ANTES de desenhar qualquer coisa,
+         para tratar "Fluxo: título" + diagrama como um bloco atômico — essa
+         é a causa raiz do título ficando numa página e o desenho na
+         seguinte: antes, a quebra de página usava uma estimativa fixa
+         (pageH-100) só pro título, e só depois disso o desenho calculava a
+         altura de verdade e decidia sozinho se cabia. */
+      var alturaDiagrama = 16;
+      if(etapas.length){
+        var layoutPrevia = calcularLayout(raias, etapas);
+        var escalaPrevia = Math.min(1, (pageW - 80) / layoutPrevia.largura);
+        alturaDiagrama = layoutPrevia.altura * escalaPrevia;
       }
-      if(y > pageH - 100){ doc.addPage(); y = 40; }
+      var alturaBlocoTitulo = 16;
+
+      if(idx > 0){
+        if(y + 26 + alturaBlocoTitulo + alturaDiagrama > pageH - 40){
+          doc.addPage(); y = 40;
+        } else {
+          y += 10;
+          doc.setDrawColor(218,223,230); doc.setLineWidth(0.8);
+          doc.line(40, y, pageW - 40, y);
+          y += 16;
+        }
+      } else if(y + alturaBlocoTitulo + alturaDiagrama > pageH - 40){
+        doc.addPage(); y = 40;
+      }
 
       doc.setFont("helvetica","bold"); doc.setFontSize(10.5);
       doc.setTextColor(28,36,48);
       doc.text("Fluxo: " + (fluxo.nome || "(sem nome)"), 40, y);
       y += 16;
 
-      y = desenharUmFluxo(doc, fluxo.raias || [], fluxo.etapas || [], y);
+      y = desenharUmFluxo(doc, raias, etapas, y);
     });
 
     return y;
   }
 
-  return { mount: mount, desenharNoDoc: desenharNoDoc };
+  return { mount: mount, desenharNoDoc: desenharNoDoc, alturaMinimaPrimeiroBloco: alturaMinimaPrimeiroBloco };
 })();

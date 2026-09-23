@@ -259,19 +259,35 @@ window.PopModule = (function(){
     }
 
     docState.itens.forEach(function(item, idx){
-      if(idx > 0) y += 10;
-      if(y > pageH - 60){ doc.addPage(); y = 40; }
+      /* Reserva espaço mínimo pro título+meta atomicamente (evita um POP
+         começar com o título sozinho no fim de uma página) — mesma
+         técnica do bloco de aprovação e do Fluxograma. */
+      var tituloLinhasPrevia = doc.splitTextToSize((item.titulo || "(sem título)") + "  —  v" + (item.versao || "1.0"), pageW - 80);
+      var alturaCabecalho = tituloLinhasPrevia.length * 12 + 4 + 14;
+
+      if(idx > 0){
+        var espaco = window.PdfDoc.garantirEspaco(doc, y, 20 + alturaCabecalho, 60);
+        if(espaco.quebrou){
+          y = espaco.y;
+        } else {
+          y += 18;
+          doc.setDrawColor(230,233,238); doc.setLineWidth(0.6);
+          doc.line(40, y, pageW - 40, y);
+          y += 18;
+        }
+      } else {
+        y = window.PdfDoc.garantirEspaco(doc, y, alturaCabecalho, 60).y;
+      }
 
       doc.setFont("helvetica","bold"); doc.setFontSize(10);
       doc.setTextColor(28,36,48);
-      var tituloLinhas = doc.splitTextToSize((item.titulo || "(sem título)") + "  —  v" + (item.versao || "1.0"), pageW - 80);
-      doc.text(tituloLinhas, 40, y);
-      y += tituloLinhas.length * 12 + 4;
+      doc.text(tituloLinhasPrevia, 40, y);
+      y += tituloLinhasPrevia.length * 12 + 4;
 
       doc.setFont("helvetica","normal"); doc.setFontSize(8.5);
       doc.setTextColor(110,116,128);
       doc.text("Etapa: " + (item.etapaTexto || "—") + "   •   Responsável: " + (item.responsavelNome || "—"), 40, y);
-      y += 14;
+      y += 16;
 
       y = window.RichText.desenharNoDoc(doc, item.conteudo, 40, y, pageW - 80, pageH, {
         fontSize: 9, lineHeight: 12.5, cor: [60,66,78], vazio: "(sem instruções registradas)"

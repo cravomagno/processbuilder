@@ -27,6 +27,26 @@ window.RichText = (function(){
 
   var TAGS_INLINE = {B:"bold", STRONG:"bold", I:"italic", EM:"italic", U:"underline", S:"strike", STRIKE:"strike"};
 
+  /* A fonte padrão do jsPDF (Helvetica, codificação WinAnsi) só cobre
+     Latin-1 + um pequeno extra de pontuação "esperta" do Windows-1252.
+     Texto colado do Word costuma trazer marcadores decorativos de uma
+     fonte de símbolos (Wingdings/Webdings) ou emoji — fora desse
+     alfabeto, esses caracteres viram lixo ilegível no PDF (o padrão
+     "Ø=ÞÒ" relatado). Em vez disso, qualquer caractere fora do alfabeto
+     suportado vira um marcador neutro ("•"), nunca um glifo quebrado. */
+  var EXTRAS_WINANSI_SEGUROS = {
+    0x2018:1, 0x2019:1, 0x201A:1, 0x201C:1, 0x201D:1, 0x201E:1,
+    0x2013:1, 0x2014:1, 0x2020:1, 0x2021:1, 0x2022:1, 0x2026:1,
+    0x2030:1, 0x2039:1, 0x203A:1, 0x2122:1, 0x20AC:1, 0x0152:1,
+    0x0153:1, 0x0160:1, 0x0161:1, 0x0178:1, 0x017D:1, 0x017E:1
+  };
+  function sanitizarTexto(texto){
+    return String(texto || "").replace(/[Ā-\u{10FFFF}]/gu, function(ch){
+      var cp = ch.codePointAt(0);
+      return EXTRAS_WINANSI_SEGUROS[cp] ? ch : "•";
+    });
+  }
+
   /* Converte quebras de linha antigas (texto puro salvo antes deste
      recurso existir) em <br>, pra não perder a estrutura de linhas
      ao carregar um POP salvo há mais tempo. HTML gerado pelo próprio
@@ -84,21 +104,42 @@ window.RichText = (function(){
 
   /* ---------------- PDF ---------------- */
 
+  /* Divide um texto já sanitizado em palavras, preservando quebras de
+     linha REAIS que tenham ficado como caractere solto (\n) dentro de
+     um nó de texto — comum em conteúdo colado (Word, e-mail, Teams)
+     que não chega a gerar um <br>/<div> por linha. Sem isso, `\s+`
+     trata \n como um espaço qualquer e o texto vira um bloco só. */
+  function dividirComQuebras(texto){
+    var linhas = String(texto || "").split(/\r\n|\r|\n/);
+    var itens = [];
+    linhas.forEach(function(linha, idx){
+      if(idx > 0) itens.push({quebra: true});
+      linha.split(/\s+/).filter(function(p){ return p.length > 0; }).forEach(function(p){ itens.push(p); });
+    });
+    return itens;
+  }
+
   /* Percorre um nó e devolve uma lista plana de "palavras" com o
      estilo acumulado até ali — {texto, bold, italic, underline,
-     strike} — ou {quebra:true} no lugar de cada <br>. */
+     strike} — ou {quebra:true} no lugar de cada <br> (ou \n literal). */
   function coletarPalavras(node, estiloBase){
     var palavras = [];
     function andar(n, estilo){
       for(var i = 0; i < n.childNodes.length; i++){
         var c = n.childNodes[i];
         if(c.nodeType === 3){
-          var partes = String(c.textContent || "").split(/\s+/).filter(function(p){ return p.length > 0; });
-          partes.forEach(function(p){
+          dividirComQuebras(sanitizarTexto(c.textContent)).forEach(function(p){
+            if(p && p.quebra){ palavras.push(p); return; }
             palavras.push({texto: p, bold: !!estilo.bold, italic: !!estilo.italic, underline: !!estilo.underline, strike: !!estilo.strike});
           });
         } else if(c.nodeType === 1){
           if(c.tagName === "BR"){ palavras.push({quebra: true}); continue; }
+          /* Reforço defensivo: se por algum motivo um bloco (div/p/li)
+             aparecer aqui dentro (fora do caminho normal de extrairBlocos,
+             que já trata blocos separadamente), nunca deixar o texto dele
+             colar sem separação nenhuma no bloco anterior. */
+          var eBloco = c.tagName === "DIV" || c.tagName === "P" || c.tagName === "LI";
+          if(eBloco && palavras.length){ palavras.push({quebra: true}); }
           var novoEstilo = {bold: estilo.bold, italic: estilo.italic, underline: estilo.underline, strike: estilo.strike};
           var marca = TAGS_INLINE[c.tagName];
           if(marca) novoEstilo[marca] = true;
@@ -110,43 +151,99 @@ window.RichText = (function(){
     return palavras;
   }
 
-  /* Identifica os blocos de nível superior do conteúdo — parágrafos
-     (div/p, ou texto solto antes do primeiro Enter) e itens de lista
-     (li dentro de ul/ol, guardando se é numerada e a posição). */
+  /* Um nó "é um wrapper" quando tem, entre seus filhos diretos, algum
+     elemento de bloco (div/p/li/ul/ol) — nesse caso ele não é, ele
+     mesmo, um parágrafo/item de folha: precisa ser percorrido de novo,
+     não lido como texto corrido. Sem essa checagem, uma lista colada
+     que o navegador aninhou um ou mais níveis mais fundo do que o
+     comum (ex.: <div><div><ol>...</ol></div></div>) era lida como um
+     único parágrafo de texto corrido, perdendo números e quebras. */
+  var TAGS_BLOCO = {DIV:1, P:1, LI:1, UL:1, OL:1};
+  function temFilhoDeBloco(el){
+    for(var i = 0; i < el.children.length; i++){
+      if(TAGS_BLOCO[el.children[i].tagName]) return true;
+    }
+    return false;
+  }
+
+  /* Identifica os blocos do conteúdo — parágrafos e itens de lista
+     (numerada ou com marcadores) — percorrendo a árvore inteira,
+     recursivamente, independente de em qual profundidade o navegador
+     tenha aninhado cada <div>/<ol>/<li> (não assume uma forma fixa de
+     DOM — só que blocos "de folha" viram parágrafo, e <li> dentro de
+     <ul>/<ol> vira item numerado/com marcador, em qualquer nível). */
   function extrairBlocos(container){
     var blocos = [];
     var acumulador = null;
 
     function fecharAcumulador(){
-      if(acumulador){ blocos.push({tipo: "paragrafo", palavras: acumulador}); acumulador = null; }
+      if(acumulador && acumulador.length){ blocos.push({tipo: "paragrafo", palavras: acumulador}); }
+      acumulador = null;
     }
 
-    Array.prototype.slice.call(container.childNodes).forEach(function(el){
-      if(el.nodeType === 1 && (el.tagName === "UL" || el.tagName === "OL")){
-        fecharAcumulador();
-        var ordenada = el.tagName === "OL";
-        Array.prototype.slice.call(el.children).filter(function(li){ return li.tagName === "LI"; })
-          .forEach(function(li, idx){
-            blocos.push({tipo: "item", ordenada: ordenada, indice: idx + 1, palavras: coletarPalavras(li, {})});
+    function visitarLista(el){
+      var ordenada = el.tagName === "OL";
+      var idx = 0;
+      Array.prototype.slice.call(el.children).forEach(function(li){
+        if(li.tagName !== "LI") return;
+        idx++;
+        if(temFilhoDeBloco(li)){
+          /* <li> com bloco aninhado (ex.: parágrafo + sublista dentro do
+             mesmo item) — o texto solto direto do <li> (antes de
+             qualquer bloco filho) vira o item numerado; o restante
+             (parágrafos/sublistas aninhados) é achatado em blocos
+             adicionais na sequência, sem numeração hierárquica (fora do
+             escopo — v1 do editor não tem indentação de sub-nível). */
+          var textoDireto = document.createElement("div");
+          Array.prototype.slice.call(li.childNodes).forEach(function(c){
+            if(c.nodeType === 1 && TAGS_BLOCO[c.tagName]) return;
+            textoDireto.appendChild(c.cloneNode(true));
           });
-      } else if(el.nodeType === 1 && (el.tagName === "DIV" || el.tagName === "P")){
-        fecharAcumulador();
-        blocos.push({tipo: "paragrafo", palavras: coletarPalavras(el, {})});
-      } else if(el.nodeType === 1 && el.tagName === "BR"){
-        fecharAcumulador();
-        acumulador = [];
-      } else if(el.nodeType === 3){
-        if(!acumulador) acumulador = [];
-        String(el.textContent || "").split(/\s+/).filter(function(p){ return p.length > 0; })
-          .forEach(function(p){ acumulador.push({texto: p, bold: false, italic: false, underline: false, strike: false}); });
-      } else if(el.nodeType === 1){
-        if(!acumulador) acumulador = [];
-        var estiloInline = {};
-        var marcaInline = TAGS_INLINE[el.tagName];
-        if(marcaInline) estiloInline[marcaInline] = true;
-        acumulador = acumulador.concat(coletarPalavras(el, estiloInline));
-      }
-    });
+          blocos.push({tipo: "item", ordenada: ordenada, indice: idx, palavras: coletarPalavras(textoDireto, {})});
+          visitar(li);
+        } else {
+          blocos.push({tipo: "item", ordenada: ordenada, indice: idx, palavras: coletarPalavras(li, {})});
+        }
+      });
+    }
+
+    function visitar(node){
+      Array.prototype.slice.call(node.childNodes).forEach(function(el){
+        if(el.nodeType === 1 && (el.tagName === "UL" || el.tagName === "OL")){
+          fecharAcumulador();
+          visitarLista(el);
+        } else if(el.nodeType === 1 && (el.tagName === "DIV" || el.tagName === "P")){
+          fecharAcumulador();
+          if(temFilhoDeBloco(el)){
+            visitar(el);
+          } else {
+            blocos.push({tipo: "paragrafo", palavras: coletarPalavras(el, {})});
+          }
+        } else if(el.nodeType === 1 && el.tagName === "BR"){
+          fecharAcumulador();
+          acumulador = [];
+        } else if(el.nodeType === 3){
+          if(!acumulador) acumulador = [];
+          dividirComQuebras(sanitizarTexto(el.textContent)).forEach(function(p){
+            if(p && p.quebra){ acumulador.push(p); return; }
+            acumulador.push({texto: p, bold: false, italic: false, underline: false, strike: false});
+          });
+        } else if(el.nodeType === 1){
+          if(temFilhoDeBloco(el)){
+            fecharAcumulador();
+            visitar(el);
+          } else {
+            if(!acumulador) acumulador = [];
+            var estiloInline = {};
+            var marcaInline = TAGS_INLINE[el.tagName];
+            if(marcaInline) estiloInline[marcaInline] = true;
+            acumulador = acumulador.concat(coletarPalavras(el, estiloInline));
+          }
+        }
+      });
+    }
+
+    visitar(container);
     fecharAcumulador();
     return blocos;
   }

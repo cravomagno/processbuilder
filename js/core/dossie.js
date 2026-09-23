@@ -24,30 +24,19 @@ window.Dossie = (function(){
   }
 
   function desenharCapa(doc, caso){
-    var pageW = doc.internal.pageSize.getWidth();
-    var y = 60;
-
-    doc.setFont("helvetica","bold"); doc.setFontSize(20);
-    doc.setTextColor(28,36,48);
-    var tituloLinhas = doc.splitTextToSize(caso.nome, pageW - 80);
-    doc.text(tituloLinhas, 40, y);
-    y += tituloLinhas.length * 24 + 6;
-
-    doc.setFont("helvetica","normal"); doc.setFontSize(13);
-    doc.setTextColor(70,80,100);
-    doc.text("Dossiê Consolidado do Processo", 40, y);
-    y += 22;
-
     var fechadas = caso.fases.filter(function(f){ return f.status === "fechada"; }).length;
-    doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
-    doc.setTextColor(110,116,128);
-    doc.text("Gerado em " + new Date().toLocaleDateString("pt-BR") + " às " + new Date().toLocaleTimeString("pt-BR").slice(0,5) + "   •   " + fechadas + " de " + caso.fases.length + " fases fechadas", 40, y);
-    y += 30;
 
-    var head = [["Fase", "Status", "Aprovado por"]];
+    var y = window.PdfDoc.desenharCabecalhoPrincipal(doc, {
+      titulo: caso.nome,
+      tamanhoTitulo: 20,
+      subtitulo: "Dossiê Consolidado do Processo",
+      meta: "Gerado em " + window.PdfDoc.formatarDataHora() + "   •   " + fechadas + " de " + caso.fases.length + " fases fechadas"
+    });
+    y += 8;
+
+    var head = [["Fase", "Status"]];
     var body = caso.fases.map(function(f){
-      var aprovador = window.Fechamento.buscarAprovadorNaGovernanca(caso, f.nome);
-      return ["Fase " + f.ordem + " — " + f.nome, statusLabel(f), aprovador || "(não definido na Governança)"];
+      return ["Fase " + f.ordem + " — " + f.nome, statusLabel(f)];
     });
 
     doc.autoTable({
@@ -56,24 +45,18 @@ window.Dossie = (function(){
       theme: "grid",
       styles:{fontSize:9.5, cellPadding:7, valign:"middle", lineColor:[218,223,230], lineWidth:0.6, textColor:[28,36,48]},
       headStyles:{fillColor:[43,58,103], textColor:255, fontStyle:"bold", fontSize:9.5},
-      columnStyles:{0:{halign:"left", cellWidth:180, fontStyle:"bold"}, 1:{halign:"left", cellWidth:150}, 2:{halign:"left"}}
+      columnStyles:{0:{halign:"left", cellWidth:220, fontStyle:"bold"}, 1:{halign:"left"}}
     });
   }
 
   function desenharPaginaFase(doc, caso, fase){
     var pageW = doc.internal.pageSize.getWidth();
-    var y = 42;
 
-    doc.setFont("helvetica","bold"); doc.setFontSize(14);
-    doc.setTextColor(28,36,48);
-    var tituloLinhas = doc.splitTextToSize("Fase " + fase.ordem + " — " + fase.nome, pageW - 80);
-    doc.text(tituloLinhas, 40, y);
-    y += tituloLinhas.length * 17;
-
-    doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
-    doc.setTextColor(110,116,128);
-    doc.text(statusLabel(fase), 40, y + 4);
-    y += 22;
+    var y = window.PdfDoc.desenharCabecalhoPrincipal(doc, {
+      titulo: "Fase " + fase.ordem + " — " + fase.nome,
+      tamanhoTitulo: 14,
+      meta: statusLabel(fase)
+    });
 
     doc.setFont("helvetica","bold"); doc.setFontSize(10.5);
     doc.setTextColor(28,36,48);
@@ -93,12 +76,17 @@ window.Dossie = (function(){
     var jsPDF = window.jspdf.jsPDF;
 
     var doc = new jsPDF({orientation:"portrait", unit:"pt"});
+    var ctx = {metaDireita: "Gerado em " + window.PdfDoc.formatarDataHora()};
+    window.PdfDoc.registrarSecao(doc, ctx, caso.nome + " — Dossiê Consolidado");
     desenharCapa(doc, caso);
 
     caso.fases.forEach(function(fase){
       doc.addPage("a4", window.Fechamento.calcularPrecisaPaisagem(fase) ? "landscape" : "portrait");
+      window.PdfDoc.registrarSecao(doc, ctx, caso.nome + " — Fase " + fase.ordem + ": " + fase.nome);
       desenharPaginaFase(doc, caso, fase);
     });
+
+    window.PdfDoc.finalizarDocumento(doc, ctx);
 
     var nomeArquivo = "Casos_" + slugCaso(caso.nome) + "_dossie-consolidado.pdf";
     doc.save(nomeArquivo);
