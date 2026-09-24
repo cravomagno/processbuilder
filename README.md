@@ -1,6 +1,6 @@
 # Construtor de Processos
 
-**Ferramenta de consultoria interna da Enops** para conduzir a implantação de um processo de negócio do diagnóstico ao encerramento, em **7 fases estruturadas** — com uma ferramenta própria por etapa, documentação de apoio integrada e fechamento formal em PDF a cada fase concluída.
+**Ferramenta de consultoria interna** para conduzir a implantação de um processo de negócio do diagnóstico ao encerramento, em **7 fases estruturadas** — com uma ferramenta própria por etapa, documentação de apoio integrada e fechamento formal em PDF a cada fase concluída.
 
 🔗 **Acesse:** [cravomagno.github.io/processbuilder](https://cravomagno.github.io/processbuilder/)
 
@@ -62,4 +62,4 @@ CHANGELOG.md           → histórico de versões publicadas
 
 ---
 
-*Enops Engenharia — uso interno.*
+*Emerson da Cunha — uso interno.*
