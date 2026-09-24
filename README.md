@@ -1,17 +1,26 @@
 # Construtor de Processos
 
-**Ferramenta de consultoria interna** para conduzir a implantação de um processo de negócio do diagnóstico ao encerramento, em **7 fases estruturadas** — com uma ferramenta própria por etapa, documentação de apoio integrada e fechamento formal em PDF a cada fase concluída.
+**Ferramenta de consultoria interna da Enops** para conduzir a implantação de um processo de negócio do diagnóstico ao encerramento, em **7 fases estruturadas** — com uma ferramenta própria por etapa, documentação de apoio integrada e fechamento formal em PDF a cada fase concluída.
 
 🔗 **Acesse:** [cravomagno.github.io/processbuilder](https://cravomagno.github.io/processbuilder/)
 
 > **Beta-teste de produção controlada.** Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer. Veja o [`CHANGELOG.md`](CHANGELOG.md) para o histórico completo de cada versão publicada.
 
+## Não está vendo uma atualização recente?
+
+Cada nova versão já vem com um carimbo de cache-busting nos arquivos internos, então normalmente basta recarregar a página. Se mesmo assim a tela continuar com a versão antiga:
+
+1. **Recarregamento forçado** (ignora o cache desta página): `Ctrl + Shift + R` (Windows/Linux) ou `Cmd + Shift + R` (Mac).
+2. **Se ainda não resolver**, limpe os dados salvos do site: abra as Ferramentas do Desenvolvedor (`F12`) → aba **Application** → **Storage** → botão **Clear site data**. (Ou, no Chrome, acesse `chrome://settings/content/all`, procure pelo endereço do site e clique em **Excluir**.)
+3. **Teste rápido alternativo**: abra o link numa janela anônima/privada — ela nunca usa cache antigo.
+
 ## O que a ferramenta faz
 
-O Construtor de Processos guia um processo de negócio por um backbone fixo de 7 fases, cada uma com suas próprias ferramentas de análise e registro:
+O Construtor de Processos guia um projeto de negócio por um backbone fixo de 7 fases — mais uma Fase 0 que antecede todas, definindo o projeto antes de ele nascer como processo —, cada uma com suas próprias ferramentas de análise e registro:
 
 | Fase | Ferramentas |
 |---|---|
+| 0. PM Canvas do Projeto | PM Canvas (Porquê/O quê/Quem/Como/Quando e Quanto), registro de Aprovador(a)/Revisor(a) por fase |
 | 1. Diagnóstico e Viabilidade | Termo de Abertura, Matriz GUT, Diagrama de Ishikawa (6M), 5 Porquês |
 | 2. Governança e Compliance | Matriz RACI, Matriz de Alçadas, Segregação de Funções |
 | 3. Modelagem do Processo | Plano de Ação (5W2H), Fluxograma do Processo (com raias por papel), POPs / Instruções de Trabalho |
@@ -26,6 +35,8 @@ Cada ferramenta se retroalimenta das demais (ex.: responsáveis vêm da Matriz R
 
 - **Fechamento de fase em PDF**, versionado — cada fechamento gera um documento formal (cabeçalho com brasão, rodapé com numeração de página, uma página própria por ferramenta) e fica registrado no histórico da fase; reabrir uma fase fechada libera a edição de novo.
 - **Dossiê consolidado**: um único PDF com a capa-resumo das 7 fases e o conteúdo de cada uma, gerado a qualquer momento.
+- **Melhoria contínua por ciclos**: com as 7 fases (e a Fase 0) fechadas, "Reabrir Processo" (na Fase 7) baixa um backup, versiona o Dossiê marcando o fim do ciclo e reabre tudo para o próximo ciclo — sem recriar nada do zero, tudo dentro do mesmo caso.
+- **Aprovador(a)/Revisor(a) por fase**: registrado uma vez na Fase 0, aparece automaticamente no PDF de fechamento de cada fase e em cada página do Dossiê — documentação viva, continua editável mesmo com a Fase 0 fechada.
 - **Salvar/Carregar rascunho**: exporta e importa o caso inteiro como um arquivo `.json`, para continuar depois ou manter um backup.
 - **Documentação por fase**: cada fase e cada campo tem uma explicação própria (conceito, boas práticas, erros comuns), acessível direto na tela.
 - **Múltiplos casos em paralelo** — "Novo caso" abre um processo do zero sem descartar o atual.
@@ -62,4 +73,4 @@ CHANGELOG.md           → histórico de versões publicadas
 
 ---
 
-*Emerson da Cunha — uso interno.*
+*Enops Engenharia — uso interno.*

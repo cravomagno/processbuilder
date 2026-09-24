@@ -23,14 +23,17 @@ window.Dossie = (function(){
     return "Ainda aberta";
   }
 
-  function desenharCapa(doc, caso){
+  function desenharCapa(doc, caso, opts){
+    opts = opts || {};
     var fechadas = caso.fases.filter(function(f){ return f.status === "fechada"; }).length;
+    var meta = "Gerado em " + window.PdfDoc.formatarDataHora() + "   •   " + fechadas + " de " + caso.fases.length + " fases fechadas";
+    if(opts.rotuloVersao) meta = opts.rotuloVersao + "   •   " + meta;
 
     var y = window.PdfDoc.desenharCabecalhoPrincipal(doc, {
       titulo: caso.nome,
       tamanhoTitulo: 20,
-      subtitulo: "Dossiê Consolidado do Processo",
-      meta: "Gerado em " + window.PdfDoc.formatarDataHora() + "   •   " + fechadas + " de " + caso.fases.length + " fases fechadas"
+      subtitulo: opts.rotuloVersao ? "Dossiê Consolidado — Fechamento de Ciclo" : "Dossiê Consolidado do Processo",
+      meta: meta
     });
     y += 8;
 
@@ -68,17 +71,33 @@ window.Dossie = (function(){
     doc.text(objetivoLinhas, 40, y);
     y += objetivoLinhas.length * 12 + 18;
 
-    window.Fechamento.desenharConteudoFase(doc, caso, fase, y);
+    var resultado = window.Fechamento.desenharConteudoFase(doc, caso, fase, y);
+
+    /* Tabela de Aprovador(a)/Revisor(a) por fase — só faz sentido para
+       fases com pelo menos um fechamento (a Fase 0 nunca tem, porque
+       não aprova/revisa a si mesma) e usa o snapshot histórico gravado
+       no ÚLTIMO fechamento daquela fase, não o registro ao vivo da
+       Fase 0 (que pode já ter mudado desde então). */
+    if(fase.id !== "fase0" && fase.fechamentos.length){
+      var ultimo = fase.fechamentos[fase.fechamentos.length - 1];
+      window.Fechamento.desenharTabelaAprovacao(doc, resultado.y, ultimo.aprovador || "", ultimo.revisor || "", ultimo.versao, ultimo.dataFechamento);
+    }
   }
 
-  function gerarDossiePdf(caso){
+  /* Monta o PDF do Dossiê (capa + uma página por fase) — compartilhado
+     entre o Dossiê avulso de sempre (`gerarDossiePdf`, sem versão) e o
+     Dossiê de fechamento de ciclo (`gerarDossieVersionadoDeCiclo`, que
+     grava uma versão no histórico do caso). `opts.rotuloVersao`, quando
+     presente, estampa a capa como um "retrato oficial" do fechamento de
+     um ciclo, não só um export de conferência do momento atual. */
+  function construirDossiePdf(caso, opts){
     if(!window.jspdf || !window.jspdf.jsPDF){ throw new Error("jsPDF não carregado"); }
     var jsPDF = window.jspdf.jsPDF;
 
     var doc = new jsPDF({orientation:"portrait", unit:"pt"});
     var ctx = {metaDireita: "Gerado em " + window.PdfDoc.formatarDataHora()};
     window.PdfDoc.registrarSecao(doc, ctx, caso.nome + " — Dossiê Consolidado");
-    desenharCapa(doc, caso);
+    desenharCapa(doc, caso, opts);
 
     caso.fases.forEach(function(fase){
       doc.addPage("a4", window.Fechamento.calcularPrecisaPaisagem(fase) ? "landscape" : "portrait");
@@ -87,11 +106,35 @@ window.Dossie = (function(){
     });
 
     window.PdfDoc.finalizarDocumento(doc, ctx);
+    return doc;
+  }
 
+  function gerarDossiePdf(caso){
+    var doc = construirDossiePdf(caso);
     var nomeArquivo = "Casos_" + slugCaso(caso.nome) + "_dossie-consolidado.pdf";
     doc.save(nomeArquivo);
     return {pdfFileName: nomeArquivo};
   }
 
-  return { gerarDossiePdf: gerarDossiePdf };
+  /* Gera o Dossiê marcando o fechamento de um ciclo inteiro do processo
+     (as 7 fases fechadas) — chamado só por "Reabrir Processo" (app.js),
+     nunca pelo botão avulso "Gerar dossiê". Diferente do Dossiê de
+     sempre, este grava uma entrada em `caso.dossieVersoes` — vira um
+     retrato oficial e permanente daquele ciclo, não um export solto que
+     pode ser refeito e substituído a qualquer momento. */
+  function gerarDossieVersionadoDeCiclo(caso){
+    var versao = caso.dossieVersoes.length + 1;
+    var doc = construirDossiePdf(caso, {rotuloVersao: "Ciclo " + caso.cicloAtual + " — Dossiê v" + versao});
+    var nomeArquivo = "Casos_" + slugCaso(caso.nome) + "_dossie-ciclo" + caso.cicloAtual + "-v" + versao + ".pdf";
+    doc.save(nomeArquivo);
+    caso.dossieVersoes.push({
+      versao: versao,
+      ciclo: caso.cicloAtual,
+      dataFechamento: new Date().toISOString(),
+      pdfFileName: nomeArquivo
+    });
+    return {versao: versao, pdfFileName: nomeArquivo};
+  }
+
+  return { gerarDossiePdf: gerarDossiePdf, gerarDossieVersionadoDeCiclo: gerarDossieVersionadoDeCiclo };
 })();

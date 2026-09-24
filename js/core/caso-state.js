@@ -9,6 +9,10 @@ window.CasoState = (function(){
 
   var FASES_BACKBONE = [
     {
+      ordem: 0, id: "fase0", nome: "PM Canvas do Projeto",
+      objetivo: "Definir o projeto (Porquê, O quê, Quem, Como, Quando e Quanto) e registrar quem aprova e revisa cada uma das 7 fases, antes do processo nascer de fato — um projeto só se torna processo depois que a Fase 7 fecha."
+    },
+    {
       ordem: 1, id: "diagnostico", nome: "Diagnóstico e Viabilidade",
       objetivo: "Mapear o estado atual das operações para identificar desvios específicos, estabelecendo uma linha de base com indicadores mensuráveis que justifiquem a viabilidade e o cronograma de padronização do processo junto aos clientes e fornecedores."
     },
@@ -38,6 +42,13 @@ window.CasoState = (function(){
     }
   ];
 
+  /* As 7 fases "reais" do processo (exclui a Fase 0, que é definição de
+     projeto/PM Canvas, não uma etapa do backbone RACI-governado). Usado
+     pra montar as activities da RACI e o registro de Aprovador/Revisor. */
+  function fasesReais(){
+    return FASES_BACKBONE.filter(function(f){ return f.id !== "fase0"; });
+  }
+
   /* Papéis e RACI da matriz Controller (controller.pdf) — template padrão
      da fase Governança e Compliance para todo caso novo. Área e Cargo vêm
      do template real; Nome fica em branco (é dado pessoal de colegas, não
@@ -55,7 +66,7 @@ window.CasoState = (function(){
       {id:"role_9", area:"CFO", nome:"", cargo:"Diretor"}
     ];
 
-    var activities = FASES_BACKBONE.map(function(f, i){
+    var activities = fasesReais().map(function(f, i){
       return {id:"act_" + (i+1), titulo:f.nome, descricao:f.objetivo};
     });
 
@@ -93,6 +104,51 @@ window.CasoState = (function(){
     return {variant: "RACI", title: "Matriz de Governança", desc: "", roles: [], activities: [], cells: {}};
   }
 
+  function construirFase(f, semRaciPadrao){
+    return {
+      ordem: f.ordem,
+      id: f.id,
+      nome: f.nome,
+      objetivo: f.objetivo,
+      status: "aberta",
+      tarefas: [],
+      entregaveis: [],
+      ferramentas: {
+        pmCanvas: f.id === "fase0" ? {
+          pitch: "",
+          justificativas: [], objetivosSmart: [], beneficios: [],
+          produto: [], requisitos: [],
+          stakeholders: [], equipe: [],
+          premissas: [], entregaveisChave: [], restricoes: [],
+          riscos: [], custos: []
+        } : null,
+        aprovadoresRevisores: f.id === "fase0" ? fasesReais().map(function(x){
+          return {faseId: x.id, aprovador: "", revisor: ""};
+        }) : null,
+        raci: f.id === "governanca" ? (semRaciPadrao ? raciEmBranco() : seedControllerTemplate()) : null,
+        w2h: f.id === "modelagem" ? {acoes: []} : null,
+        fluxograma: f.id === "modelagem" ? {fluxos: []} : null,
+        pop: f.id === "modelagem" ? {itens: []} : null,
+        rastreabilidade: f.id === "sistemas" ? {itens: []} : null,
+        sistemas: f.id === "sistemas" ? {itens: []} : null,
+        abertura: f.id === "diagnostico" ? {objetivo: "", prazoAlvo: "", patrocinadorRoleId: "", patrocinadorNome: "", escopoDentro: [], escopoFora: [], criteriosSucesso: [], stakeholders: []} : null,
+        gut: f.id === "diagnostico" ? {itens: []} : null,
+        ishikawa: f.id === "diagnostico" ? {diagramas: []} : null,
+        porques: f.id === "diagnostico" ? {analises: []} : null,
+        riscos: f.id === "auditoria" ? {itens: []} : null,
+        planoAuditoria: f.id === "auditoria" ? {itens: []} : null,
+        regrasDivergencia: f.id === "auditoria" ? {itens: []} : null,
+        alcadas: f.id === "governanca" ? {itens: []} : null,
+        segregacao: f.id === "governanca" ? {pares: []} : null,
+        checklist: f.id === "implantacao" ? {itens: []} : null,
+        kpis: f.id === "implantacao" ? {itens: []} : null,
+        encerramento: f.id === "implantacao" ? {resultadosAlcancados: "", dataEncerramento: "", criteriosAvaliados: [], licoesAprendidas: [], pendencias: []} : null,
+        treinamento: f.id === "piloto" ? {itens: []} : null
+      },
+      fechamentos: []
+    };
+  }
+
   function novoCaso(nomeCaso, opcoes){
     var semRaciPadrao = opcoes && opcoes.semRaciPadrao;
     var agora = new Date().toISOString();
@@ -101,39 +157,16 @@ window.CasoState = (function(){
       nome: nomeCaso || "Novo caso",
       criadoEm: agora,
       atualizadoEm: agora,
-      fases: FASES_BACKBONE.map(function(f){
-        return {
-          ordem: f.ordem,
-          id: f.id,
-          nome: f.nome,
-          objetivo: f.objetivo,
-          status: "aberta",
-          tarefas: [],
-          entregaveis: [],
-          ferramentas: {
-            raci: f.id === "governanca" ? (semRaciPadrao ? raciEmBranco() : seedControllerTemplate()) : null,
-            w2h: f.id === "modelagem" ? {acoes: []} : null,
-            fluxograma: f.id === "modelagem" ? {fluxos: []} : null,
-            pop: f.id === "modelagem" ? {itens: []} : null,
-            rastreabilidade: f.id === "sistemas" ? {itens: []} : null,
-            sistemas: f.id === "sistemas" ? {itens: []} : null,
-            abertura: f.id === "diagnostico" ? {objetivo: "", prazoAlvo: "", patrocinadorRoleId: "", patrocinadorNome: "", escopoDentro: [], escopoFora: [], criteriosSucesso: [], stakeholders: []} : null,
-            gut: f.id === "diagnostico" ? {itens: []} : null,
-            ishikawa: f.id === "diagnostico" ? {diagramas: []} : null,
-            porques: f.id === "diagnostico" ? {analises: []} : null,
-            riscos: f.id === "auditoria" ? {itens: []} : null,
-            planoAuditoria: f.id === "auditoria" ? {itens: []} : null,
-            regrasDivergencia: f.id === "auditoria" ? {itens: []} : null,
-            alcadas: f.id === "governanca" ? {itens: []} : null,
-            segregacao: f.id === "governanca" ? {pares: []} : null,
-            checklist: f.id === "implantacao" ? {itens: []} : null,
-            kpis: f.id === "implantacao" ? {itens: []} : null,
-            encerramento: f.id === "implantacao" ? {resultadosAlcancados: "", dataEncerramento: "", criteriosAvaliados: [], licoesAprendidas: [], pendencias: []} : null,
-            treinamento: f.id === "piloto" ? {itens: []} : null
-          },
-          fechamentos: []
-        };
-      })
+      /* cicloAtual conta quantas vezes o processo inteiro já passou por
+         "Reabrir Processo" (melhoria contínua) — começa em 1. dossieVersoes
+         guarda o histórico de Dossiês gerados ao fechar um ciclo (mesmo
+         padrão de fase.fechamentos[], só que no nível do caso inteiro em
+         vez de uma fase só). O Dossiê "avulso" (botão da barra do caso,
+         a qualquer momento) continua sem versionar — só o que marca o
+         fim de um ciclo entra aqui. */
+      cicloAtual: 1,
+      dossieVersoes: [],
+      fases: FASES_BACKBONE.map(function(f){ return construirFase(f, semRaciPadrao); })
     };
   }
 
@@ -145,7 +178,22 @@ window.CasoState = (function(){
   function carregarCasoLocalStorage(){
     try{
       var raw = localStorage.getItem(LS_KEY);
-      return raw ? JSON.parse(raw) : null;
+      if(!raw) return null;
+      var caso = JSON.parse(raw);
+      /* Backfill pra casos salvos antes de cicloAtual/dossieVersoes existirem
+         — mesmo espírito do backfill de ferramenta por ferramenta já feito
+         em montarFases() (app.js), só que aqui no nível do caso inteiro. */
+      if(caso){
+        if(caso.cicloAtual == null) caso.cicloAtual = 1;
+        if(!Array.isArray(caso.dossieVersoes)) caso.dossieVersoes = [];
+        /* Backfill da Fase 0 (PM Canvas + registro de Aprovador/Revisor) pra
+           casos salvos antes dela existir — insere no início do array, com
+           estado vazio, sem mexer nas fases 1-7 já existentes. */
+        if(Array.isArray(caso.fases) && !caso.fases.some(function(f){ return f.id === "fase0"; })){
+          caso.fases.unshift(construirFase(FASES_BACKBONE[0], false));
+        }
+      }
+      return caso;
     }catch(e){ console.error("Falha ao carregar caso do localStorage", e); return null; }
   }
 

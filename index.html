@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.6">
-<link rel="stylesheet" href="css/app.css?v=1.6">
+<link rel="stylesheet" href="css/shell.css?v=1.7">
+<link rel="stylesheet" href="css/app.css?v=1.7">
 </head>
 <body>
 
@@ -59,6 +59,27 @@
 
   <nav class="fase-nav" id="faseNav"></nav>
 
+  <!-- Fase 0 — PM Canvas do Projeto (define o projeto e quem aprova/revisa cada fase, antes de o processo nascer de fato) -->
+  <section class="fase-view" id="fase-view-fase0">
+    <div class="fase-head">
+      <div>
+        <h2>Fase 0 — PM Canvas do Projeto</h2>
+        <p class="objetivo fase-objetivo"></p>
+      </div>
+      <div class="fase-head-right">
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado — exceto o registro de Aprovador(a)/Revisor(a), que fica sempre editável.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="fase0" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
+      </div>
+    </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-fase0" hidden>Fase fechada — clique em "Reabrir fase" para editar o PM Canvas.</div>
+    <div id="fase-root-fase0"></div>
+    <div class="fase-fechamento">
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição do PM Canvas até 'Reabrir fase'.">Fechar Fase</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
+      <span class="historico"></span>
+    </div>
+  </section>
+
   <!-- Fase 1 — Diagnóstico e Viabilidade -->
   <section class="fase-view" id="fase-view-diagnostico">
     <div class="fase-head">
@@ -77,7 +98,7 @@
     <div id="fase-root-diagnostico-ishikawa"></div>
     <div id="fase-root-diagnostico-porques"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -100,7 +121,7 @@
     <div id="fase-root-governanca-alcadas"></div>
     <div id="fase-root-governanca-segregacao"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -123,7 +144,7 @@
     <div id="fase-root-modelagem-fluxograma"></div>
     <div id="fase-root-modelagem-pop"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -146,7 +167,7 @@
     <div id="fase-root-auditoria-plano"></div>
     <div id="fase-root-auditoria-regrasdiv"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -168,7 +189,7 @@
     <div id="fase-root-sistemas"></div>
     <div id="fase-root-sistemas-aquisicao"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -189,7 +210,7 @@
     <div class="fase-bloqueio-aviso" id="fase-bloqueio-piloto" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-piloto"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
@@ -212,11 +233,14 @@
     <div id="fase-root-implantacao-checklist"></div>
     <div id="fase-root-implantacao-encerramento"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
+      <button class="btn btn-ghost" id="btnReabrirProcesso" type="button" style="display:none" data-tooltip="Só aparece quando as 7 fases estão fechadas. Reabre o processo inteiro para um novo ciclo de melhoria contínua — baixa um backup, versiona o Dossiê e libera a edição das 7 fases.">Reabrir Processo</button>
       <span class="historico"></span>
     </div>
   </section>
+
+  <footer class="app-copyright">&copy; <span id="copyrightAno"></span> Emerson da Cunha — Controller. Todos os direitos reservados.</footer>
 
 </div>
 
@@ -628,6 +652,45 @@
 </template>
 
 <!-- ============================================================
+     Template do módulo Fase 0 — PM Canvas do Projeto + registro de
+     Aprovador(a)/Revisor(a) por fase. Os 12 blocos do Canvas e as
+     linhas do registro são montados em JS (fase0-module.js), não
+     aqui — este template só marca os pontos de ancoragem.
+     ============================================================ -->
+<template id="fase0-template">
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Pitch do projeto</h3></div>
+  <textarea class="fase0-pitch" id="fase0-pitch" maxlength="400" rows="2" placeholder="Resumo de uma frase: o que é este projeto e por que ele existe."></textarea>
+</div>
+
+<div class="riscos-panel">
+  <div class="tool-head"><h3>PM Canvas</h3></div>
+  <p class="gut-scale">
+    <span>Porquê / O quê / Quem / Como / Quando e Quanto — mesma estrutura do PM Canvas já usado internamente. Cada bloco aceita quantos itens forem necessários. A importação lê o mesmo formato que a ferramenta de PM Canvas exporta (Propriedade/Projeto/Título/...) — pode subir o export de lá direto, sem editar nada.</span>
+  </p>
+  <div class="fase0-canvas-actions">
+    <button class="btn btn-ghost" id="fase0-modeloBtn" type="button" data-tooltip="Baixa uma planilha .xlsx de exemplo, no formato que esta tela entende — use como ponto de partida pra preencher fora daqui.">Baixar modelo</button>
+    <button class="btn btn-ghost" id="fase0-importarBtn" type="button" data-tooltip="Sobe um .xlsx preenchido — tanto o modelo baixado aqui quanto um arquivo exportado direto da ferramenta de PM Canvas funcionam, sem editar nada antes.">Importar Excel</button>
+    <button class="btn btn-ghost fase0-limpar-btn" id="fase0-limparBtn" type="button" data-tooltip="Apaga o Pitch e todos os itens dos 12 blocos do Canvas. Não afeta o registro de Aprovador(a)/Revisor(a).">Limpar PM Canvas</button>
+  </div>
+  <div class="fase0-canvas-grid" id="fase0-canvasGrid"></div>
+</div>
+
+<div class="riscos-panel">
+  <div class="tool-head"><h3>Aprovador(a) e Revisor(a) por fase</h3></div>
+  <p class="gut-scale">
+    <span>Documentação viva — continua editável mesmo com esta fase fechada, porque muda conforme o processo avança pelas 7 fases.</span>
+  </p>
+  <div class="doc-table-wrap">
+    <table class="doc-table fase0-registro">
+      <thead><tr><th>Fase</th><th>Aprovador(a)</th><th>Revisor(a)</th></tr></thead>
+      <tbody id="fase0-registroTbody"></tbody>
+    </table>
+  </div>
+</div>
+</template>
+
+<!-- ============================================================
      Template do módulo Matriz de Riscos (Fase 4 — Auditoria,
      Riscos e Controles).
      ============================================================ -->
@@ -826,6 +889,100 @@
       <p class="lead">Você não precisa decorar como cada ferramenta funciona — cada uma tem sua própria documentação embutida.</p>
       <p>Depois de entrar num processo, repare que cada uma das 7 fases tem um botão <b>"? Documentação"</b> no canto da tela — ele explica o conceito de cada ferramenta daquela fase, o que cada campo e cada botão faz, boas práticas, erros comuns a evitar e um exemplo prático completo. A Matriz RACI (Fase 2 — Governança) tem sua documentação reunida ali mesmo, incluindo variações (RACI, RASCI, RACI-VS) e perguntas frequentes.</p>
       <p>Use essa documentação sempre que tiver dúvida sobre o que escrever em um campo — ela foi pensada para dar segurança de que você está preenchendo cada ferramenta da forma que realmente sustenta a construção do processo, não só "para preencher".</p>
+    </section>
+
+  </div>
+</div>
+</template>
+
+<template id="docs-fase-fase0">
+<div class="docs-layout">
+  <nav class="docs-toc">
+    <button data-target="doc-fase0-conceito" class="active">O que é a Fase 0</button>
+    <button data-target="doc-fase0-canvas">PM Canvas</button>
+    <button data-target="doc-fase0-excel">Excel — modelo e importação</button>
+    <button data-target="doc-fase0-registro">Aprovador(a)/Revisor(a)</button>
+  </nav>
+  <div>
+
+    <div class="doc-phase-intro">
+      <b>Por que existe uma fase antes da Fase 1:</b> até a Fase 7 fechar, o que você está construindo é um <b>projeto</b> — só vira <b>processo</b> de fato depois disso. A Fase 0 registra o projeto (o PM Canvas, com Porquê/O quê/Quem/Como/Quando e Quanto) e define, logo no início, quem aprova e quem revisa cada uma das 7 fases seguintes — sem isso definido antes, cada fase fechada não tem a quem prestar contas.
+      <ol>
+        <li>PM Canvas — define o projeto antes de qualquer ferramenta das 7 fases ser preenchida.</li>
+        <li>Registro de Aprovador(a)/Revisor(a) — quem confere cada fase, decidido uma vez, editável sempre.</li>
+      </ol>
+    </div>
+
+    <section class="docs-section" id="doc-fase0-conceito">
+      <h2>O que é a Fase 0</h2>
+      <p class="lead">A única fase que não é uma etapa da execução do processo — é a definição do projeto que dá origem a ele. Segue o mesmo mecanismo de fechar/gerar PDF/reabrir das demais 7 fases, com uma exceção: o registro de Aprovador(a)/Revisor(a) nunca trava, mesmo com esta fase fechada.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Preencha a Fase 0 antes de começar a Fase 1 — as decisões de escopo/objetivo do PM Canvas evitam retrabalho nas fases seguintes.</li>
+          <li>Feche a Fase 0 assim que o PM Canvas e o registro de aprovadores estiverem estáveis — isso já libera "Reabrir Processo" mais adiante, na Fase 7, junto com as outras 7 fases fechadas.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-fase0-canvas">
+      <h2>PM Canvas</h2>
+      <p class="lead">12 blocos agrupados nas 5 perguntas clássicas do PM Canvas — mesma estrutura da ferramenta já usada internamente na Enops. Cada bloco aceita quantos itens forem necessários; nenhum é obrigatório para fechar a fase.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Pergunta</th><th>Blocos</th></tr></thead>
+          <tbody>
+            <tr><th>Porquê?</th><td>Justificativas (Passado), Objetivos SMART, Benefícios (Futuro)</td></tr>
+            <tr><th>O quê?</th><td>Produto, Requisitos</td></tr>
+            <tr><th>Quem?</th><td>Stakeholders (Externo), Equipe (Interno)</td></tr>
+            <tr><th>Como?</th><td>Premissas, Entregáveis-Chave, Restrições</td></tr>
+            <tr><th>Quando e Quanto?</th><td>Riscos, Custos</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>O campo <b>Pitch</b>, no topo, é um resumo livre de uma frase — o que é o projeto e por que ele existe.</p>
+      <div class="doc-callout tip">
+        <b class="tag">Boas práticas</b>
+        <ul>
+          <li>Escreva cada item como um fato específico, não uma categoria genérica — "prazo de fechamento contábil não é cumprido" é melhor que "problemas no fechamento".</li>
+          <li>Objetivos SMART precisam de meta e prazo, igual ao Objetivo do Termo de Abertura (Fase 1) — os dois devem contar a mesma história do projeto.</li>
+        </ul>
+      </div>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Cadastrar Stakeholders só de pessoas — sistemas e áreas externas que o projeto depende (ex.: um fornecedor de dados) também entram aqui.</li>
+          <li>Deixar Restrições vazio quando existe alguma regra real (LGPD, acesso restrito, orçamento fechado) — isso costuma aparecer tarde demais, já na Auditoria.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="docs-section" id="doc-fase0-excel">
+      <h2>Excel — modelo e importação</h2>
+      <p class="lead">"Baixar modelo (.xlsx)" gera uma planilha de exemplo no formato que a Fase 0 entende; "Importar Excel" lê esse mesmo formato de volta — inclusive um arquivo exportado direto da ferramenta de PM Canvas já usada internamente, sem precisar editar nada antes de subir.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Coluna</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>Propriedade</th><td>Qual bloco do Canvas ("Justificativa", "Risco"...). "Pitch" vira o campo de texto livre; "Nome" é ignorado (é o nome do projeto, não um bloco). Uma Propriedade que não bate com nenhum bloco conhecido é tratada como um papel da Equipe (ex.: "Dev", "Scrum Master").</td></tr>
+            <tr><th>Título</th><td>O texto do item — único campo realmente obrigatório por linha.</td></tr>
+            <tr><th>Description, SprintPeriod, Valor</th><td>Opcionais — quando presentes, são incorporados ao texto do item importado (ex.: prazo em dias de um Entregável-Chave).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><b>Importar sempre soma</b> — os itens importados são adicionados aos que já existem, nunca substituem. Use "Limpar PM Canvas" antes de importar se quiser começar do zero.</p>
+    </section>
+
+    <section class="docs-section" id="doc-fase0-registro">
+      <h2>Aprovador(a) e Revisor(a) por fase</h2>
+      <p class="lead">Uma linha por fase real do processo (1 a 7) — quem aprova e quem revisa aquela fase. É "documentação viva": continua editável mesmo com a Fase 0 fechada, porque pode mudar conforme o processo avança pelas fases.</p>
+      <p><b>Retroalimentação:</b> o que estiver preenchido aqui no momento em que cada fase fecha aparece automaticamente numa tabela no fim do PDF daquela fase, e também na página correspondente do Dossiê consolidado.</p>
+      <div class="doc-callout warn">
+        <b class="tag">Erros comuns</b>
+        <ul>
+          <li>Preencher o registro só depois de já ter fechado várias fases — o PDF de fechamento de cada fase usa o que estava preenchido <i>naquele momento</i>, não retroage se você completar o registro depois.</li>
+        </ul>
+      </div>
     </section>
 
   </div>
@@ -1841,38 +1998,39 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.6"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.6"></script>
-<script src="js/lib/exceljs.embed.js?v=1.6"></script>
-<script src="js/core/toast.js?v=1.6"></script>
-<script src="js/core/caso-state.js?v=1.6"></script>
-<script src="js/core/docs-fase.js?v=1.6"></script>
-<script src="js/core/logo-data.js?v=1.6"></script>
-<script src="js/core/pdf-doc.js?v=1.6"></script>
-<script src="js/core/fechamento.js?v=1.6"></script>
-<script src="js/core/dossie.js?v=1.6"></script>
-<script src="js/core/nav.js?v=1.6"></script>
-<script src="js/core/richtext.js?v=1.6"></script>
-<script src="js/modules/raci-module.js?v=1.6"></script>
-<script src="js/modules/alcadas-module.js?v=1.6"></script>
-<script src="js/modules/segregacao-module.js?v=1.6"></script>
-<script src="js/modules/placeholder-module.js?v=1.6"></script>
-<script src="js/modules/w2h-module.js?v=1.6"></script>
-<script src="js/modules/fluxograma-module.js?v=1.6"></script>
-<script src="js/modules/pop-module.js?v=1.6"></script>
-<script src="js/modules/abertura-module.js?v=1.6"></script>
-<script src="js/modules/encerramento-module.js?v=1.6"></script>
-<script src="js/modules/gut-module.js?v=1.6"></script>
-<script src="js/modules/ishikawa-module.js?v=1.6"></script>
-<script src="js/modules/porques-module.js?v=1.6"></script>
-<script src="js/modules/riscos-module.js?v=1.6"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.6"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.6"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.6"></script>
-<script src="js/modules/sistemas-module.js?v=1.6"></script>
-<script src="js/modules/checklist-module.js?v=1.6"></script>
-<script src="js/modules/kpis-module.js?v=1.6"></script>
-<script src="js/modules/treinamento-module.js?v=1.6"></script>
-<script src="js/app.js?v=1.6"></script>
+<script src="js/lib/jspdf.embed.js?v=1.7"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.7"></script>
+<script src="js/lib/exceljs.embed.js?v=1.7"></script>
+<script src="js/core/toast.js?v=1.7"></script>
+<script src="js/core/caso-state.js?v=1.7"></script>
+<script src="js/core/docs-fase.js?v=1.7"></script>
+<script src="js/core/logo-data.js?v=1.7"></script>
+<script src="js/core/pdf-doc.js?v=1.7"></script>
+<script src="js/core/fechamento.js?v=1.7"></script>
+<script src="js/core/dossie.js?v=1.7"></script>
+<script src="js/core/nav.js?v=1.7"></script>
+<script src="js/core/richtext.js?v=1.7"></script>
+<script src="js/modules/raci-module.js?v=1.7"></script>
+<script src="js/modules/alcadas-module.js?v=1.7"></script>
+<script src="js/modules/segregacao-module.js?v=1.7"></script>
+<script src="js/modules/placeholder-module.js?v=1.7"></script>
+<script src="js/modules/w2h-module.js?v=1.7"></script>
+<script src="js/modules/fluxograma-module.js?v=1.7"></script>
+<script src="js/modules/pop-module.js?v=1.7"></script>
+<script src="js/modules/abertura-module.js?v=1.7"></script>
+<script src="js/modules/encerramento-module.js?v=1.7"></script>
+<script src="js/modules/gut-module.js?v=1.7"></script>
+<script src="js/modules/ishikawa-module.js?v=1.7"></script>
+<script src="js/modules/porques-module.js?v=1.7"></script>
+<script src="js/modules/riscos-module.js?v=1.7"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.7"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.7"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.7"></script>
+<script src="js/modules/sistemas-module.js?v=1.7"></script>
+<script src="js/modules/checklist-module.js?v=1.7"></script>
+<script src="js/modules/kpis-module.js?v=1.7"></script>
+<script src="js/modules/treinamento-module.js?v=1.7"></script>
+<script src="js/modules/fase0-module.js?v=1.7"></script>
+<script src="js/app.js?v=1.7"></script>
 </body>
 </html>

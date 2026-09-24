@@ -34,10 +34,13 @@ window.Fechamento = (function(){
      do RaciModule.exportPdf) — em retrato, 9 colunas ficam estreitas demais e o
      cabeçalho quebra letra por letra, inflando a tabela para várias páginas — ou
      quando o Fluxograma tem etapas demais para caber na largura do retrato sem
-     encolher demais o desenho. Compartilhada com o Dossiê consolidado, que decide
-     a orientação de cada página de fase com o mesmo critério. */
+     encolher demais o desenho — ou quando é a Fase 0, cujo PM Canvas é sempre
+     uma grade de 5 colunas (Porquê/O quê/Quem/Como/Quando e Quanto), estreita
+     demais em retrato de qualquer jeito. Compartilhada com o Dossiê consolidado,
+     que decide a orientação de cada página de fase com o mesmo critério. */
   function calcularPrecisaPaisagem(fase){
-    return !!((fase.ferramentas && fase.ferramentas.raci && fase.ferramentas.raci.roles.length > 4) ||
+    return !!(fase.id === "fase0" ||
+      (fase.ferramentas && fase.ferramentas.raci && fase.ferramentas.raci.roles.length > 4) ||
       (fase.ferramentas && fase.ferramentas.fluxograma && fase.ferramentas.fluxograma.fluxos && fase.ferramentas.fluxograma.fluxos.some(function(f){ return f.etapas.length > 3; })));
   }
 
@@ -57,7 +60,12 @@ window.Fechamento = (function(){
       y = window.PdfDoc.desenharTituloSecao(doc, eyebrow, titulo);
     }
 
-    if(fase.id === "diagnostico"){
+    if(fase.id === "fase0"){
+      if(fase.ferramentas.pmCanvas && window.Fase0Module){
+        iniciarFerramenta("PM Canvas do Projeto");
+        y = window.Fase0Module.desenharNoDoc(doc, fase.ferramentas.pmCanvas, y);
+      }
+    } else if(fase.id === "diagnostico"){
       /* Fase com quatro ferramentas simultâneas — Termo de Abertura delimita
          o processo, GUT prioriza, Ishikawa mapeia as causas (6M), 5 Porquês
          aprofunda uma causa até a raiz. */
@@ -177,6 +185,33 @@ window.Fechamento = (function(){
     return {y: y, aprovador: aprovador};
   }
 
+  /* Tabela de assinatura (1 linha x 3 colunas: Aprovador(a) | Revisor(a) |
+     Data e Versão) desenhada no fim do conteúdo de uma fase — tanto no
+     PDF de fechamento de fase única (construirPdfFase) quanto em cada
+     página de fase dentro do Dossiê (dossie.js). Os valores de
+     aprovador/revisor vêm do registro da Fase 0 (ver fase0-module.js);
+     versão/data vêm de quem chamou, porque o significado muda conforme
+     o contexto (versão sendo criada agora vs. último fechamento já
+     registrado). Retorna o Y final, depois da tabela. */
+  function desenharTabelaAprovacao(doc, y, aprovador, revisor, versao, data){
+    var chk = window.PdfDoc.garantirEspaco(doc, y, 50, 40);
+    y = chk.y;
+    doc.autoTable({
+      startY: y,
+      head: [["Aprovador(a)", "Revisor(a)", "Data e Versão"]],
+      body: [[
+        aprovador || "—",
+        revisor || "—",
+        (data ? window.PdfDoc.formatarDataHora(data) : "—") + "  ·  v" + versao
+      ]],
+      theme: "grid",
+      styles:{fontSize:9, cellPadding:6, valign:"middle", lineColor:[218,223,230], lineWidth:0.6, textColor:[28,36,48]},
+      headStyles:{fillColor:[43,58,103], textColor:255, fontStyle:"bold", fontSize:9},
+      columnStyles:{2:{cellWidth:140}}
+    });
+    return doc.lastAutoTable.finalY + 10;
+  }
+
   /* Monta o PDF de fechamento de uma fase para uma versão/data já
      definidas — compartilhado entre gerar uma versão NOVA
      (`gerarPdfFechamentoFase`) e regenerar o arquivo da versão ATUAL
@@ -186,7 +221,7 @@ window.Fechamento = (function(){
      arquivo específico está sendo produzido, usado só no rodapé
      ("Gerado em") — as duas coincidem na primeira vez que a fase fecha,
      e divergem quando o mesmo PDF é baixado de novo depois. */
-  function construirPdfFase(caso, fase, versao, dataRotulo, dataGeracaoArquivo){
+  function construirPdfFase(caso, fase, versao, dataRotulo, dataGeracaoArquivo, aprovadorFase0, revisorFase0){
     if(!window.jspdf || !window.jspdf.jsPDF){ throw new Error("jsPDF não carregado"); }
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({orientation: calcularPrecisaPaisagem(fase) ? "landscape" : "portrait", unit:"pt"});
@@ -216,6 +251,10 @@ window.Fechamento = (function(){
     var resultado = desenharConteudoFase(doc, caso, fase, y);
     var aprovador = resultado.aprovador;
 
+    if(fase.id !== "fase0"){
+      desenharTabelaAprovacao(doc, resultado.y, aprovadorFase0, revisorFase0, versao, dataRotulo);
+    }
+
     window.PdfDoc.finalizarDocumento(doc, ctx);
 
     /* O navegador não cria subpastas a partir de "/" no nome sugerido do download
@@ -236,12 +275,15 @@ window.Fechamento = (function(){
 
     var versao = fase.fechamentos.length + 1;
     var agora = new Date();
-    var construido = construirPdfFase(caso, fase, versao, agora, agora);
+    var av = window.Fase0Module ? window.Fase0Module.buscarAprovadorRevisor(caso, faseId) : {aprovador:"", revisor:""};
+    var construido = construirPdfFase(caso, fase, versao, agora, agora, av.aprovador, av.revisor);
 
     fase.fechamentos.push({
       versao: versao,
       dataFechamento: agora.toISOString(),
       aprovadoPor: construido.aprovador || null,
+      aprovador: av.aprovador || "",
+      revisor: av.revisor || "",
       pdfFileName: construido.nomeArquivo
     });
     fase.status = "fechada";
@@ -261,7 +303,7 @@ window.Fechamento = (function(){
     if(!fase || !fase.fechamentos.length) return null;
 
     var ultimo = fase.fechamentos[fase.fechamentos.length - 1];
-    var construido = construirPdfFase(caso, fase, ultimo.versao, new Date(ultimo.dataFechamento), new Date());
+    var construido = construirPdfFase(caso, fase, ultimo.versao, new Date(ultimo.dataFechamento), new Date(), ultimo.aprovador || "", ultimo.revisor || "");
 
     return {versao: ultimo.versao, aprovador: construido.aprovador, pdfFileName: construido.nomeArquivo};
   }
@@ -270,6 +312,7 @@ window.Fechamento = (function(){
     buscarAprovadorNaGovernanca: buscarAprovadorNaGovernanca,
     calcularPrecisaPaisagem: calcularPrecisaPaisagem,
     desenharConteudoFase: desenharConteudoFase,
+    desenharTabelaAprovacao: desenharTabelaAprovacao,
     gerarPdfFechamentoFase: gerarPdfFechamentoFase,
     regerarPdfUltimaVersao: regerarPdfUltimaVersao
   };

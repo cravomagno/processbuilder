@@ -4,6 +4,37 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.7] — 24/09/2026
+
+Foco: melhoria contínua no fechamento da Fase 7 deixa de recriar o caso do zero; nova Fase 0 define o projeto e quem aprova/revisa cada fase.
+
+### Adicionado
+
+- **Fase 0 — PM Canvas do Projeto**: nova tela, antes da Fase 1, com os 12 blocos do PM Canvas (Porquê/O quê/Quem/Como/Quando e Quanto — mesma estrutura já usada internamente na Enops), campo de Pitch, e importação/exportação em Excel (modelo baixável, reimportação do preenchido). Segue o mesmo mecanismo de fechar/reabrir/PDF das demais fases.
+- **Registro de Aprovador(a)/Revisor(a) por fase**: dentro da Fase 0, uma tabela viva (sempre editável, mesmo com a Fase 0 fechada) define quem aprova e quem revisa cada uma das 7 fases. Essa informação passa a aparecer, automaticamente, como uma tabela no fim do PDF de fechamento de cada fase e em cada página de fase do Dossiê consolidado — substitui, na prática, o antigo "Aprovado por" derivado sozinho da Matriz RACI (que nunca chegou a aparecer visualmente em nenhum PDF).
+- **Ícone por fase na barra de navegação**: as 8 abas (Fase 0 a 7) ganharam um ícone próprio, no mesmo estilo visual já usado na barra do caso.
+- **Documentação da Fase 0**: botão "? Documentação" com conceito, campos, boas práticas e erros comuns — mesmo padrão das outras 7 fases.
+- **Botão "Limpar PM Canvas"**: apaga o Pitch e os 12 blocos de uma vez, com confirmação antes.
+- **Botão "Próxima fase"**: ao fim de cada fase (exceto a última), libera assim que ela fecha e navega direto para a fase seguinte.
+- **Rodapé de copyright**: "© {ano} Emerson da Cunha — Controller. Todos os direitos reservados." no fim da tela.
+- **Importação compatível com o export real do PM Canvas**: além do modelo próprio, a Fase 0 agora lê o mesmo formato que a ferramenta de PM Canvas já usada internamente exporta (colunas Propriedade/Projeto/Título/...) — dá pra subir esse arquivo direto, sem editar nada antes.
+
+### Corrigido
+
+- **Barra de navegação quebrando em duas linhas**: a grade de abas estava fixa em 7 colunas, sem contar com a nova Fase 0 — corrigido para 8.
+- **Nome da Fase 0 duplicado** em tooltips e no Dossiê ("Fase 0 — Fase 0 — PM Canvas...").
+- **Cards do PM Canvas**: texto cortado (sem quebra de linha), botão de remover desalinhado, sem separação visual entre itens e a coluna — cards reconstruídos com quebra de linha real e contraste de fundo.
+- **PDF da Fase 0**: desenhava os 12 blocos em lista linear (retrato, muito espaço vazio) — agora sai em paisagem, numa grade de 5 colunas com os blocos alinhados por linha, igual à distribuição visual da ferramenta de PM Canvas original, e cada bloco desenhado como uma célula com fundo e borda (não só texto solto) pra deixar a separação entre eles evidente.
+- **"Fechar fase (gerar PDF)" → "Fechar Fase"**: texto simplificado em todas as 8 fases; botão ganhou o mesmo visual (`.btn.btn-primary`) e ícone do resto do app; "Reabrir fase" também ganhou ícone.
+- **"Baixar modelo"/"Importar Excel"** da Fase 0 ficaram mais discretos (estilo `btn-ghost`, antes tão destacados quanto uma ação primária); texto explicativo que estava entre parênteses nos botões virou tooltip.
+- **Blocos do PM Canvas com altura variável**: cada bloco crescia sem limite conforme o número de itens, quebrando a leitura em grade — agora têm altura fixa com rolagem própria (mesmo padrão de Papéis/Atividades da Matriz RACI).
+
+### Alterado
+
+- **"Reabrir Processo" substitui o gatilho automático de reabertura de ciclo**: ao fechar a Fase 7, o sistema não pergunta mais se deve criar um caso novo do zero — em vez disso, um botão "Reabrir Processo" aparece ao lado de "Reabrir Fase" na Fase 7 **só quando as 7 fases estão fechadas** (agora incluindo a Fase 0). Ao clicar (com confirmação antes), o processo continua no **mesmo caso**: baixa um backup (.json), gera e versiona o Dossiê consolidado marcando o fechamento do ciclo atual, e reabre as 7 fases para edição — nenhum dado é apagado, nenhuma ferramenta precisa ser recriada do zero a cada ciclo.
+- **Dossiê ganha versionamento de ciclo**: `caso.dossieVersoes[]` (novo) registra cada Dossiê gerado ao fechar um ciclo — mesmo padrão já usado no histórico de fechamentos de cada fase, agora também no nível do processo inteiro. O Dossiê avulso ("Gerar dossiê" na barra do caso, a qualquer momento) continua sem versionar.
+- **Contador de Ciclo**: a barra do caso agora mostra em qual ciclo do processo você está ("Ciclo 1", "Ciclo 2"...) — incrementado a cada "Reabrir Processo".
+
 ## [v1.6] — 23/09/2026
 
 Sétima publicação. Foco: fases fechadas passam a bloquear a edição de verdade (até então só um badge cosmético), mais uma leva de ajustes visuais e de layout a partir de testes reais dentro do app.
