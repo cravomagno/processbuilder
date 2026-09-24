@@ -4,6 +4,13 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.8] — 24/09/2026
+
+### Corrigido
+
+- **Tela inicial e documentação geral desatualizadas**: ainda diziam "em 7 fases" (sem contar a Fase 0) — corrigido na landing, nos tooltips de "Gerar dossiê"/"Reabrir Processo" e na documentação geral.
+- **Documentação da Fase 7 descrevendo o mecanismo antigo de reabertura de ciclo** (criar cópia do caso com nome novo) — substituído pela descrição real de "Reabrir Processo" (mesmo caso, backup, Dossiê versionado, contador de Ciclo).
+
 ## [v1.7] — 24/09/2026
 
 Foco: melhoria contínua no fechamento da Fase 7 deixa de recriar o caso do zero; nova Fase 0 define o projeto e quem aprova/revisa cada fase.

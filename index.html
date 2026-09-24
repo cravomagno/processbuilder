@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.7">
-<link rel="stylesheet" href="css/app.css?v=1.7">
+<link rel="stylesheet" href="css/shell.css?v=1.8">
+<link rel="stylesheet" href="css/app.css?v=1.8">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
   <div class="landing-card">
     <p class="eyebrow">Enops · Consultoria interna de processos</p>
     <h1>Construtor de Processos</h1>
-    <p class="landing-lede">Guia a implantação de um processo do diagnóstico ao encerramento, em 7 fases — com ferramentas próprias, documentação de apoio em cada uma e fechamento em PDF a cada etapa.</p>
+    <p class="landing-lede">Guia a implantação de um processo do diagnóstico ao encerramento — a Fase 0 define o projeto (PM Canvas) e mais 7 fases de execução, com ferramentas próprias, documentação de apoio em cada uma e fechamento em PDF a cada etapa.</p>
     <div class="landing-actions">
       <button class="btn btn-primary landing-btn" id="landingNovoBtn" type="button">Iniciar novo processo</button>
       <button class="btn btn-secondary landing-btn" id="landingCarregarBtn" type="button">Carregar processo</button>
@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="caso-actions">
-      <button class="btn-ghost-inverse tooltip-abaixo" id="btnGerarDossie" data-tooltip="Gera um único PDF com a capa-resumo das 7 fases e o conteúdo de cada uma — funciona mesmo com fases ainda abertas.">
+      <button class="btn-ghost-inverse tooltip-abaixo" id="btnGerarDossie" data-tooltip="Gera um único PDF com a capa-resumo das 8 fases (Fase 0 + 1 a 7) e o conteúdo de cada uma — funciona mesmo com fases ainda abertas.">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
         Gerar<br>dossiê
       </button>
@@ -235,7 +235,7 @@
     <div class="fase-fechamento">
       <button class="btn btn-primary btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar Fase</button>
       <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
-      <button class="btn btn-ghost" id="btnReabrirProcesso" type="button" style="display:none" data-tooltip="Só aparece quando as 7 fases estão fechadas. Reabre o processo inteiro para um novo ciclo de melhoria contínua — baixa um backup, versiona o Dossiê e libera a edição das 7 fases.">Reabrir Processo</button>
+      <button class="btn btn-ghost" id="btnReabrirProcesso" type="button" style="display:none" data-tooltip="Só aparece quando as 8 fases (Fase 0 + 1 a 7) estão fechadas. Reabre o processo inteiro para um novo ciclo de melhoria contínua — baixa um backup, versiona o Dossiê e libera a edição de todas elas.">Reabrir Processo</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -853,10 +853,10 @@
 
     <section class="docs-section" id="doc-geral-conceito">
       <h2>O que é o Construtor de Processos</h2>
-      <p class="lead">Uma ferramenta para estruturar, documentar e acompanhar a implantação de um processo do zero — do diagnóstico inicial até o encerramento formal — em 7 fases fixas, cada uma com suas próprias ferramentas de apoio.</p>
-      <p>Cada fase representa uma etapa da consultoria interna de processos: <b>1. Diagnóstico e Viabilidade</b>, <b>2. Governança e Compliance</b>, <b>3. Modelagem do Processo</b>, <b>4. Auditoria, Riscos e Controles</b>, <b>5. Sistemas, Tecnologia e Documentação</b>, <b>6. Piloto e Gestão de Mudança</b> e <b>7. Implantação e Estabelecimento</b>. Dentro de cada fase, você preenche ferramentas específicas (matrizes, planos, checklists, fluxogramas) que se conectam entre si — o que você cadastra numa fase costuma reaparecer, pronto para reutilizar, nas fases seguintes.</p>
+      <p class="lead">Uma ferramenta para estruturar, documentar e acompanhar a implantação de um processo do zero — do diagnóstico inicial até o encerramento formal — em 8 fases fixas (a Fase 0, de definição do projeto, mais 7 fases de execução), cada uma com suas próprias ferramentas de apoio.</p>
+      <p>Cada fase representa uma etapa da consultoria interna de processos: <b>0. PM Canvas do Projeto</b>, <b>1. Diagnóstico e Viabilidade</b>, <b>2. Governança e Compliance</b>, <b>3. Modelagem do Processo</b>, <b>4. Auditoria, Riscos e Controles</b>, <b>5. Sistemas, Tecnologia e Documentação</b>, <b>6. Piloto e Gestão de Mudança</b> e <b>7. Implantação e Estabelecimento</b>. Dentro de cada fase, você preenche ferramentas específicas (matrizes, planos, checklists, fluxogramas) que se conectam entre si — o que você cadastra numa fase costuma reaparecer, pronto para reutilizar, nas fases seguintes. Só depois que a Fase 7 fecha o que você construiu vira <b>processo</b> de fato — até lá, é <b>projeto</b>.</p>
       <div class="concept-grid">
-        <div class="concept-card"><b>Um caso</b><span>É o processo que você está construindo agora — tem nome próprio, e guarda o preenchimento das 7 fases.</span></div>
+        <div class="concept-card"><b>Um caso</b><span>É o processo que você está construindo agora — tem nome próprio, e guarda o preenchimento das 8 fases.</span></div>
         <div class="concept-card"><b>Fechar uma fase</b><span>Gera um PDF formal daquela fase, registra a versão e permite reabrir para corrigir depois, se precisar.</span></div>
         <div class="concept-card"><b>Dossiê consolidado</b><span>Reúne todas as fases já fechadas de um caso num único PDF, a qualquer momento.</span></div>
       </div>
@@ -870,7 +870,7 @@
         <table class="doc-table">
           <thead><tr><th>Botão</th><th>O que faz</th></tr></thead>
           <tbody>
-            <tr><th>Iniciar novo processo</th><td>Pede um nome e cria um caso novo, em branco, com as 7 fases prontas para preencher. É a mesma função do botão "Novo caso" que fica na barra superior do app, disponível a qualquer momento — inclusive para quem acompanha vários processos diferentes ao mesmo tempo, cada um em seu próprio arquivo.</td></tr>
+            <tr><th>Iniciar novo processo</th><td>Pede um nome e cria um caso novo, em branco, com as 8 fases prontas para preencher. É a mesma função do botão "Novo caso" que fica na barra superior do app, disponível a qualquer momento — inclusive para quem acompanha vários processos diferentes ao mesmo tempo, cada um em seu próprio arquivo.</td></tr>
             <tr><th>Carregar processo</th><td>Abre o seletor de arquivos do seu computador para importar um caso salvo anteriormente (arquivo <code>.json</code> baixado por "Salvar rascunho do caso"). É a mesma função do botão "Carregar rascunho" da barra superior do app.</td></tr>
           </tbody>
         </table>
@@ -887,7 +887,7 @@
     <section class="docs-section" id="doc-geral-docs">
       <h2>Documentação de cada ferramenta</h2>
       <p class="lead">Você não precisa decorar como cada ferramenta funciona — cada uma tem sua própria documentação embutida.</p>
-      <p>Depois de entrar num processo, repare que cada uma das 7 fases tem um botão <b>"? Documentação"</b> no canto da tela — ele explica o conceito de cada ferramenta daquela fase, o que cada campo e cada botão faz, boas práticas, erros comuns a evitar e um exemplo prático completo. A Matriz RACI (Fase 2 — Governança) tem sua documentação reunida ali mesmo, incluindo variações (RACI, RASCI, RACI-VS) e perguntas frequentes.</p>
+      <p>Depois de entrar num processo, repare que cada uma das 8 fases tem um botão <b>"? Documentação"</b> no canto da tela — ele explica o conceito de cada ferramenta daquela fase, o que cada campo e cada botão faz, boas práticas, erros comuns a evitar e um exemplo prático completo. A Matriz RACI (Fase 2 — Governança) tem sua documentação reunida ali mesmo, incluindo variações (RACI, RASCI, RACI-VS) e perguntas frequentes.</p>
       <p>Use essa documentação sempre que tiver dúvida sobre o que escrever em um campo — ela foi pensada para dar segurança de que você está preenchendo cada ferramenta da forma que realmente sustenta a construção do processo, não só "para preencher".</p>
     </section>
 
@@ -1861,12 +1861,12 @@
     <button data-target="doc-imp-checklist" class="active">Checklist de Implantação</button>
     <button data-target="doc-imp-kpis">KPIs / Indicadores</button>
     <button data-target="doc-imp-encerramento">Termo de Encerramento</button>
-    <button data-target="doc-imp-gatilho">Reabertura de novo ciclo</button>
+    <button data-target="doc-imp-gatilho">Reabrir Processo</button>
   </nav>
   <div>
 
     <div class="doc-phase-intro">
-      <b>Como as ferramentas desta fase se conectam:</b> o Checklist confirma que os pré-requisitos concretos de implantação estão prontos (sistemas em produção, treinamentos feitos). Os KPIs medem, já em operação real, se o processo entrega o que prometeu. O Termo de Encerramento fecha o ciclo, reavaliando os Critérios de sucesso definidos desde a Fase 1 — e a Reabertura de novo ciclo decide o que acontece depois: se o processo continua só sendo monitorado, ou se um novo ciclo de melhoria é necessário.
+      <b>Como as ferramentas desta fase se conectam:</b> o Checklist confirma que os pré-requisitos concretos de implantação estão prontos (sistemas em produção, treinamentos feitos). Os KPIs medem, já em operação real, se o processo entrega o que prometeu. O Termo de Encerramento fecha o ciclo, reavaliando os Critérios de sucesso definidos desde a Fase 1 — e, com as 8 fases fechadas, "Reabrir Processo" decide o que acontece depois: se o processo continua só sendo monitorado, ou se um novo ciclo de melhoria é necessário.
       <ol>
         <li>Checklist de Implantação — os pré-requisitos estão todos prontos?</li>
         <li>KPIs / Indicadores — o processo, já em operação, está performando dentro da meta?</li>
@@ -1989,48 +1989,48 @@
     </section>
 
     <section class="docs-section" id="doc-imp-gatilho">
-      <h2>Reabertura de novo ciclo</h2>
-      <p class="lead">Ao clicar em "Fechar fase (gerar PDF)" nesta última fase, o app oferece a opção de abrir um novo ciclo do mesmo processo — por exemplo, uma revisão anual.</p>
-      <p>Se você aceitar, é criada uma cópia do caso com um nome sugerido (ex.: "Processo de Compras — Ciclo 2"), permitindo recomeçar o acompanhamento das 7 fases sem perder o histórico e os PDFs do ciclo anterior.</p>
+      <h2>Reabrir Processo</h2>
+      <p class="lead">Quando as 8 fases (Fase 0 + 1 a 7) estão todas fechadas, um botão <b>"Reabrir Processo"</b> aparece ao lado de "Reabrir fase" — para melhoria contínua, por exemplo uma revisão anual do mesmo processo.</p>
+      <p>Ao clicar (com confirmação antes), o processo continua no <b>mesmo caso</b> — nada de criar uma cópia com nome novo: baixa um backup (.json), gera e versiona o Dossiê consolidado marcando o fechamento do ciclo atual, incrementa o contador de "Ciclo" (visível na barra do caso) e reabre as 8 fases para edição. Nenhum dado é apagado — o histórico de fechamentos de cada fase, e os PDFs já gerados, continuam preservados.</p>
     </section>
 
   </div>
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.7"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.7"></script>
-<script src="js/lib/exceljs.embed.js?v=1.7"></script>
-<script src="js/core/toast.js?v=1.7"></script>
-<script src="js/core/caso-state.js?v=1.7"></script>
-<script src="js/core/docs-fase.js?v=1.7"></script>
-<script src="js/core/logo-data.js?v=1.7"></script>
-<script src="js/core/pdf-doc.js?v=1.7"></script>
-<script src="js/core/fechamento.js?v=1.7"></script>
-<script src="js/core/dossie.js?v=1.7"></script>
-<script src="js/core/nav.js?v=1.7"></script>
-<script src="js/core/richtext.js?v=1.7"></script>
-<script src="js/modules/raci-module.js?v=1.7"></script>
-<script src="js/modules/alcadas-module.js?v=1.7"></script>
-<script src="js/modules/segregacao-module.js?v=1.7"></script>
-<script src="js/modules/placeholder-module.js?v=1.7"></script>
-<script src="js/modules/w2h-module.js?v=1.7"></script>
-<script src="js/modules/fluxograma-module.js?v=1.7"></script>
-<script src="js/modules/pop-module.js?v=1.7"></script>
-<script src="js/modules/abertura-module.js?v=1.7"></script>
-<script src="js/modules/encerramento-module.js?v=1.7"></script>
-<script src="js/modules/gut-module.js?v=1.7"></script>
-<script src="js/modules/ishikawa-module.js?v=1.7"></script>
-<script src="js/modules/porques-module.js?v=1.7"></script>
-<script src="js/modules/riscos-module.js?v=1.7"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.7"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.7"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.7"></script>
-<script src="js/modules/sistemas-module.js?v=1.7"></script>
-<script src="js/modules/checklist-module.js?v=1.7"></script>
-<script src="js/modules/kpis-module.js?v=1.7"></script>
-<script src="js/modules/treinamento-module.js?v=1.7"></script>
-<script src="js/modules/fase0-module.js?v=1.7"></script>
-<script src="js/app.js?v=1.7"></script>
+<script src="js/lib/jspdf.embed.js?v=1.8"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.8"></script>
+<script src="js/lib/exceljs.embed.js?v=1.8"></script>
+<script src="js/core/toast.js?v=1.8"></script>
+<script src="js/core/caso-state.js?v=1.8"></script>
+<script src="js/core/docs-fase.js?v=1.8"></script>
+<script src="js/core/logo-data.js?v=1.8"></script>
+<script src="js/core/pdf-doc.js?v=1.8"></script>
+<script src="js/core/fechamento.js?v=1.8"></script>
+<script src="js/core/dossie.js?v=1.8"></script>
+<script src="js/core/nav.js?v=1.8"></script>
+<script src="js/core/richtext.js?v=1.8"></script>
+<script src="js/modules/raci-module.js?v=1.8"></script>
+<script src="js/modules/alcadas-module.js?v=1.8"></script>
+<script src="js/modules/segregacao-module.js?v=1.8"></script>
+<script src="js/modules/placeholder-module.js?v=1.8"></script>
+<script src="js/modules/w2h-module.js?v=1.8"></script>
+<script src="js/modules/fluxograma-module.js?v=1.8"></script>
+<script src="js/modules/pop-module.js?v=1.8"></script>
+<script src="js/modules/abertura-module.js?v=1.8"></script>
+<script src="js/modules/encerramento-module.js?v=1.8"></script>
+<script src="js/modules/gut-module.js?v=1.8"></script>
+<script src="js/modules/ishikawa-module.js?v=1.8"></script>
+<script src="js/modules/porques-module.js?v=1.8"></script>
+<script src="js/modules/riscos-module.js?v=1.8"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.8"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.8"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.8"></script>
+<script src="js/modules/sistemas-module.js?v=1.8"></script>
+<script src="js/modules/checklist-module.js?v=1.8"></script>
+<script src="js/modules/kpis-module.js?v=1.8"></script>
+<script src="js/modules/treinamento-module.js?v=1.8"></script>
+<script src="js/modules/fase0-module.js?v=1.8"></script>
+<script src="js/app.js?v=1.8"></script>
 </body>
 </html>
