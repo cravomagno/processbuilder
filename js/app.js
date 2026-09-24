@@ -34,6 +34,14 @@
       var fechadas = caso.fases.filter(function(f){ return f.status === "fechada"; }).length;
       metaEl.textContent = fechadas + " de " + caso.fases.length + " fases fechadas — atualizado em " + new Date(caso.atualizadoEm).toLocaleString("pt-BR");
     }
+    /* Mesmo brasão embutido usado no cabeçalho dos PDFs (js/core/logo-data.js)
+       — bloco opcional, se o arquivo não tiver sido carregado a imagem
+       simplesmente não aparece (hidden por padrão no app.html). */
+    var brasaoEl = document.getElementById("casoBrasao");
+    if(brasaoEl && window.LOGO_BASE64 && !brasaoEl.src){
+      brasaoEl.src = window.LOGO_BASE64;
+      brasaoEl.hidden = false;
+    }
   }
 
   function atualizarFaseHead(faseId){
@@ -49,6 +57,54 @@
         ? "Nenhum fechamento ainda."
         : "Último fechamento: v" + fase.fechamentos[fase.fechamentos.length-1].versao + " em " + new Date(fase.fechamentos[fase.fechamentos.length-1].dataFechamento).toLocaleDateString("pt-BR");
     }
+    /* "Reabrir fase" só faz sentido (e só aparece) quando há algo pra
+       reabrir — com a fase aberta, clicar nele não teria efeito nenhum
+       e só confundia (o mesmo tipo de confusão que o aviso de bloqueio
+       com bug de CSS causou). Usa style.display em vez do atributo
+       hidden de propósito: .btn já define display:inline-flex com a
+       mesma especificidade de [hidden]{display:none} — um estilo
+       inline sempre vence qualquer regra de folha de estilo externa,
+       então não corre o mesmo risco que o aviso teve. */
+    var reabrirBtnHead = document.querySelector("#fase-view-" + faseId + " .btn-reabrir");
+    if(reabrirBtnHead) reabrirBtnHead.style.display = (fase.status === "fechada") ? "" : "none";
+
+    var fecharBtnHead = document.querySelector("#fase-view-" + faseId + " .btn-fechar");
+    if(fecharBtnHead){
+      fecharBtnHead.dataset.tooltip = fase.status === "fechada"
+        ? "A fase já está fechada — clique gera de novo o PDF da versão atual, sem criar uma versão nova."
+        : "Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.";
+    }
+
+    aplicarBloqueioFase(faseId);
+  }
+
+  /* Bloqueia (ou libera) os campos de uma fase conforme seu status —
+     "fechada" trava tudo até "Reabrir fase" ser clicado. Percorre todos
+     os mount points da fase (`fase-root-<id>*`) e desabilita cada
+     input/select/textarea/button encontrado, mais o campo de texto rico
+     (contenteditable, que não é um controle de formulário nativo e por
+     isso precisa ser tratado à parte). Botões marcados com a classe
+     .fase-nao-bloquear (ex.: Exportar PDF/Excel da RACI) ficam de fora
+     — são leitura, não edição, continuam liberados mesmo com a fase
+     fechada. O cabeçalho da fase e os botões "Fechar fase"/"Reabrir
+     fase" nunca são tocados aqui (ficam fora de qualquer fase-root). */
+  function aplicarBloqueioFase(faseId){
+    var fase = porId(faseId);
+    var bloqueado = fase.status === "fechada";
+
+    var aviso = document.getElementById("fase-bloqueio-" + faseId);
+    if(aviso) aviso.hidden = !bloqueado;
+
+    document.querySelectorAll('[id^="fase-root-' + faseId + '"]').forEach(function(raiz){
+      raiz.classList.toggle("fase-campos-bloqueada", bloqueado);
+      raiz.querySelectorAll("input, select, textarea, button").forEach(function(el){
+        if(el.classList.contains("fase-nao-bloquear")) return;
+        el.disabled = bloqueado;
+      });
+      raiz.querySelectorAll("[contenteditable]").forEach(function(el){
+        el.contentEditable = bloqueado ? "false" : "true";
+      });
+    });
   }
 
   /* Gatilho de reabertura de ciclo — só perguntado ao fechar a Fase 7
@@ -93,11 +149,23 @@
     if(!btn) return;
     btn.addEventListener("click", function(){
       try{
-        var resultado = window.Fechamento.gerarPdfFechamentoFase(caso, faseId);
+        /* A fase já fechada não tem nada de novo pra virar versão — os
+           campos estão travados desde o último fechamento (ver
+           aplicarBloqueioFase). Clicar de novo aqui só rebaixa o PDF da
+           versão atual, sem criar uma versão nova nem mexer no
+           histórico; só "Reabrir fase" + fechar de novo cria uma versão. */
+        var jaFechada = porId(faseId).status === "fechada";
+        var resultado = jaFechada
+          ? window.Fechamento.regerarPdfUltimaVersao(caso, faseId)
+          : window.Fechamento.gerarPdfFechamentoFase(caso, faseId);
         persistir();
         atualizarFaseHead(faseId);
-        if(window.AppToast) window.AppToast.show("Fase fechada. PDF gerado (versão " + resultado.versao + ").");
-        if(faseId === "implantacao"){
+        if(window.AppToast){
+          window.AppToast.show(jaFechada
+            ? "PDF da versão " + resultado.versao + " gerado novamente (sem criar versão nova)."
+            : "Fase fechada. PDF gerado (versão " + resultado.versao + ").");
+        }
+        if(faseId === "implantacao" && !jaFechada){
           ofertarReaberturaDeCiclo();
         }
       }catch(err){
@@ -205,8 +273,9 @@
     var nav = document.getElementById("faseNav");
     window.CasoState.FASES_BACKBONE.forEach(function(f){
       var tab = document.createElement("button");
-      tab.className = "nav-tab";
+      tab.className = "nav-tab tooltip-abaixo";
       tab.dataset.fase = f.id;
+      tab.dataset.tooltip = "Fase " + f.ordem + " — " + f.nome + ". Bolinha verde = fase fechada; cinza = ainda aberta.";
       tab.innerHTML = '<span class="nav-tab-top"><span class="status-dot"></span><span class="n">F' + f.ordem + '</span></span><span class="nav-tab-label">' + f.nome + '</span>';
       nav.appendChild(tab);
     });

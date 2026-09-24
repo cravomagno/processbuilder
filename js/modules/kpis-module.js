@@ -83,7 +83,8 @@ window.KpisModule = (function(){
    * imagem no PDF (gerarImagemGraficoPNG), pra desenhar exatamente a
    * mesma coisa nos dois lugares.
    */
-  function calcularGeometria(item){
+  function calcularGeometria(item, opts){
+    opts = opts || {};
     var pontos = item.historico.slice()
       .sort(function(a,b){ return a.data < b.data ? -1 : 1; })
       .map(function(l){ return {data:l.data, valor: parseFloat(l.valor)}; })
@@ -91,11 +92,19 @@ window.KpisModule = (function(){
 
     var meta = parseFloat(item.meta);
     var temMeta = !isNaN(meta);
-    var W = 220, H = 100, padL = 8, padR = 8, padT = 10, padB = 20;
+    /* W/H/padding aceitam override — a tela (renderGraficoBloco) usa os
+       valores padrão de sempre; o PDF (gerarImagemGraficoPNG) pede um
+       gráfico maior com mais respiro embaixo/em cima pra caber datas no
+       eixo X e rótulo nos pontos-chave, sem mudar o gráfico em tela. */
+    var W = opts.W || 220, H = opts.H || 100;
+    var padL = opts.padL != null ? opts.padL : 8;
+    var padR = opts.padR != null ? opts.padR : 8;
+    var padT = opts.padT != null ? opts.padT : 10;
+    var padB = opts.padB != null ? opts.padB : 20;
     var plotW = W - padL - padR, plotH = H - padT - padB, plotBottom = H - padB;
 
     if(pontos.length === 0){
-      return {pontos: pontos, temMeta: temMeta, meta: meta, W:W, H:H, padL:padL, plotW:plotW, plotBottom:plotBottom};
+      return {pontos: pontos, temMeta: temMeta, meta: meta, W:W, H:H, padL:padL, padR:padR, padT:padT, padB:padB, plotW:plotW, plotBottom:plotBottom};
     }
 
     var valores = pontos.map(function(p){ return p.valor; });
@@ -107,7 +116,7 @@ window.KpisModule = (function(){
     function xAt(i){ return pontos.length > 1 ? padL + (i/(pontos.length-1)) * plotW : padL + plotW/2; }
     function yAt(v){ return plotBottom - ((v - vmin)/(vmax - vmin)) * plotH; }
 
-    return {pontos:pontos, temMeta:temMeta, meta:meta, W:W, H:H, padL:padL, plotW:plotW, plotBottom:plotBottom, xAt:xAt, yAt:yAt};
+    return {pontos:pontos, temMeta:temMeta, meta:meta, W:W, H:H, padL:padL, padR:padR, padT:padT, padB:padB, plotW:plotW, plotBottom:plotBottom, xAt:xAt, yAt:yAt};
   }
 
   /**
@@ -176,8 +185,26 @@ window.KpisModule = (function(){
    * escala 3x pra sair nítido mesmo impresso. Retorna null se não há
    * nenhuma leitura numérica ainda.
    */
-  function gerarImagemGraficoPNG(item){
-    var geo = calcularGeometria(item);
+  function dataBrCurta(iso){
+    if(!iso) return "";
+    var p = iso.split("-");
+    return p.length === 3 ? (p[2]+"/"+p[1]) : iso;
+  }
+
+  /* Índices dos pontos que ganham data no eixo X — no máximo 4, sempre
+     incluindo o primeiro e o último, espaçados uniformemente entre eles.
+     Rotular todo ponto (podem ser 10-15 leituras) apertaria demais e
+     sobrepunha texto; poucos pontos-chave bem espaçados dão a noção do
+     período coberto sem esse risco. */
+  function indicesEixoX(n){
+    if(n <= 1) return [0];
+    if(n <= 4) { var todos = []; for(var i=0;i<n;i++) todos.push(i); return todos; }
+    var idx = [0, Math.round((n-1)/3), Math.round((n-1)*2/3), n-1];
+    return idx.filter(function(v, i){ return idx.indexOf(v) === i; }); // remove duplicata se o arredondamento colidir
+  }
+
+  function gerarImagemGraficoPNG(item, opts){
+    var geo = calcularGeometria(item, opts);
     if(geo.pontos.length === 0) return null;
 
     var escala = 3;
@@ -189,8 +216,9 @@ window.KpisModule = (function(){
     ctx.fillStyle = SURFACE_HEX;
     ctx.fillRect(0, 0, geo.W, geo.H);
 
+    var my = null;
     if(geo.temMeta){
-      var my = geo.yAt(geo.meta);
+      my = geo.yAt(geo.meta);
       ctx.save();
       ctx.strokeStyle = INK_FAINT_HEX;
       ctx.lineWidth = 1;
@@ -202,8 +230,13 @@ window.KpisModule = (function(){
       ctx.restore();
       ctx.fillStyle = INK_FAINT_HEX;
       ctx.font = "8px Helvetica, Arial, sans-serif";
-      ctx.textAlign = "right";
-      ctx.fillText("Meta " + item.meta + (item.unidade ? (" "+item.unidade) : ""), geo.padL + geo.plotW, my - 4);
+      /* Rótulo da meta no lado ESQUERDO da linha (não mais no direito) —
+         de propósito: o ponto mais recente também fica no extremo
+         direito do gráfico e também ganha um rótulo de valor agora;
+         deixar os dois no mesmo canto competindo pelo mesmo espaço era
+         exatamente o tipo de sobreposição que este pedido veio evitar. */
+      ctx.textAlign = "left";
+      ctx.fillText("Meta " + item.meta + (item.unidade ? (" "+item.unidade) : ""), geo.padL, my - 4);
     }
 
     if(geo.pontos.length > 1){
@@ -219,6 +252,24 @@ window.KpisModule = (function(){
       ctx.stroke();
     }
 
+    /* Datas no eixo X — só nos índices selecionados (ver indicesEixoX),
+       um tracinho + a data curta (DD/MM) logo abaixo do eixo. */
+    if(opts && opts.rotulosEixoX){
+      ctx.fillStyle = INK_FAINT_HEX;
+      ctx.strokeStyle = INK_FAINT_HEX;
+      ctx.font = "7px Helvetica, Arial, sans-serif";
+      ctx.textAlign = "center";
+      indicesEixoX(geo.pontos.length).forEach(function(i){
+        var x = geo.xAt(i);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, geo.plotBottom);
+        ctx.lineTo(x, geo.plotBottom + 3);
+        ctx.stroke();
+        ctx.fillText(dataBrCurta(geo.pontos[i].data), x, geo.plotBottom + 13);
+      });
+    }
+
     geo.pontos.forEach(function(p, i){
       var isLast = i === geo.pontos.length - 1;
       var x = geo.xAt(i), y = geo.yAt(p.valor);
@@ -232,6 +283,41 @@ window.KpisModule = (function(){
         ctx.stroke();
       }
     });
+
+    /* Rótulo de valor só no primeiro e no último ponto (o mais recente)
+       — os "elementos a mais" pedidos, sem rotular ponto a ponto (com
+       10-15 leituras isso sobrepõe garantido). Pulado quando não cabe
+       (perto demais da borda de cima) em vez de forçar uma posição
+       ruim. */
+    if(opts && opts.rotulosValor){
+      ctx.font = "bold 7.5px Helvetica, Arial, sans-serif";
+      var candidatos = geo.pontos.length > 1 ? [0, geo.pontos.length-1] : [0];
+      candidatos.forEach(function(i){
+        var isLast = i === geo.pontos.length - 1;
+        var x = geo.xAt(i), y = geo.yAt(geo.pontos[i].valor);
+        var labelY = y - 8;
+        if(labelY < geo.padT * 0.5) return; // muito perto do topo, não força
+        var alinhamento = i === 0 ? "left" : "right";
+        var labelX = i === 0 ? Math.max(x, geo.padL) : Math.min(x, geo.padL+geo.plotW);
+        var texto = geo.pontos[i].valor + (item.unidade ? (" "+item.unidade) : "");
+
+        /* Fundo branco atrás do texto — sem isso, a própria linha do
+           gráfico pode cruzar por cima do rótulo (ex.: quando o valor
+           seguinte ao primeiro ponto sobe bastante) e cortar o texto.
+           Garante legibilidade não importa o formato da linha ali. */
+        var largura = ctx.measureText(texto).width;
+        ctx.save();
+        ctx.fillStyle = SURFACE_HEX;
+        ctx.globalAlpha = 0.88;
+        var halo = alinhamento === "left" ? labelX - 2 : labelX - largura - 2;
+        ctx.fillRect(halo, labelY - 7, largura + 4, 9);
+        ctx.restore();
+
+        ctx.fillStyle = isLast ? metaStatus(item).hex : INK_FAINT_HEX;
+        ctx.textAlign = alinhamento;
+        ctx.fillText(texto, labelX, labelY);
+      });
+    }
 
     return canvas.toDataURL("image/png");
   }
@@ -493,6 +579,7 @@ window.KpisModule = (function(){
    */
   function desenharNoDoc(doc, docState, startY){
     var pageH = doc.internal.pageSize.getHeight();
+    var pageW = doc.internal.pageSize.getWidth();
     var y = startY;
 
     if(!docState.itens || docState.itens.length === 0){
@@ -507,7 +594,17 @@ window.KpisModule = (function(){
       return [parseInt(hex.substring(0,2),16), parseInt(hex.substring(2,4),16), parseInt(hex.substring(4,6),16)];
     }
 
-    var CHART_W = 170, CHART_H = 78;
+    /* Gráfico e tabela dimensionados pra ocupar a largura útil da
+       página inteira (antes eram 170pt+170pt fixos, sobrando bastante
+       espaço em branco à direita numa página de ~515pt úteis) — e o
+       gráfico ganha altura extra (proporção 2:1, não mais 2.2:1
+       comprimido) pra caber datas no eixo X e rótulo de valor sem
+       apertar. */
+    var GAP = 20;
+    var LARGURA_UTIL = pageW - 80;
+    var CHART_W = Math.round(LARGURA_UTIL * 0.56);
+    var CHART_H = Math.round(CHART_W * 0.5);
+    var TABELA_W = LARGURA_UTIL - CHART_W - GAP;
 
     docState.itens.forEach(function(item, idx){
       if(idx > 0){
@@ -515,7 +612,7 @@ window.KpisModule = (function(){
         doc.setDrawColor(218,223,230);
         doc.line(40, y - 8, doc.internal.pageSize.getWidth() - 40, y - 8);
       }
-      if(y > pageH - 130){ doc.addPage(); y = 40; }
+      if(y > pageH - (CHART_H + 50)){ doc.addPage(); y = 40; }
 
       var status = metaStatus(item);
       var statusRgb = hexToRgb(status.hex);
@@ -539,7 +636,7 @@ window.KpisModule = (function(){
       y += 12;
 
       var topoBloco = y;
-      var imgData = gerarImagemGraficoPNG(item);
+      var imgData = gerarImagemGraficoPNG(item, {W: CHART_W, H: CHART_H, padL: 14, padR: 14, padT: 26, padB: 26, rotulosEixoX: true, rotulosValor: true});
       if(imgData){
         doc.addImage(imgData, "PNG", 40, topoBloco, CHART_W, CHART_H);
       } else {
@@ -548,13 +645,13 @@ window.KpisModule = (function(){
         doc.text("Sem leituras ainda.", 40, topoBloco + 12);
       }
 
-      var tabelaX = 40 + CHART_W + 16;
+      var tabelaX = 40 + CHART_W + GAP;
       if(item.historico.length){
         var ordenado = item.historico.slice().sort(function(a,b){ return a.data < b.data ? 1 : -1; });
         doc.autoTable({
           startY: topoBloco,
           margin:{left: tabelaX},
-          tableWidth: 170,
+          tableWidth: TABELA_W,
           head: [["Data","Valor"]],
           body: ordenado.map(function(l){ return [dataBr(l.data), l.valor + (item.unidade ? " "+item.unidade : "")]; }),
           theme: "grid",

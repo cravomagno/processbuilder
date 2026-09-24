@@ -166,12 +166,27 @@ window.PdfDoc = (function(){
     return atual;
   }
 
+  /* Corta uma linha de texto (com "…" no fim) se ela ultrapassar a
+     largura disponível — mede a largura real no jsPDF em vez de
+     confiar num limite de caracteres, mesma técnica já usada na
+     quebra de texto dentro das caixas do Fluxograma. */
+  function truncarLinha(doc, texto, maxWidth){
+    texto = String(texto || "");
+    if(doc.getTextWidth(texto) <= maxWidth) return texto;
+    while(texto.length > 1 && doc.getTextWidth(texto + "…") > maxWidth){ texto = texto.slice(0, -1); }
+    return texto + "…";
+  }
+
   /* Chamado por último, depois de TODO o conteúdo do documento já
      desenhado (inclusive todas as quebras de página) — percorre as
-     páginas já existentes e desenha o rodapé em cada uma: linha fina,
-     contexto do documento à esquerda, data/hora/versão ao centro,
-     "Página N de M" à direita. Sempre dentro da margem inferior já
-     reservada pelos próprios módulos (nunca sobrepõe conteúdo). */
+     páginas já existentes e desenha o rodapé em cada uma, em DUAS
+     linhas: o contexto do documento (caso — fase) sozinho na primeira,
+     ocupando a largura toda; data/hora/versão ao centro e "Página N de
+     M" à direita na segunda. Duas linhas em vez de uma de propósito —
+     com tudo numa linha só, um nome de caso/fase comprido invadia o
+     texto central (relatado com um print real). Sempre dentro da
+     margem inferior já reservada pelos próprios módulos (nunca
+     sobrepõe conteúdo). */
   function finalizarDocumento(doc, ctx){
     ctx = ctx || {};
     var total = doc.internal.getNumberOfPages();
@@ -182,13 +197,16 @@ window.PdfDoc = (function(){
 
       doc.setDrawColor(COR_LINHA[0], COR_LINHA[1], COR_LINHA[2]);
       doc.setLineWidth(0.6);
-      doc.line(MARGEM_X, pageH - 34, pageW - MARGEM_X, pageH - 34);
+      doc.line(MARGEM_X, pageH - 42, pageW - MARGEM_X, pageH - 42);
 
       doc.setFont("helvetica", "normal"); doc.setFontSize(8);
       doc.setTextColor(COR_RODAPE[0], COR_RODAPE[1], COR_RODAPE[2]);
-      doc.text(rotuloDaPagina(ctx, i), MARGEM_X, pageH - 20);
-      doc.text(ctx.metaDireita || ("Gerado em " + formatarDataHora()), pageW / 2, pageH - 20, {align: "center"});
-      doc.text("Página " + i + " de " + total, pageW - MARGEM_X, pageH - 20, {align: "right"});
+
+      var rotulo = truncarLinha(doc, rotuloDaPagina(ctx, i), pageW - MARGEM_X * 2);
+      doc.text(rotulo, MARGEM_X, pageH - 29);
+
+      doc.text(ctx.metaDireita || ("Gerado em " + formatarDataHora()), pageW / 2, pageH - 16, {align: "center"});
+      doc.text("Página " + i + " de " + total, pageW - MARGEM_X, pageH - 16, {align: "right"});
     }
   }
 

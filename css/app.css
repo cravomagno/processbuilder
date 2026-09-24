@@ -92,6 +92,20 @@
   box-shadow:var(--shadow-md);
   margin-bottom:16px;
 }
+.caso-bar .caso-bar-titulo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.caso-bar .caso-brasao{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+  background:#fff;
+  padding:4px;
+  flex:none;
+  box-shadow:var(--shadow-sm);
+}
 .caso-bar .caso-nome{
   font-family:'Space Grotesk',sans-serif;
   font-weight:600;
@@ -112,19 +126,99 @@
   color:#fff;
   border:1px solid rgba(255,255,255,.3);
   border-radius:var(--radius-sm);
-  width:112px;
-  height:44px;
-  padding:0 8px;
-  font-size:12px;
+  width:104px;
+  height:60px;
+  padding:8px 6px 7px;
+  font-size:11.5px;
   font-weight:600;
   line-height:1.25;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  gap:5px;
   text-align:center;
+  transition:background .15s ease, border-color .15s ease, transform .15s ease;
 }
-.caso-bar .btn-ghost-inverse:hover{background:rgba(255,255,255,.18);}
+.caso-bar .btn-ghost-inverse svg{width:18px;height:18px;flex:none;stroke:#fff;}
+.caso-bar .btn-ghost-inverse:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5);}
+.caso-bar .btn-ghost-inverse:active{transform:scale(.97);}
+
+/* ---------- Tooltip reutilizável (data-tooltip="texto explicativo") ----------
+   CSS puro, sem JS/biblioteca — o mesmo atributo pode ser aplicado em
+   qualquer elemento do app (não só na barra do caso) sempre que fizer
+   sentido explicar o que ele faz ao passar o mouse por cima.
+
+   Posicionamento composto via --tt-x/--tt-y: cada variante (.tooltip-
+   esquerda, .tooltip-abaixo) só mexe no eixo que lhe diz respeito, pra
+   dar pra combinar as duas no mesmo elemento (ex.: um botão no canto
+   superior direito precisa das duas ao mesmo tempo) sem uma pisar na
+   regra da outra — com "transform" de um jeito só (não composto), a
+   última declarada sempre ganharia inteira, quebrando o eixo da outra. */
+[data-tooltip]{position:relative;}
+[data-tooltip]::after,
+[data-tooltip]::before{
+  --tt-x:translateX(-50%);
+  --tt-y:translateY(4px);
+}
+[data-tooltip]::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  bottom:calc(100% + 10px);
+  left:50%;
+  transform:var(--tt-x) var(--tt-y);
+  background:var(--ink);
+  color:#fff;
+  font-size:11.5px;
+  font-weight:500;
+  line-height:1.4;
+  white-space:normal;
+  width:max-content;
+  max-width:230px;
+  padding:7px 10px;
+  border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-md);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease, visibility .12s;
+  z-index:80;
+  text-align:left;
+}
+[data-tooltip]::before{
+  content:"";
+  position:absolute;
+  bottom:calc(100% + 4px);
+  left:50%;
+  transform:var(--tt-x) var(--tt-y);
+  border:5px solid transparent;
+  border-top-color:var(--ink);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .12s ease, transform .12s ease, visibility .12s;
+  z-index:80;
+}
+[data-tooltip]:hover::after, [data-tooltip]:focus-visible::after,
+[data-tooltip]:hover::before, [data-tooltip]:focus-visible::before{
+  --tt-y:translateY(0);
+  opacity:1;
+  visibility:visible;
+}
+/* variante pra elementos coladinhos na borda direita (ex.: "Novo caso",
+   último botão da barra) -- sem isso a bolha centralizada estoura a tela.
+   Só mexe no eixo X (left/right + --tt-x); o eixo Y fica livre pra
+   .tooltip-abaixo (ou o padrão) definir. */
+[data-tooltip].tooltip-esquerda::after, [data-tooltip].tooltip-esquerda::before{left:auto;right:0;--tt-x:translateX(0);}
+[data-tooltip].tooltip-esquerda::before{right:9px;}
+
+/* variante pra elementos coladinhos no TOPO da página (barra do caso,
+   abas de fase) -- a bolha por cima estouraria pra fora da janela ali,
+   então mostra abaixo do elemento em vez de acima. Só mexe no eixo Y. */
+[data-tooltip].tooltip-abaixo::after{bottom:auto;top:calc(100% + 10px);--tt-y:translateY(-4px);}
+[data-tooltip].tooltip-abaixo::before{bottom:auto;top:calc(100% + 4px);--tt-y:translateY(-4px);border-top-color:transparent;border-bottom-color:var(--ink);}
+[data-tooltip].tooltip-abaixo:hover::after, [data-tooltip].tooltip-abaixo:focus-visible::after,
+[data-tooltip].tooltip-abaixo:hover::before, [data-tooltip].tooltip-abaixo:focus-visible::before{--tt-y:translateY(0);}
 
 /* ---------- Navegação por fases ---------- */
 .fase-nav{
@@ -219,6 +313,40 @@
   flex:none;
 }
 .fase-head .fase-status-badge.fechada{background:#E4F3ED;color:#186B4D;}
+
+.fase-bloqueio-aviso{
+  /* display só é definido no seletor :not([hidden]) abaixo, de propósito:
+     um "display:flex" aqui teria a MESMA especificidade do "display:none"
+     que o navegador aplica pra [hidden] — e como esta folha de estilo vem
+     depois da folha padrão do navegador na cascata, ganharia dela e o
+     aviso ficaria sempre visível, ignorando o atributo hidden setado via
+     JS (bug real, encontrado em produção — ver registro-de-progresso.md). */
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:600;
+  color:#8A5A00;
+  background:#FFF4E0;
+  border:1px solid #F5D9A0;
+  border-radius:var(--radius-md, 10px);
+  padding:10px 14px;
+  margin:0 0 14px;
+}
+.fase-bloqueio-aviso:not([hidden]){display:flex;}
+.fase-bloqueio-aviso::before{content:"🔒";font-size:13px;}
+
+/* Campos de uma fase fechada — bloqueados via JS (app.js), aqui só o
+   reforço visual: esmaece cada controle interativo (não o container
+   inteiro, pra não precisar "desfazer" opacity em botões de exceção —
+   opacity de um pai não é cancelável pelo opacity:1 de um filho) e
+   troca o cursor, deixando claro que não responde a clique/digitação
+   até "Reabrir fase". Botões com .fase-nao-bloquear (ex.: Exportar
+   PDF/Excel da RACI) ficam de fora, aparência normal. */
+.fase-campos-bloqueada :is(input,select,textarea,button,[contenteditable]):not(.fase-nao-bloquear){
+  opacity:.55;
+  filter:grayscale(.2);
+  cursor:not-allowed;
+}
 
 .fase-head-right{
   display:flex;

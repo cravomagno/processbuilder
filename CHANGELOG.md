@@ -4,6 +4,30 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.6] — 23/09/2026
+
+Sétima publicação. Foco: fases fechadas passam a bloquear a edição de verdade (até então só um badge cosmético), mais uma leva de ajustes visuais e de layout a partir de testes reais dentro do app.
+
+### Adicionado
+
+- **Bloqueio de campos ao fechar uma fase**: ao fechar uma fase (gerar a primeira ou qualquer versão do PDF), todos os campos dela (inputs, selects, textareas, botões de adicionar/remover/reordenar, células da Matriz RACI, o campo de texto rico das POPs) ficam bloqueados — clique e teclado não respondem mais, com um aviso visual explicando o motivo. O botão "Reabrir fase" (já existia, mas até agora só mudava a cor do badge) volta a liberar a edição.
+- **Exceção deliberada**: botões de leitura (Exportar PDF/Excel da Matriz RACI) continuam liberados mesmo com a fase fechada — bloquear só o que edita dado, não o que só lê/exporta o que já está lá.
+- Construído sem tocar em nenhum dos 20 módulos de ferramenta — reaproveita o fato de todos usarem elementos HTML nativos de formulário (`input`/`select`/`button`), bloqueados de uma vez a partir de `app.js`; só o campo de texto rico (que usa `contenteditable`, não um controle nativo) recebeu tratamento à parte, também sem mexer no `richtext.js`.
+- **"Fechar fase" não cria mais uma versão nova se a fase já estiver fechada**: como os campos ficam travados assim que a fase fecha, clicar em "Fechar fase (gerar PDF)" de novo sem ter passado por "Reabrir fase" antes agora só baixa novamente o PDF da versão atual (mesmo número, mesma data de "Fechado em") — sem criar uma entrada nova no histórico de fechamentos. Só reabrir e fechar de novo cria uma versão nova de verdade.
+
+### Corrigido
+
+- **Aviso de "Fase fechada" aparecendo em fases que nunca foram fechadas**: bug de CSS — a regra do aviso definia `display:flex` sem levar em conta o atributo `hidden`, então ele aparecia sempre, independente do estado real da fase (mesmo com o badge corretamente mostrando "Aberta"). Os campos continuavam liberados corretamente (isso nunca teve bug), só o aviso mentia visualmente.
+- **Botão "Reabrir fase" visível mesmo em fases nunca fechadas**: não tinha efeito nenhum nesse caso, só confundia — agora só aparece quando há de fato algo pra reabrir.
+- **Texto do rodapé se sobrepondo nos PDFs**: com um nome de caso e/ou fase mais longo (ex.: "Controle de Agregados — Fase 7: Implantação e Estabelecimento"), o rótulo à esquerda invadia visualmente o texto central de data/hora. Rodapé reestruturado em duas linhas — o rótulo sozinho numa linha, ocupando a largura toda; data/hora e "Página N de M" na linha de baixo — nunca mais colide, além de uma quebra de segurança (texto cortado com "…") se algum dia o rótulo for longo até demais pra uma linha inteira.
+
+### Adicionado
+
+- **Brasão da empresa no cabeçalho do app** (não só nos PDFs) — mesma imagem embutida já usada nos documentos, ao lado do nome do caso na barra superior.
+- **Ícones nos botões da barra do caso** (Gerar dossiê, Salvar rascunho, Carregar rascunho, Novo caso) — desenhados do zero como SVG simples (sem biblioteca externa), no mesmo estilo minimalista de traço fino do resto do app.
+- **Textos de orientação ao passar o mouse (tooltips)** — componente reutilizável em CSS puro (`data-tooltip="texto"` em qualquer elemento), sem JS nem biblioteca. Aplicado nesta rodada aos botões da barra do caso, abas de fase, badge de status, "Fechar fase"/"Reabrir fase" e botão de Documentação — o texto de "Fechar fase" muda dinamicamente conforme a fase já estar fechada ou não. Pronto pra ser aplicado em campos específicos sempre que solicitado, mesmo padrão do RichText.
+- **Gráfico e tabela dos KPIs redesenhados no PDF**: antes ocupavam só ~350pt de uma página com ~515pt úteis, sobrando bastante espaço em branco à direita — gráfico e tabela agora dimensionados pra usar a largura útil da página inteira. O gráfico também ganhou datas no eixo X (até 4, bem espaçadas, nunca uma por ponto) e o valor do primeiro e do último ponto rotulado diretamente na plotagem — com um fundo branco atrás de cada rótulo pra continuar legível mesmo quando a linha do gráfico passa por cima.
+
 ## [v1.5] — 23/09/2026
 
 Sexta publicação. Foco: revisão completa da formatação de todos os PDFs gerados pela solução (fechamento de fase e Dossiê consolidado), a partir de PDFs reais exportados do caso "Controle de Agregados" e de pontos apontados diretamente sobre eles — com duas rodadas de correção a partir dos seus testes reais dentro do app (estouro de texto no Fluxograma, lista numerada sumindo no PDF, bloco "Aprovado por", página própria por ferramenta) — **testada e validada por você em 23/09/2026**.

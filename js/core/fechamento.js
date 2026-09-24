@@ -177,26 +177,30 @@ window.Fechamento = (function(){
     return {y: y, aprovador: aprovador};
   }
 
-  function gerarPdfFechamentoFase(caso, faseId){
-    var fase = caso.fases.filter(function(f){ return f.id === faseId; })[0];
-    if(!fase) return null;
+  /* Monta o PDF de fechamento de uma fase para uma versão/data já
+     definidas — compartilhado entre gerar uma versão NOVA
+     (`gerarPdfFechamentoFase`) e regenerar o arquivo da versão ATUAL
+     sem criar uma versão nova (`regerarPdfUltimaVersao`). `dataRotulo`
+     é a data histórica que aparece como "Fechado em" no cabeçalho (não
+     muda ao regerar); `dataGeracaoArquivo` é o instante em que este
+     arquivo específico está sendo produzido, usado só no rodapé
+     ("Gerado em") — as duas coincidem na primeira vez que a fase fecha,
+     e divergem quando o mesmo PDF é baixado de novo depois. */
+  function construirPdfFase(caso, fase, versao, dataRotulo, dataGeracaoArquivo){
     if(!window.jspdf || !window.jspdf.jsPDF){ throw new Error("jsPDF não carregado"); }
-
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({orientation: calcularPrecisaPaisagem(fase) ? "landscape" : "portrait", unit:"pt"});
-    var versao = fase.fechamentos.length + 1;
     var pageW = doc.internal.pageSize.getWidth();
-    var dataFechamento = new Date();
 
     var ctx = {
       rotulo: caso.nome + " — Fase " + fase.ordem + ": " + fase.nome,
-      metaDireita: "v" + versao + " • Gerado em " + window.PdfDoc.formatarDataHora(dataFechamento)
+      metaDireita: "v" + versao + " • Gerado em " + window.PdfDoc.formatarDataHora(dataGeracaoArquivo)
     };
 
     var y = window.PdfDoc.desenharCabecalhoPrincipal(doc, {
       titulo: caso.nome + " — Fase " + fase.ordem + ": " + fase.nome,
       subtitulo: "Documento de fechamento de fase",
-      meta: "Versão " + versao + "   •   Fechado em " + window.PdfDoc.formatarDataHora(dataFechamento)
+      meta: "Versão " + versao + "   •   Fechado em " + window.PdfDoc.formatarDataHora(dataRotulo)
     });
 
     doc.setFont("helvetica","bold"); doc.setFontSize(10.5);
@@ -220,21 +224,53 @@ window.Fechamento = (function(){
     var nomeArquivo = "Casos_" + window.CasoState.slugCaso(caso.nome) + "_0" + fase.ordem + "-" + slug(fase.nome) + "-v" + versao + ".pdf";
     doc.save(nomeArquivo);
 
+    return {doc: doc, aprovador: aprovador, nomeArquivo: nomeArquivo};
+  }
+
+  /* Fecha a fase de verdade: só é chamado quando ela está "aberta"
+     (fase nova ou recém-reaberta) — cria uma versão NOVA, grava no
+     histórico de fechamentos e trava a edição (ver app.js). */
+  function gerarPdfFechamentoFase(caso, faseId){
+    var fase = caso.fases.filter(function(f){ return f.id === faseId; })[0];
+    if(!fase) return null;
+
+    var versao = fase.fechamentos.length + 1;
+    var agora = new Date();
+    var construido = construirPdfFase(caso, fase, versao, agora, agora);
+
     fase.fechamentos.push({
       versao: versao,
-      dataFechamento: dataFechamento.toISOString(),
-      aprovadoPor: aprovador || null,
-      pdfFileName: nomeArquivo
+      dataFechamento: agora.toISOString(),
+      aprovadoPor: construido.aprovador || null,
+      pdfFileName: construido.nomeArquivo
     });
     fase.status = "fechada";
 
-    return {versao:versao, aprovador:aprovador, pdfFileName:nomeArquivo};
+    return {versao: versao, aprovador: construido.aprovador, pdfFileName: construido.nomeArquivo};
+  }
+
+  /* Rebaixa o PDF da fase que JÁ está fechada, sem criar uma versão
+     nova — usado quando "Fechar fase" é clicado de novo sem a fase ter
+     sido reaberta (nada pode ter mudado, os campos estão travados; ver
+     app.js). Reaproveita o número de versão e a data de "Fechado em" já
+     registrados; o rodapé do arquivo mostra a data de HOJE em "Gerado
+     em", já que é quando esse arquivo específico está sendo produzido —
+     não altera `fase.fechamentos` nem `fase.status`. */
+  function regerarPdfUltimaVersao(caso, faseId){
+    var fase = caso.fases.filter(function(f){ return f.id === faseId; })[0];
+    if(!fase || !fase.fechamentos.length) return null;
+
+    var ultimo = fase.fechamentos[fase.fechamentos.length - 1];
+    var construido = construirPdfFase(caso, fase, ultimo.versao, new Date(ultimo.dataFechamento), new Date());
+
+    return {versao: ultimo.versao, aprovador: construido.aprovador, pdfFileName: construido.nomeArquivo};
   }
 
   return {
     buscarAprovadorNaGovernanca: buscarAprovadorNaGovernanca,
     calcularPrecisaPaisagem: calcularPrecisaPaisagem,
     desenharConteudoFase: desenharConteudoFase,
-    gerarPdfFechamentoFase: gerarPdfFechamentoFase
+    gerarPdfFechamentoFase: gerarPdfFechamentoFase,
+    regerarPdfUltimaVersao: regerarPdfUltimaVersao
   };
 })();

@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.5">
-<link rel="stylesheet" href="css/app.css?v=1.5">
+<link rel="stylesheet" href="css/shell.css?v=1.6">
+<link rel="stylesheet" href="css/app.css?v=1.6">
 </head>
 <body>
 
@@ -29,15 +29,30 @@
 <div class="app-shell">
 
   <div class="caso-bar">
-    <div>
-      <div class="caso-nome" id="casoNome">Caso</div>
-      <div class="caso-meta" id="casoMeta"></div>
+    <div class="caso-bar-titulo">
+      <img class="caso-brasao" id="casoBrasao" alt="Brasão" hidden />
+      <div>
+        <div class="caso-nome" id="casoNome">Caso</div>
+        <div class="caso-meta" id="casoMeta"></div>
+      </div>
     </div>
     <div class="caso-actions">
-      <button class="btn-ghost-inverse" id="btnGerarDossie">Gerar<br>dossiê</button>
-      <button class="btn-ghost-inverse" id="btnSalvarRascunho">Salvar rascunho<br>do caso</button>
-      <button class="btn-ghost-inverse" id="btnCarregarRascunho">Carregar<br>rascunho</button>
-      <button class="btn-ghost-inverse" id="btnNovoCaso">Novo<br>caso</button>
+      <button class="btn-ghost-inverse tooltip-abaixo" id="btnGerarDossie" data-tooltip="Gera um único PDF com a capa-resumo das 7 fases e o conteúdo de cada uma — funciona mesmo com fases ainda abertas.">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+        Gerar<br>dossiê
+      </button>
+      <button class="btn-ghost-inverse tooltip-abaixo" id="btnSalvarRascunho" data-tooltip="Baixa um arquivo .json com o caso inteiro (todas as fases, editável) — use pra continuar depois ou fazer um backup.">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
+        Salvar rascunho<br>do caso
+      </button>
+      <button class="btn-ghost-inverse tooltip-abaixo" id="btnCarregarRascunho" data-tooltip="Carrega um arquivo .json de rascunho salvo antes — substitui o caso atual pelo que estiver no arquivo.">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V10"/><path d="M7 15l5-5 5 5"/><path d="M4 4h16"/></svg>
+        Carregar<br>rascunho
+      </button>
+      <button class="btn-ghost-inverse tooltip-esquerda tooltip-abaixo" id="btnNovoCaso" data-tooltip="Abre um caso novo do zero, em branco — o caso atual continua salvo, pra acompanhar mais de um processo em paralelo.">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+        Novo<br>caso
+      </button>
       <input type="file" id="inputCarregarRascunho" accept="application/json,.json" style="display:none" />
     </div>
   </div>
@@ -52,17 +67,18 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="diagnostico" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="diagnostico" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-diagnostico" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-diagnostico-abertura"></div>
     <div id="fase-root-diagnostico-gut"></div>
     <div id="fase-root-diagnostico-ishikawa"></div>
     <div id="fase-root-diagnostico-porques"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -75,16 +91,17 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="governanca" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="governanca" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-governanca" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-governanca"></div>
     <div id="fase-root-governanca-alcadas"></div>
     <div id="fase-root-governanca-segregacao"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -97,16 +114,17 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="modelagem" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="modelagem" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-modelagem" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-modelagem"></div>
     <div id="fase-root-modelagem-fluxograma"></div>
     <div id="fase-root-modelagem-pop"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -119,16 +137,17 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="auditoria" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="auditoria" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-auditoria" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-auditoria"></div>
     <div id="fase-root-auditoria-plano"></div>
     <div id="fase-root-auditoria-regrasdiv"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -141,15 +160,16 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="sistemas" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="sistemas" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-sistemas" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-sistemas"></div>
     <div id="fase-root-sistemas-aquisicao"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -162,14 +182,15 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="piloto" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="piloto" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-piloto" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-piloto"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -182,16 +203,17 @@
         <p class="objetivo fase-objetivo"></p>
       </div>
       <div class="fase-head-right">
-        <span class="fase-status-badge">Aberta</span>
-        <button class="fase-docs-btn" data-fase="implantacao" type="button"><span class="q">?</span> Documentação</button>
+        <span class="fase-status-badge" data-tooltip="Fases fechadas bloqueiam edição até 'Reabrir fase' ser clicado.">Aberta</span>
+        <button class="fase-docs-btn" data-fase="implantacao" type="button" data-tooltip="Abre a documentação detalhada desta fase: conceito, campos, boas práticas e erros comuns."><span class="q">?</span> Documentação</button>
       </div>
     </div>
+    <div class="fase-bloqueio-aviso" id="fase-bloqueio-implantacao" hidden>Fase fechada — clique em "Reabrir fase" para editar.</div>
     <div id="fase-root-implantacao-kpis"></div>
     <div id="fase-root-implantacao-checklist"></div>
     <div id="fase-root-implantacao-encerramento"></div>
     <div class="fase-fechamento">
-      <button class="btn-fechar">Fechar fase (gerar PDF)</button>
-      <button class="btn btn-ghost btn-reabrir">Reabrir fase</button>
+      <button class="btn-fechar" data-tooltip="Fecha a fase e gera o PDF — trava a edição dos campos até 'Reabrir fase'.">Fechar fase (gerar PDF)</button>
+      <button class="btn btn-ghost btn-reabrir" data-tooltip="Libera os campos desta fase para edição de novo.">Reabrir fase</button>
       <span class="historico"></span>
     </div>
   </section>
@@ -293,8 +315,8 @@
       <div class="panel export-bar">
         <p class="privacy-note">Todos os dados ficam apenas neste navegador — nada é enviado a servidores externos, em linha com as diretrizes de segurança da informação. A ferramenta funciona mesmo sem conexão com a internet.</p>
         <div class="export-actions">
-          <button class="btn btn-secondary" id="raci-exportExcelBtn">Exportar Excel</button>
-          <button class="btn btn-primary" id="raci-exportPdfBtn">Exportar PDF</button>
+          <button class="btn btn-secondary fase-nao-bloquear" id="raci-exportExcelBtn">Exportar Excel</button>
+          <button class="btn btn-primary fase-nao-bloquear" id="raci-exportPdfBtn">Exportar PDF</button>
         </div>
       </div>
     </div>
@@ -1819,38 +1841,38 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.5"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.5"></script>
-<script src="js/lib/exceljs.embed.js?v=1.5"></script>
-<script src="js/core/toast.js?v=1.5"></script>
-<script src="js/core/caso-state.js?v=1.5"></script>
-<script src="js/core/docs-fase.js?v=1.5"></script>
-<script src="js/core/logo-data.js?v=1.5"></script>
-<script src="js/core/pdf-doc.js?v=1.5"></script>
-<script src="js/core/fechamento.js?v=1.5"></script>
-<script src="js/core/dossie.js?v=1.5"></script>
-<script src="js/core/nav.js?v=1.5"></script>
-<script src="js/core/richtext.js?v=1.5"></script>
-<script src="js/modules/raci-module.js?v=1.5"></script>
-<script src="js/modules/alcadas-module.js?v=1.5"></script>
-<script src="js/modules/segregacao-module.js?v=1.5"></script>
-<script src="js/modules/placeholder-module.js?v=1.5"></script>
-<script src="js/modules/w2h-module.js?v=1.5"></script>
-<script src="js/modules/fluxograma-module.js?v=1.5"></script>
-<script src="js/modules/pop-module.js?v=1.5"></script>
-<script src="js/modules/abertura-module.js?v=1.5"></script>
-<script src="js/modules/encerramento-module.js?v=1.5"></script>
-<script src="js/modules/gut-module.js?v=1.5"></script>
-<script src="js/modules/ishikawa-module.js?v=1.5"></script>
-<script src="js/modules/porques-module.js?v=1.5"></script>
-<script src="js/modules/riscos-module.js?v=1.5"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.5"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.5"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.5"></script>
-<script src="js/modules/sistemas-module.js?v=1.5"></script>
-<script src="js/modules/checklist-module.js?v=1.5"></script>
-<script src="js/modules/kpis-module.js?v=1.5"></script>
-<script src="js/modules/treinamento-module.js?v=1.5"></script>
-<script src="js/app.js?v=1.5"></script>
+<script src="js/lib/jspdf.embed.js?v=1.6"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.6"></script>
+<script src="js/lib/exceljs.embed.js?v=1.6"></script>
+<script src="js/core/toast.js?v=1.6"></script>
+<script src="js/core/caso-state.js?v=1.6"></script>
+<script src="js/core/docs-fase.js?v=1.6"></script>
+<script src="js/core/logo-data.js?v=1.6"></script>
+<script src="js/core/pdf-doc.js?v=1.6"></script>
+<script src="js/core/fechamento.js?v=1.6"></script>
+<script src="js/core/dossie.js?v=1.6"></script>
+<script src="js/core/nav.js?v=1.6"></script>
+<script src="js/core/richtext.js?v=1.6"></script>
+<script src="js/modules/raci-module.js?v=1.6"></script>
+<script src="js/modules/alcadas-module.js?v=1.6"></script>
+<script src="js/modules/segregacao-module.js?v=1.6"></script>
+<script src="js/modules/placeholder-module.js?v=1.6"></script>
+<script src="js/modules/w2h-module.js?v=1.6"></script>
+<script src="js/modules/fluxograma-module.js?v=1.6"></script>
+<script src="js/modules/pop-module.js?v=1.6"></script>
+<script src="js/modules/abertura-module.js?v=1.6"></script>
+<script src="js/modules/encerramento-module.js?v=1.6"></script>
+<script src="js/modules/gut-module.js?v=1.6"></script>
+<script src="js/modules/ishikawa-module.js?v=1.6"></script>
+<script src="js/modules/porques-module.js?v=1.6"></script>
+<script src="js/modules/riscos-module.js?v=1.6"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.6"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.6"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.6"></script>
+<script src="js/modules/sistemas-module.js?v=1.6"></script>
+<script src="js/modules/checklist-module.js?v=1.6"></script>
+<script src="js/modules/kpis-module.js?v=1.6"></script>
+<script src="js/modules/treinamento-module.js?v=1.6"></script>
+<script src="js/app.js?v=1.6"></script>
 </body>
 </html>
