@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.8">
-<link rel="stylesheet" href="css/app.css?v=1.8">
+<link rel="stylesheet" href="css/shell.css?v=1.9">
+<link rel="stylesheet" href="css/app.css?v=1.9">
 </head>
 <body>
 
@@ -253,6 +253,26 @@
     </div>
   </div>
   <div id="docsFaseSlot"></div>
+</div>
+
+<!-- Tela de execução do checklist de auditoria (Plano de Auditoria, Fase 4)
+     — mesmo mecanismo de troca de tela do docsFaseOverlay acima (esconde
+     a .app-shell, mostra este <div> irmão), controlado por
+     plano-auditoria-module.js. Só fica acessível depois que a Fase 4
+     fecha e os pesos do checklist estão balanceados (ver
+     renderChecklistSecao/atualizarBloqueio); uma vez liberada, continua
+     disponível daí em diante, mesmo com a fase fechada, porque não vive
+     dentro de nenhum fase-root. -->
+<div class="docs-view" id="auditExecOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="auditExecBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1 id="auditExecTitulo">Checklist de auditoria</h1>
+      <p id="auditExecSubtitulo">Execução funcional</p>
+    </div>
+  </div>
+  <div id="auditExecMeta"></div>
+  <div id="auditExecSlot"></div>
 </div>
 
 <div class="toast" id="appToast"></div>
@@ -719,7 +739,7 @@
 <div class="riscos-panel">
   <div class="tool-head"><h3>Plano de Auditoria</h3></div>
   <p class="gut-scale">
-    <span>Defina o que será verificado, o método e tamanho da amostra, a periodicidade da checagem e o prazo para resolver não conformidades encontradas. Risco relacionado é escolhido entre os riscos já cadastrados na Matriz de Riscos acima; Responsável pela verificação é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
+    <span>Defina o que será verificado, o método e tamanho da amostra, a periodicidade da checagem e o prazo para resolver não conformidades encontradas. Risco relacionado é escolhido entre os riscos já cadastrados na Matriz de Riscos acima; Responsável pela verificação é escolhido entre os papéis já cadastrados na Matriz RACI da Governança. Cada item também tem seu próprio checklist de verificação, com peso (0 a 10, uma casa decimal) por item — cada ponto de peso vale 10% do total. O botão "Executar checklist" só libera depois que a fase é fechada e os pesos somam exatamente 100% — a partir daí, continua disponível pra registrar auditorias reais, com histórico, % de conformidade por execução, indicador comparativo e exportação em PDF/Excel.</span>
   </p>
   <div class="add-row">
     <input id="audplano-addInput" type="text" placeholder="O que será auditado" maxlength="160" />
@@ -1646,6 +1666,28 @@
         <li><b>Método:</b><p>"Amostragem estatística" — Tamanho "10% dos pedidos do mês".</p></li>
         <li><b>Periodicidade:</b><p>"Mensal" — Prazo "5 dias" — Responsável "Controller".</p></li>
       </ol>
+
+      <h3 style="font-size:14.5px;margin-top:18px;">Checklist de verificação, peso e conformidade</h3>
+      <p class="lead">Cada item do Plano de Auditoria também tem seu próprio checklist — o passo a passo do que efetivamente será conferido quando alguém for auditar aquele item na prática, com um peso por linha que define o quanto cada conferência pesa no resultado final.</p>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Campo</th><th>Tipo</th><th>Para que serve</th></tr></thead>
+          <tbody>
+            <tr><th>O que será conferido neste item</th><td>Texto</td><td>Um passo concreto do checklist — o que exatamente será olhado nessa conferência.</td></tr>
+            <tr><th>Peso</th><td>Número (0 a 10, uma casa decimal)</td><td>Quanto essa conferência pesa no resultado. Cada ponto de peso vale 10% do total — a soma dos pesos de todos os itens do checklist precisa fechar em exatamente 100% (ex.: 10 itens de peso 1, ou 2 itens de peso 5, ou 1 item de peso 10).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="doc-callout tip">
+        <b class="tag">Como funciona o balanço</b>
+        <ul>
+          <li>A pílula ao lado de "Checklist de verificação" mostra o estado atual: <b>"Checklist não cadastrado"</b> (nenhum item ainda), <b>"Pesos desbalanceados"</b> (soma diferente de 100%) ou <b>"Pesos balanceados (100%)"</b>.</li>
+          <li>O botão <b>"Executar checklist"</b> fica bloqueado enquanto a fase está aberta, mesmo com os pesos já balanceados — só libera depois que a fase é <b>fechada</b> e os pesos somam exatamente 100%. Isso trava os critérios em vigor antes de qualquer execução, e garante que o % de conformidade calculado tenha sempre um total de 100% pra se basear.</li>
+          <li>Depois que a fase fecha, o checklist (itens e pesos) trava como o resto do card — preservando o registro de quais critérios estavam em vigor quando a fase foi fechada. É só nesse momento que o botão "Executar checklist" libera, e continua disponível daí em diante (inclusive se a fase for reaberta e fechada de novo).</li>
+          <li>Ao clicar em "Fechar Fase", se algum item tiver um checklist com pelo menos um passo cadastrado mas desbalanceado, aparece um aviso nomeando qual item e o quanto os pesos somam — esse checklist específico fica sem poder ser executado até a fase ser reaberta e os pesos corrigidos.</li>
+        </ul>
+      </div>
+      <p class="lead" style="margin-top:14px;">A tela de execução abre com um cabeçalho ("Dados do item auditado") repetindo risco relacionado, método/tamanho da amostra, periodicidade, prazo e responsável — quem está executando a auditoria não precisa voltar ao card pra lembrar o contexto do item. Esse cabeçalho tem um campo a mais, editável: <b>Contrato/Obra</b> (texto livre — aceita números e símbolos, mas as letras são sempre convertidas para maiúsculas automaticamente — identifica a que contrato/obra a próxima execução pertence). O botão "+ Nova execução" só libera depois desse campo preenchido, e ao clicar ele trava — não dá pra editar Contrato/Obra depois de a execução começar, e o valor fica gravado permanentemente naquela execução. Cada <b>execução</b> do checklist marca cada item como Conforme (pílula verde) ou Não conforme (pílula vermelha); marcar "Não conforme" torna a <b>observação obrigatória</b> pra aquele item — "Concluir execução" fica bloqueado até ela ser preenchida. No histórico, cada item mostra o texto à esquerda e a pílula de status sempre à direita. Ao concluir, o sistema soma o peso dos itens marcados "Conforme" e calcula o <b>% de conformidade</b> daquela execução, que fica congelado no histórico (não recalcula depois, mesmo que o checklist mude), e o campo Contrato/Obra volta a ficar vazio e editável pra próxima execução (que pode ser de um contrato/obra diferente). No histórico de execuções, cada uma pode ter os detalhes expandidos ("Ver detalhes") e ser exportada isoladamente em <b>PDF</b> ("Exportar PDF"), com a tabela completa de item/status/observação daquela execução específica. Um <b>indicador</b> ao lado dos campos do item compara a última execução com a média histórica, mostra a tendência (↑/↓) e um gráfico de colunas com o histórico; quando há mais de um Contrato/Obra no histórico, um dropdown discreto no topo (dividindo a linha com o botão "Exportar") filtra tudo — número, média, tendência, gráfico e a exportação em Excel (tabela de datas + gráfico de colunas) — por um Contrato/Obra específico ou por "Todos".</p>
     </section>
 
     <section class="docs-section" id="doc-aud-regras">
@@ -1998,39 +2040,39 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.8"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.8"></script>
-<script src="js/lib/exceljs.embed.js?v=1.8"></script>
-<script src="js/core/toast.js?v=1.8"></script>
-<script src="js/core/caso-state.js?v=1.8"></script>
-<script src="js/core/docs-fase.js?v=1.8"></script>
-<script src="js/core/logo-data.js?v=1.8"></script>
-<script src="js/core/pdf-doc.js?v=1.8"></script>
-<script src="js/core/fechamento.js?v=1.8"></script>
-<script src="js/core/dossie.js?v=1.8"></script>
-<script src="js/core/nav.js?v=1.8"></script>
-<script src="js/core/richtext.js?v=1.8"></script>
-<script src="js/modules/raci-module.js?v=1.8"></script>
-<script src="js/modules/alcadas-module.js?v=1.8"></script>
-<script src="js/modules/segregacao-module.js?v=1.8"></script>
-<script src="js/modules/placeholder-module.js?v=1.8"></script>
-<script src="js/modules/w2h-module.js?v=1.8"></script>
-<script src="js/modules/fluxograma-module.js?v=1.8"></script>
-<script src="js/modules/pop-module.js?v=1.8"></script>
-<script src="js/modules/abertura-module.js?v=1.8"></script>
-<script src="js/modules/encerramento-module.js?v=1.8"></script>
-<script src="js/modules/gut-module.js?v=1.8"></script>
-<script src="js/modules/ishikawa-module.js?v=1.8"></script>
-<script src="js/modules/porques-module.js?v=1.8"></script>
-<script src="js/modules/riscos-module.js?v=1.8"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.8"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.8"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.8"></script>
-<script src="js/modules/sistemas-module.js?v=1.8"></script>
-<script src="js/modules/checklist-module.js?v=1.8"></script>
-<script src="js/modules/kpis-module.js?v=1.8"></script>
-<script src="js/modules/treinamento-module.js?v=1.8"></script>
-<script src="js/modules/fase0-module.js?v=1.8"></script>
-<script src="js/app.js?v=1.8"></script>
+<script src="js/lib/jspdf.embed.js?v=1.9"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.9"></script>
+<script src="js/lib/exceljs.embed.js?v=1.9"></script>
+<script src="js/core/toast.js?v=1.9"></script>
+<script src="js/core/caso-state.js?v=1.9"></script>
+<script src="js/core/docs-fase.js?v=1.9"></script>
+<script src="js/core/logo-data.js?v=1.9"></script>
+<script src="js/core/pdf-doc.js?v=1.9"></script>
+<script src="js/core/fechamento.js?v=1.9"></script>
+<script src="js/core/dossie.js?v=1.9"></script>
+<script src="js/core/nav.js?v=1.9"></script>
+<script src="js/core/richtext.js?v=1.9"></script>
+<script src="js/modules/raci-module.js?v=1.9"></script>
+<script src="js/modules/alcadas-module.js?v=1.9"></script>
+<script src="js/modules/segregacao-module.js?v=1.9"></script>
+<script src="js/modules/placeholder-module.js?v=1.9"></script>
+<script src="js/modules/w2h-module.js?v=1.9"></script>
+<script src="js/modules/fluxograma-module.js?v=1.9"></script>
+<script src="js/modules/pop-module.js?v=1.9"></script>
+<script src="js/modules/abertura-module.js?v=1.9"></script>
+<script src="js/modules/encerramento-module.js?v=1.9"></script>
+<script src="js/modules/gut-module.js?v=1.9"></script>
+<script src="js/modules/ishikawa-module.js?v=1.9"></script>
+<script src="js/modules/porques-module.js?v=1.9"></script>
+<script src="js/modules/riscos-module.js?v=1.9"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.9"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.9"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.9"></script>
+<script src="js/modules/sistemas-module.js?v=1.9"></script>
+<script src="js/modules/checklist-module.js?v=1.9"></script>
+<script src="js/modules/kpis-module.js?v=1.9"></script>
+<script src="js/modules/treinamento-module.js?v=1.9"></script>
+<script src="js/modules/fase0-module.js?v=1.9"></script>
+<script src="js/app.js?v=1.9"></script>
 </body>
 </html>

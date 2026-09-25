@@ -4,6 +4,29 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.9] — 25/09/2026
+
+Foco: o Plano de Auditoria (Fase 4) ganha um checklist que continua funcional mesmo depois de a fase fechar.
+
+### Adicionado
+
+- **Checklist de verificação por item do Plano de Auditoria**: cada item passa a ter uma lista do que será conferido, com status Conforme/Não conforme e observação por linha.
+- **Execução funcional, liberada só a partir do fechamento da fase**: o botão "Executar checklist" fica bloqueado enquanto a Fase 4 está aberta (mesmo com os pesos balanceados) e só libera depois que a fase fecha e os pesos somam exatamente 100% — trava os critérios em vigor antes de qualquer execução. Uma vez liberado, continua disponível daí em diante (inclusive após reabrir e fechar a fase de novo): cada execução (data/hora carimbada, status e observações) entra num histórico que acumula dentro do próprio caso, salvo/carregado junto com o rascunho `.json`.
+- **Exportar PDF por execução**: cada execução concluída pode ser exportada isoladamente em PDF, com a tabela de status e observações.
+- **Coluna "Execuções"** no PDF de fechamento do Plano de Auditoria, mostrando quantas execuções cada item já teve.
+- **Peso (0 a 10, com uma casa decimal) por item de checklist** e cálculo de balanço dos pesos (cada ponto de peso vale 10% do total, precisa somar exatamente 100%) — junto com a fase fechada, condiciona a liberação do botão "Executar checklist". A pílula de balanço tem tooltip explicando o cálculo.
+- **% de conformidade por execução**, ponderado pelos pesos dos itens marcados "Conforme", congelado no momento da conclusão.
+- **Indicador de conformidade** ao lado dos campos de cada item do Plano de Auditoria: última execução, média histórica, tendência e um gráfico de colunas com o histórico, comparando as execuções do mesmo item ao longo do tempo. Filtro e botão de exportar dividem a mesma linha, no topo.
+- **Pílulas coloridas (verde/vermelho) no histórico de execuções**, sempre alinhadas à direita de cada item conferido. Marcar um item como "Não conforme" torna a observação obrigatória para concluir a execução.
+- **Exportar Excel do indicador**: tabela de datas/% de conformidade por execução + gráfico de colunas embutido como imagem.
+- **Cabeçalho "Dados do item auditado" na tela de execução**: repete risco relacionado, método/tamanho da amostra, periodicidade, prazo e responsável — sem precisar voltar ao card pra lembrar o contexto do item.
+- **Aviso ao fechar a Fase 4 com checklist desbalanceado**: se algum item tiver um checklist com pesos que não somam 100%, o toast de fechamento avisa qual item e o quanto os pesos somam, deixando claro que esse checklist não poderá ser executado até a correção.
+- **Campo Contrato/Obra por execução**: texto livre (letras sempre em maiúsculas, números e símbolos preservados) no cabeçalho da tela de execução, obrigatório para liberar "+ Nova execução" e travado assim que a execução começa. Vira filtro no indicador de conformidade (dropdown discreto listando os contratos/obras já usados) e na exportação em Excel — permite comparar o histórico de conformidade de um item específico por contrato/obra.
+
+### Documentação
+
+- **Revisão completa da documentação do app** (item 46 do backlog): a documentação da Fase 4 (botão "? Documentação" → Plano de Auditoria) e o texto explicativo do próprio módulo foram conferidos e atualizados pra refletir todo o incremento de checklist/peso/conformidade/Contrato/Obra desta versão — incluindo uma menção que tinha ficado de fora, "Exportar PDF" por execução. As demais 7 fases, a documentação geral (tela inicial) e os textos de cada outro módulo foram revisados e continuam batendo com o comportamento atual — nenhuma outra divergência encontrada.
+
 ## [v1.8] — 24/09/2026
 
 ### Corrigido

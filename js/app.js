@@ -154,6 +154,14 @@
         el.contentEditable = bloqueado ? "false" : "true";
       });
     });
+
+    /* Plano de Auditoria (Fase 4): "Executar checklist" tem regra própria
+       (só libera com a fase FECHADA e os pesos balanceados) — não dá pra
+       expressar isso no sweep genérico acima, então o módulo recebe o
+       status aqui e recalcula sozinho (ver atualizarBloqueio no módulo). */
+    if(faseId === "auditoria" && window.PlanoAuditoriaModule && window.PlanoAuditoriaModule.atualizarBloqueio){
+      window.PlanoAuditoriaModule.atualizarBloqueio(bloqueado);
+    }
   }
 
   /* "Reabrir Processo" — melhoria contínua dentro do MESMO caso, em vez
@@ -220,11 +228,32 @@
           : window.Fechamento.gerarPdfFechamentoFase(caso, faseId);
         persistir();
         atualizarFaseHead(faseId);
-        if(window.AppToast){
-          window.AppToast.show(jaFechada
-            ? "PDF da versão " + resultado.versao + " gerado novamente (sem criar versão nova)."
-            : "Fase fechada. PDF gerado (versão " + resultado.versao + ").");
+
+        var msg = jaFechada
+          ? "PDF da versão " + resultado.versao + " gerado novamente (sem criar versão nova)."
+          : "Fase fechada. PDF gerado (versão " + resultado.versao + ").";
+        var msgErro = false;
+
+        /* Fechar a Fase 4 pela primeira vez trava os pesos do checklist
+           de cada item do Plano de Auditoria — se algum ficou desbalan-
+           ceado (soma diferente de 100%), avisa aqui, porque a partir de
+           agora esse checklist específico não poderá ser executado até
+           a fase ser reaberta e os pesos corrigidos (ver
+           checklistsDesbalanceados no módulo). Um toast só — combinado
+           com a mensagem de fechamento — porque o toast global mostra
+           uma mensagem por vez. */
+        if(faseId === "auditoria" && !jaFechada && window.PlanoAuditoriaModule && window.PlanoAuditoriaModule.checklistsDesbalanceados){
+          var desbal = window.PlanoAuditoriaModule.checklistsDesbalanceados(porId("auditoria").ferramentas.planoAuditoria);
+          if(desbal.length){
+            var lista = desbal.map(function(d){ return "\"" + d.nome + "\" (" + d.soma + "%)"; }).join(", ");
+            msg = desbal.length === 1
+              ? "Fase fechada. Atenção: o checklist de " + lista + " está desbalanceado — não poderá ser executado até os pesos somarem 100%."
+              : "Fase fechada. Atenção: os checklists de " + lista + " estão desbalanceados — não poderão ser executados até os pesos somarem 100%.";
+            msgErro = true;
+          }
         }
+
+        if(window.AppToast) window.AppToast.show(msg, msgErro);
       }catch(err){
         console.error(err);
         if(window.AppToast) window.AppToast.show("Não foi possível gerar o PDF de fechamento.", true);
@@ -298,7 +327,7 @@
         fase.ferramentas.regrasDivergencia = fase.ferramentas.regrasDivergencia || {itens: []};
         var governancaFase = porId("governanca");
         window.RiscosModule.mount(document.getElementById("fase-root-auditoria"), fase.ferramentas.riscos, function(){ persistir(); });
-        window.PlanoAuditoriaModule.mount(document.getElementById("fase-root-auditoria-plano"), fase.ferramentas.planoAuditoria, function(){ persistir(); }, fase.ferramentas.riscos, governancaFase && governancaFase.ferramentas.raci);
+        window.PlanoAuditoriaModule.mount(document.getElementById("fase-root-auditoria-plano"), fase.ferramentas.planoAuditoria, function(){ persistir(); }, fase.ferramentas.riscos, governancaFase && governancaFase.ferramentas.raci, caso.nome);
         window.RegrasDivergenciaModule.mount(document.getElementById("fase-root-auditoria-regrasdiv"), fase.ferramentas.regrasDivergencia, function(){ persistir(); }, governancaFase && governancaFase.ferramentas.raci);
       } else if(f.id === "modelagem"){
         // Fase com três ferramentas simultâneas — 5W2H planeja as ações,
