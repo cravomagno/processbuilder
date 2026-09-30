@@ -4,6 +4,18 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.10] — 30/09/2026
+
+### Adicionado
+
+- **Balão de aviso de beta-teste**: fixo no canto superior direito, visível em qualquer tela (landing, qualquer fase, documentação, execução do checklist). Fechável ("×"); reaparece sozinho 12 minutos depois de fechado.
+- **Cabeçalho fixo ao rolar a página**: a barra do caso e a navegação por fases continuam visíveis no topo enquanto você rola o conteúdo de uma fase.
+- **Botão "voltar ao topo"**: ícone discreto no fim de cada fase, com tooltip, rola suavemente de volta ao início da página.
+
+### Alterado
+
+- **Critérios de sucesso, Escopo — dentro e Escopo — fora (Termo de Abertura, Fase 1)**: limite de caracteres por item foi de 140 para 1000 nos três campos, e o campo de adicionar passou de um `<input>` de uma linha só para uma área de texto que cresce sozinha conforme você digita.
+
 ## [v1.9] — 25/09/2026
 
 Foco: o Plano de Auditoria (Fase 4) ganha um checklist que continua funcional mesmo depois de a fase fechar.

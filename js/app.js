@@ -510,6 +510,13 @@
     atualizarNavStatus();
     window.Nav.init(faseIds, "fase0");
     if(window.DocsFase) window.DocsFase.init();
+
+    var voltarTopoBtn = document.getElementById("btnVoltarTopo");
+    if(voltarTopoBtn){
+      voltarTopoBtn.addEventListener("click", function(){
+        window.scrollTo({top: 0, behavior: "smooth"});
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", boot);

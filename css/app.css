@@ -78,6 +78,22 @@
   font-size:10px;font-weight:700;flex:none;
 }
 
+/* ---------- Cabeçalho fixo (barra do caso + nav de fases) ----------
+   Sticky em vez de fixed de propósito: dentro de .app-shell (que já é
+   centralizado com max-width:1360px), sticky mantém a largura/posição
+   herdadas do fluxo normal sem precisar recalcular offsets — só gruda
+   no topo do viewport quando o scroll chega lá, sem "pular" o conteúdo
+   de baixo. Fundo --bg (mesma cor da página) pra não deixar o conteúdo
+   por baixo transparecendo quando estiver grudado. */
+.fase-header-sticky{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:var(--bg);
+  padding-top:4px;
+  margin-top:-4px;
+}
+
 /* ---------- Barra superior do caso ---------- */
 .caso-bar{
   background:var(--brand-dark);
@@ -726,6 +742,17 @@
   padding:5px 8px; background:var(--surface); font-size:12px; font-family:inherit;
 }
 .ishikawa-add-causa input:focus{outline:2px solid var(--brand-tint);border-color:var(--brand);}
+/* Critérios de Sucesso vira textarea (limite de 1000 caracteres — um
+   <input> de uma linha só não dá pra editar com conforto nesse
+   tamanho). Mesma técnica de auto-altura já usada em outros campos
+   desta sessão: field-sizing:content cresce sozinho conforme digita,
+   min-height é só o piso de segurança pra sempre ter 1 linha visível. */
+.ishikawa-add-causa-textarea{
+  flex:1; min-width:0; border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:5px 8px; background:var(--surface); font-size:12px; font-family:inherit;
+  resize:none; field-sizing:content; min-height:1.6em; line-height:1.4;
+}
+.ishikawa-add-causa-textarea:focus{outline:2px solid var(--brand-tint);border-color:var(--brand);}
 .ishikawa-add-causa button{
   border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-sm);
   padding:5px 10px; font-size:14px; font-weight:700; color:var(--brand); flex:none; line-height:1;
@@ -1362,6 +1389,38 @@ table.doc-table.fase0-registro td input:focus{outline:2px solid var(--brand-tint
   margin:0 0 4px;
 }
 .kpis-chart-svg{width:100%;height:auto;flex:1;}
+
+/* ---------- Balão de aviso de beta-teste (js/core/beta-aviso.js) ----------
+   position:fixed de propósito (não sticky) — precisa ficar visível em
+   QUALQUER tela, inclusive a landing (que não tem .app-shell no fluxo),
+   então não pode depender de nenhum container com scroll/posição
+   própria. Canto superior direito do viewport, acima de tudo (inclusive
+   o toast global, z-index:100 em shell.css). */
+.beta-balao{
+  position:fixed; top:16px; right:16px; z-index:150;
+  max-width:280px; background:var(--surface); border:1px solid var(--c-i);
+  border-radius:var(--radius-md); box-shadow:var(--shadow-md);
+  padding:12px 30px 12px 14px;
+}
+.beta-balao-titulo{margin:0 0 4px; font-size:12.5px; font-weight:700; color:var(--c-i);}
+.beta-balao-texto{margin:0; font-size:11.5px; color:var(--ink-soft); line-height:1.4;}
+.beta-balao-fechar{
+  position:absolute; top:6px; right:6px; width:20px; height:20px;
+  border:none; background:transparent; color:var(--ink-faint); font-size:15px; line-height:1;
+  cursor:pointer; border-radius:var(--radius-sm);
+}
+.beta-balao-fechar:hover{background:var(--surface-alt); color:var(--c-a);}
+@media (max-width:520px){ .beta-balao{left:12px; right:12px; max-width:none;} }
+
+/* ---------- Botão "voltar ao topo" (fim de cada fase) ---------- */
+.voltar-topo-wrap{display:flex; justify-content:center; margin:28px 0 8px;}
+.voltar-topo-btn{
+  width:34px; height:34px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface); color:var(--ink-soft);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.voltar-topo-btn svg{width:16px; height:16px;}
+.voltar-topo-btn:hover{border-color:var(--brand); color:var(--brand); background:var(--brand-tint);}
 .kpis-chart-vazio{
   flex:1;
   display:flex;

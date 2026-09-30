@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.9">
-<link rel="stylesheet" href="css/app.css?v=1.9">
+<link rel="stylesheet" href="css/shell.css?v=1.10">
+<link rel="stylesheet" href="css/app.css?v=1.10">
 </head>
 <body>
 
@@ -28,6 +28,7 @@
 
 <div class="app-shell">
 
+  <div class="fase-header-sticky" id="faseHeaderSticky">
   <div class="caso-bar">
     <div class="caso-bar-titulo">
       <img class="caso-brasao" id="casoBrasao" alt="Brasão" hidden />
@@ -58,6 +59,7 @@
   </div>
 
   <nav class="fase-nav" id="faseNav"></nav>
+  </div>
 
   <!-- Fase 0 — PM Canvas do Projeto (define o projeto e quem aprova/revisa cada fase, antes de o processo nascer de fato) -->
   <section class="fase-view" id="fase-view-fase0">
@@ -240,6 +242,12 @@
     </div>
   </section>
 
+  <div class="voltar-topo-wrap">
+    <button class="voltar-topo-btn" id="btnVoltarTopo" type="button" aria-label="Voltar ao topo da página" data-tooltip="Voltar ao topo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>
+    </button>
+  </div>
+
   <footer class="app-copyright">&copy; <span id="copyrightAno"></span> Emerson da Cunha — Controller. Todos os direitos reservados.</footer>
 
 </div>
@@ -276,6 +284,17 @@
 </div>
 
 <div class="toast" id="appToast"></div>
+
+<!-- Aviso de beta-teste — fixo, fora de .app-shell/.landing-screen de
+     propósito, pra ficar visível em qualquer tela (landing, qualquer
+     fase, telas de documentação/execução) sem depender do caso estar
+     carregado. Controlado por js/core/beta-aviso.js, independente do
+     resto do app. -->
+<div class="beta-balao" id="betaBalao" hidden role="status" aria-live="polite">
+  <button class="beta-balao-fechar" id="betaBalaoFechar" type="button" aria-label="Fechar aviso">&times;</button>
+  <p class="beta-balao-titulo">Versão de teste (beta)</p>
+  <p class="beta-balao-texto">Este é um ambiente de beta-teste — a ferramenta pode passar por alterações sem aviso prévio.</p>
+</div>
 
 <!-- ============================================================
      Template do módulo RACI (Fase 2 — Governança e Compliance)
@@ -538,7 +557,7 @@
       <h5>Escopo — dentro</h5>
       <ul class="ishikawa-causas-lista" id="abertura-escopoDentroLista"></ul>
       <div class="ishikawa-add-causa">
-        <input id="abertura-escopoDentroInput" placeholder="Novo item" maxlength="140" />
+        <textarea id="abertura-escopoDentroInput" class="ishikawa-add-causa-textarea" placeholder="Novo item" maxlength="1000" rows="1"></textarea>
         <button type="button" id="abertura-escopoDentroBtn">+</button>
       </div>
     </div>
@@ -546,7 +565,7 @@
       <h5>Escopo — fora</h5>
       <ul class="ishikawa-causas-lista" id="abertura-escopoForaLista"></ul>
       <div class="ishikawa-add-causa">
-        <input id="abertura-escopoForaInput" placeholder="Novo item" maxlength="140" />
+        <textarea id="abertura-escopoForaInput" class="ishikawa-add-causa-textarea" placeholder="Novo item" maxlength="1000" rows="1"></textarea>
         <button type="button" id="abertura-escopoForaBtn">+</button>
       </div>
     </div>
@@ -554,7 +573,7 @@
       <h5>Critérios de sucesso</h5>
       <ul class="ishikawa-causas-lista" id="abertura-criteriosLista"></ul>
       <div class="ishikawa-add-causa">
-        <input id="abertura-criteriosInput" placeholder="Novo critério" maxlength="140" />
+        <textarea id="abertura-criteriosInput" class="ishikawa-add-causa-textarea" placeholder="Novo critério" maxlength="1000" rows="1"></textarea>
         <button type="button" id="abertura-criteriosBtn">+</button>
       </div>
     </div>
@@ -2040,39 +2059,40 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.9"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.9"></script>
-<script src="js/lib/exceljs.embed.js?v=1.9"></script>
-<script src="js/core/toast.js?v=1.9"></script>
-<script src="js/core/caso-state.js?v=1.9"></script>
-<script src="js/core/docs-fase.js?v=1.9"></script>
-<script src="js/core/logo-data.js?v=1.9"></script>
-<script src="js/core/pdf-doc.js?v=1.9"></script>
-<script src="js/core/fechamento.js?v=1.9"></script>
-<script src="js/core/dossie.js?v=1.9"></script>
-<script src="js/core/nav.js?v=1.9"></script>
-<script src="js/core/richtext.js?v=1.9"></script>
-<script src="js/modules/raci-module.js?v=1.9"></script>
-<script src="js/modules/alcadas-module.js?v=1.9"></script>
-<script src="js/modules/segregacao-module.js?v=1.9"></script>
-<script src="js/modules/placeholder-module.js?v=1.9"></script>
-<script src="js/modules/w2h-module.js?v=1.9"></script>
-<script src="js/modules/fluxograma-module.js?v=1.9"></script>
-<script src="js/modules/pop-module.js?v=1.9"></script>
-<script src="js/modules/abertura-module.js?v=1.9"></script>
-<script src="js/modules/encerramento-module.js?v=1.9"></script>
-<script src="js/modules/gut-module.js?v=1.9"></script>
-<script src="js/modules/ishikawa-module.js?v=1.9"></script>
-<script src="js/modules/porques-module.js?v=1.9"></script>
-<script src="js/modules/riscos-module.js?v=1.9"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.9"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.9"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.9"></script>
-<script src="js/modules/sistemas-module.js?v=1.9"></script>
-<script src="js/modules/checklist-module.js?v=1.9"></script>
-<script src="js/modules/kpis-module.js?v=1.9"></script>
-<script src="js/modules/treinamento-module.js?v=1.9"></script>
-<script src="js/modules/fase0-module.js?v=1.9"></script>
-<script src="js/app.js?v=1.9"></script>
+<script src="js/lib/jspdf.embed.js?v=1.10"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.10"></script>
+<script src="js/lib/exceljs.embed.js?v=1.10"></script>
+<script src="js/core/toast.js?v=1.10"></script>
+<script src="js/core/beta-aviso.js?v=1.10"></script>
+<script src="js/core/caso-state.js?v=1.10"></script>
+<script src="js/core/docs-fase.js?v=1.10"></script>
+<script src="js/core/logo-data.js?v=1.10"></script>
+<script src="js/core/pdf-doc.js?v=1.10"></script>
+<script src="js/core/fechamento.js?v=1.10"></script>
+<script src="js/core/dossie.js?v=1.10"></script>
+<script src="js/core/nav.js?v=1.10"></script>
+<script src="js/core/richtext.js?v=1.10"></script>
+<script src="js/modules/raci-module.js?v=1.10"></script>
+<script src="js/modules/alcadas-module.js?v=1.10"></script>
+<script src="js/modules/segregacao-module.js?v=1.10"></script>
+<script src="js/modules/placeholder-module.js?v=1.10"></script>
+<script src="js/modules/w2h-module.js?v=1.10"></script>
+<script src="js/modules/fluxograma-module.js?v=1.10"></script>
+<script src="js/modules/pop-module.js?v=1.10"></script>
+<script src="js/modules/abertura-module.js?v=1.10"></script>
+<script src="js/modules/encerramento-module.js?v=1.10"></script>
+<script src="js/modules/gut-module.js?v=1.10"></script>
+<script src="js/modules/ishikawa-module.js?v=1.10"></script>
+<script src="js/modules/porques-module.js?v=1.10"></script>
+<script src="js/modules/riscos-module.js?v=1.10"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.10"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.10"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.10"></script>
+<script src="js/modules/sistemas-module.js?v=1.10"></script>
+<script src="js/modules/checklist-module.js?v=1.10"></script>
+<script src="js/modules/kpis-module.js?v=1.10"></script>
+<script src="js/modules/treinamento-module.js?v=1.10"></script>
+<script src="js/modules/fase0-module.js?v=1.10"></script>
+<script src="js/app.js?v=1.10"></script>
 </body>
 </html>
