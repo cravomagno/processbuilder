@@ -56,8 +56,55 @@ window.AlcadasModule = (function(){
       addInput: q("alcadas-addInput"),
       addBtn: q("alcadas-addBtn"),
       addDatalist: q("alcadas-criterios"),
-      lista: q("alcadas-lista")
+      lista: q("alcadas-lista"),
+      notasBtn: q("alcadas-notasBtn")
     };
+  }
+
+  /* ---------------- Notas da Matriz (tela dedicada) ----------------
+     Mesmo mecanismo de troca de tela já usado por docs-fase.js e pela
+     execução do checklist do Plano de Auditoria: esconde a .app-shell,
+     mostra um <div> irmão (#alcadasNotasOverlay). Como esse <div> fica
+     fora de qualquer fase-root, só o botão-gatilho precisa travar com
+     o resto do card ao fechar a fase — sem ele, a tela nunca abre, então
+     não há necessidade de nenhuma outra exceção/trava especial aqui. */
+  var elNotas = null;
+
+  function buildElNotasRefs(){
+    function q(id){ return document.getElementById(id); }
+    return {
+      overlay: q("alcadasNotasOverlay"),
+      slot: q("alcadasNotasSlot"),
+      backBtn: q("alcadasNotasBackBtn")
+    };
+  }
+
+  function fecharNotas(){
+    if(!elNotas || !elNotas.overlay) return;
+    elNotas.overlay.style.display = "none";
+    var shell = document.querySelector(".app-shell");
+    if(shell) shell.style.display = "";
+  }
+
+  function abrirNotas(){
+    if(!elNotas){
+      elNotas = buildElNotasRefs();
+      if(!elNotas.overlay) return;
+      elNotas.backBtn.addEventListener("click", fecharNotas);
+    }
+    var shell = document.querySelector(".app-shell");
+    if(shell) shell.style.display = "none";
+    elNotas.overlay.style.display = "block";
+    window.scrollTo(0, 0);
+
+    var painel = document.createElement("div");
+    painel.className = "riscos-panel alcadas-notas-painel";
+    elNotas.slot.innerHTML = "";
+    elNotas.slot.appendChild(painel);
+    window.RichText.montarEditor(painel, state.notas || "", function(html){
+      state.notas = html;
+      if(onChange) onChange(state);
+    }, {placeholder: "Escreva aqui observações sobre critérios, faixas ou o raciocínio por trás desta matriz de alçadas..."});
   }
 
   function popularSelectPapel(select, valorAtual, placeholderTxt){
@@ -235,6 +282,7 @@ window.AlcadasModule = (function(){
   function wireEvents(){
     el.addBtn.addEventListener("click", addItem);
     el.addInput.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); addItem(); } });
+    if(el.notasBtn) el.notasBtn.addEventListener("click", abrirNotas);
   }
 
   function mount(rootEl, initialState, onChangeCb, raciStateRef){
@@ -245,6 +293,7 @@ window.AlcadasModule = (function(){
     el = buildElRefs(rootEl);
     state = initialState;
     state.itens.forEach(migrarItem);
+    if(state.notas === undefined) state.notas = ""; // backfill — campo novo, casos salvos antes dele não têm
     onChange = onChangeCb || null;
     raciRef = raciStateRef || null;
     wireEvents();

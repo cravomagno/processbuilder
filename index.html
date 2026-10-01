@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.10">
-<link rel="stylesheet" href="css/app.css?v=1.10">
+<link rel="stylesheet" href="css/shell.css?v=1.11">
+<link rel="stylesheet" href="css/app.css?v=1.11">
 </head>
 <body>
 
@@ -283,6 +283,23 @@
   <div id="auditExecSlot"></div>
 </div>
 
+<!-- Notas da Matriz de Alçadas (Fase 2, Governança e Compliance) — mesmo
+     mecanismo de tela dedicada do docsFaseOverlay/auditExecOverlay acima.
+     Fica dentro de fase-root-governanca-alcadas só o botão-gatilho (que
+     trava normalmente com o resto do card ao fechar a fase); o overlay em
+     si é um <div> irmão, fora de qualquer fase-root, controlado por
+     alcadas-module.js. -->
+<div class="docs-view" id="alcadasNotasOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="alcadasNotasBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1>Notas da Matriz de Alçadas</h1>
+      <p>Anotações livres sobre os critérios e faixas desta matriz.</p>
+    </div>
+  </div>
+  <div id="alcadasNotasSlot"></div>
+</div>
+
 <div class="toast" id="appToast"></div>
 
 <!-- Aviso de beta-teste — fixo, fora de .app-shell/.landing-screen de
@@ -415,7 +432,10 @@
      ============================================================ -->
 <template id="alcadas-template">
 <div class="riscos-panel">
-  <div class="tool-head"><h3>Matriz de Alçadas</h3></div>
+  <div class="tool-head">
+    <h3>Matriz de Alçadas</h3>
+    <button class="tool-notas-btn" id="alcadas-notasBtn" type="button">Notas da Matriz</button>
+  </div>
   <p class="gut-scale">
     <span>Cada critério (ex.: "Aprovação de compras") agrupa suas próprias faixas — o limite não precisa ser em R$: pode ser prazo, quantidade, nível de risco etc. Responsável e Escala para são escolhidos entre os papéis já cadastrados na Matriz RACI acima.</span>
   </p>
@@ -2059,40 +2079,40 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.10"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.10"></script>
-<script src="js/lib/exceljs.embed.js?v=1.10"></script>
-<script src="js/core/toast.js?v=1.10"></script>
-<script src="js/core/beta-aviso.js?v=1.10"></script>
-<script src="js/core/caso-state.js?v=1.10"></script>
-<script src="js/core/docs-fase.js?v=1.10"></script>
-<script src="js/core/logo-data.js?v=1.10"></script>
-<script src="js/core/pdf-doc.js?v=1.10"></script>
-<script src="js/core/fechamento.js?v=1.10"></script>
-<script src="js/core/dossie.js?v=1.10"></script>
-<script src="js/core/nav.js?v=1.10"></script>
-<script src="js/core/richtext.js?v=1.10"></script>
-<script src="js/modules/raci-module.js?v=1.10"></script>
-<script src="js/modules/alcadas-module.js?v=1.10"></script>
-<script src="js/modules/segregacao-module.js?v=1.10"></script>
-<script src="js/modules/placeholder-module.js?v=1.10"></script>
-<script src="js/modules/w2h-module.js?v=1.10"></script>
-<script src="js/modules/fluxograma-module.js?v=1.10"></script>
-<script src="js/modules/pop-module.js?v=1.10"></script>
-<script src="js/modules/abertura-module.js?v=1.10"></script>
-<script src="js/modules/encerramento-module.js?v=1.10"></script>
-<script src="js/modules/gut-module.js?v=1.10"></script>
-<script src="js/modules/ishikawa-module.js?v=1.10"></script>
-<script src="js/modules/porques-module.js?v=1.10"></script>
-<script src="js/modules/riscos-module.js?v=1.10"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.10"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.10"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.10"></script>
-<script src="js/modules/sistemas-module.js?v=1.10"></script>
-<script src="js/modules/checklist-module.js?v=1.10"></script>
-<script src="js/modules/kpis-module.js?v=1.10"></script>
-<script src="js/modules/treinamento-module.js?v=1.10"></script>
-<script src="js/modules/fase0-module.js?v=1.10"></script>
-<script src="js/app.js?v=1.10"></script>
+<script src="js/lib/jspdf.embed.js?v=1.11"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.11"></script>
+<script src="js/lib/exceljs.embed.js?v=1.11"></script>
+<script src="js/core/toast.js?v=1.11"></script>
+<script src="js/core/beta-aviso.js?v=1.11"></script>
+<script src="js/core/caso-state.js?v=1.11"></script>
+<script src="js/core/docs-fase.js?v=1.11"></script>
+<script src="js/core/logo-data.js?v=1.11"></script>
+<script src="js/core/pdf-doc.js?v=1.11"></script>
+<script src="js/core/fechamento.js?v=1.11"></script>
+<script src="js/core/dossie.js?v=1.11"></script>
+<script src="js/core/nav.js?v=1.11"></script>
+<script src="js/core/richtext.js?v=1.11"></script>
+<script src="js/modules/raci-module.js?v=1.11"></script>
+<script src="js/modules/alcadas-module.js?v=1.11"></script>
+<script src="js/modules/segregacao-module.js?v=1.11"></script>
+<script src="js/modules/placeholder-module.js?v=1.11"></script>
+<script src="js/modules/w2h-module.js?v=1.11"></script>
+<script src="js/modules/fluxograma-module.js?v=1.11"></script>
+<script src="js/modules/pop-module.js?v=1.11"></script>
+<script src="js/modules/abertura-module.js?v=1.11"></script>
+<script src="js/modules/encerramento-module.js?v=1.11"></script>
+<script src="js/modules/gut-module.js?v=1.11"></script>
+<script src="js/modules/ishikawa-module.js?v=1.11"></script>
+<script src="js/modules/porques-module.js?v=1.11"></script>
+<script src="js/modules/riscos-module.js?v=1.11"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.11"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.11"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.11"></script>
+<script src="js/modules/sistemas-module.js?v=1.11"></script>
+<script src="js/modules/checklist-module.js?v=1.11"></script>
+<script src="js/modules/kpis-module.js?v=1.11"></script>
+<script src="js/modules/treinamento-module.js?v=1.11"></script>
+<script src="js/modules/fase0-module.js?v=1.11"></script>
+<script src="js/app.js?v=1.11"></script>
 </body>
 </html>

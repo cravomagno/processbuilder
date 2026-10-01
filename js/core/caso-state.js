@@ -138,7 +138,7 @@ window.CasoState = (function(){
         riscos: f.id === "auditoria" ? {itens: []} : null,
         planoAuditoria: f.id === "auditoria" ? {itens: []} : null,
         regrasDivergencia: f.id === "auditoria" ? {itens: []} : null,
-        alcadas: f.id === "governanca" ? {itens: []} : null,
+        alcadas: f.id === "governanca" ? {itens: [], notas: ""} : null,
         segregacao: f.id === "governanca" ? {pares: []} : null,
         checklist: f.id === "implantacao" ? {itens: []} : null,
         kpis: f.id === "implantacao" ? {itens: []} : null,

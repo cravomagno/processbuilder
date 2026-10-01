@@ -111,20 +111,17 @@
     var fechamentoEl = document.querySelector("#fase-view-" + faseId + " .fase-fechamento");
     if(!fechamentoEl) return;
 
-    var wrap = document.createElement("div");
-    wrap.className = "fase-proxima";
     var btn = document.createElement("button");
     btn.className = "fase-proxima-btn";
     btn.type = "button";
     btn.disabled = true;
-    btn.dataset.tooltip = "Libera assim que esta fase for fechada.";
-    btn.innerHTML = "Próxima fase — Fase " + proxima.ordem + ": " + proxima.nome + " " + svgIcone(ICONE_PROXIMA);
+    btn.dataset.tooltip = "Fase " + proxima.ordem + " — " + proxima.nome + ".";
+    btn.innerHTML = "Próxima Fase " + svgIcone(ICONE_PROXIMA);
     btn.addEventListener("click", function(){
       if(btn.disabled) return;
       window.Nav.irParaFase(proxima.id);
     });
-    wrap.appendChild(btn);
-    fechamentoEl.insertAdjacentElement("afterend", wrap);
+    fechamentoEl.appendChild(btn);
   }
 
   /* Bloqueia (ou libera) os campos de uma fase conforme seu status —

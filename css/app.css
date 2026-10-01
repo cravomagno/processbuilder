@@ -387,6 +387,25 @@
   white-space:nowrap;
 }
 .fase-docs-btn:hover{background:var(--brand-tint);border-color:var(--brand);}
+
+/* Mesmo visual do .fase-docs-btn, classe própria porque DocsFase.init()
+   liga um listener em TODO .fase-docs-btn da página esperando um
+   data-fase válido — reaproveitar a classe quebraria esse mecanismo. */
+.tool-notas-btn{
+  font-size:12px;
+  font-weight:600;
+  padding:5px 12px;
+  border-radius:var(--radius-pill);
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--brand);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.tool-notas-btn:hover{background:var(--brand-tint);border-color:var(--brand);}
+.tool-notas-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.alcadas-notas-painel .richtext-editor{min-height:340px;max-height:none;}
 .fase-docs-btn .q{
   display:flex;
   align-items:center;
@@ -415,15 +434,9 @@
   color:var(--ink-faint);
 }
 
-/* ---------- Botão "Próxima fase" (rodapé de cada fase) ---------- */
-.fase-proxima{
-  margin-top:18px;
-  padding-top:16px;
-  border-top:1px solid var(--border);
-  display:flex;
-  justify-content:flex-end;
-}
+/* ---------- Botão "Próxima Fase" (mesma linha do "Fechar Fase") ---------- */
 .fase-proxima-btn{
+  margin-left:auto;
   background:var(--surface);
   color:var(--ink-faint);
   border:1px solid var(--border);

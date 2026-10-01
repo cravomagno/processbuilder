@@ -4,6 +4,20 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
 
+## [v1.11] — 01/10/2026
+
+### Adicionado
+
+- **"Notas da Matriz" na Matriz de Alçadas (Fase 2)**: botão no canto superior direito do painel abre uma tela dedicada com um campo de texto rico (negrito, itálico, sublinhado, tachado, listas) para anotações livres sobre os critérios e faixas da matriz. Trava junto com o resto do card ao fechar a fase, como qualquer outro campo da Matriz de Alçadas.
+
+### Corrigido
+
+- **Lista "problema da Matriz GUT" desatualizada no Diagrama de Ishikawa e no 5 Porquês**: itens novos cadastrados na Matriz GUT só apareciam no seletor dessas duas ferramentas depois de recarregar a página (F5). Agora a lista é atualizada sozinha assim que você clica no campo.
+
+### Alterado
+
+- **Botão "Próxima Fase"**: texto simplificado (só "Próxima Fase", sem repetir número/nome da fase seguinte no rótulo); essa informação agora aparece na tooltip ao passar o mouse. Botão movido para a mesma linha de "Fechar Fase"/"Reabrir fase", alinhado à direita.
+
 ## [v1.10] — 30/09/2026
 
 ### Adicionado

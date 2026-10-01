@@ -187,6 +187,14 @@ window.IshikawaModule = (function(){
   }
 
   function wireEvents(){
+    /* gutRef é a mesma referência viva do estado da Matriz GUT (ver
+       app.js), então itens novos já estão em gutRef.itens assim que o
+       usuário os cadastra — mas as <option> deste <select> só existem
+       porque popularSelectGut() rodou uma vez, no mount(). Repopular
+       de novo em "focus" (antes do usuário abrir o dropdown) garante
+       que a lista sempre reflita o estado atual da GUT sem precisar de
+       F5, sem precisar de um mecanismo de notificação entre módulos. */
+    el.gutSelect.addEventListener("focus", popularSelectGut);
     el.gutSelect.addEventListener("change", function(){
       if(el.gutSelect.value) el.problemaInput.value = el.gutSelect.value;
     });
