@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.11">
-<link rel="stylesheet" href="css/app.css?v=1.11">
+<link rel="stylesheet" href="css/shell.css?v=1.12">
+<link rel="stylesheet" href="css/app.css?v=1.12">
 </head>
 <body>
 
@@ -285,32 +285,47 @@
 
 <!-- Notas da Matriz de Alçadas (Fase 2, Governança e Compliance) — mesmo
      mecanismo de tela dedicada do docsFaseOverlay/auditExecOverlay acima.
-     Fica dentro de fase-root-governanca-alcadas só o botão-gatilho (que
-     trava normalmente com o resto do card ao fechar a fase); o overlay em
-     si é um <div> irmão, fora de qualquer fase-root, controlado por
-     alcadas-module.js. -->
+     O botão-gatilho vive dentro de fase-root-governanca-alcadas mas tem
+     .fase-nao-bloquear (igual Exportar PDF/Excel em outras ferramentas) —
+     continua clicável com a fase fechada, só que em modo somente-leitura
+     (ver notas-versionadas.js). O overlay em si é um <div> irmão, fora de
+     qualquer fase-root, controlado por alcadas-module.js. -->
 <div class="docs-view" id="alcadasNotasOverlay" style="display:none">
   <div class="docs-header">
     <button class="docs-back" id="alcadasNotasBackBtn" type="button">&larr; Voltar ao caso</button>
     <div>
       <h1>Notas da Matriz de Alçadas</h1>
-      <p>Anotações livres sobre os critérios e faixas desta matriz.</p>
+      <p>Anotações livres sobre os critérios e faixas desta matriz — editável com a fase aberta, congela uma versão a cada fechamento.</p>
     </div>
   </div>
   <div id="alcadasNotasSlot"></div>
 </div>
 
+<!-- Notas da Segregação de Funções (Fase 2) — mesmo mecanismo e mesmo
+     controlador compartilhado (js/core/notas-versionadas.js) do overlay
+     de Notas da Matriz de Alçadas acima. -->
+<div class="docs-view" id="segregacaoNotasOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="segregacaoNotasBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1>Notas da Segregação de Funções</h1>
+      <p>Anotações livres sobre os pares de atividades desta análise — editável com a fase aberta, congela uma versão a cada fechamento.</p>
+    </div>
+  </div>
+  <div id="segregacaoNotasSlot"></div>
+</div>
+
 <div class="toast" id="appToast"></div>
 
-<!-- Aviso de beta-teste — fixo, fora de .app-shell/.landing-screen de
+<!-- Aviso de versão alfa — fixo, fora de .app-shell/.landing-screen de
      propósito, pra ficar visível em qualquer tela (landing, qualquer
      fase, telas de documentação/execução) sem depender do caso estar
-     carregado. Controlado por js/core/beta-aviso.js, independente do
+     carregado. Controlado por js/core/alfa-aviso.js, independente do
      resto do app. -->
-<div class="beta-balao" id="betaBalao" hidden role="status" aria-live="polite">
-  <button class="beta-balao-fechar" id="betaBalaoFechar" type="button" aria-label="Fechar aviso">&times;</button>
-  <p class="beta-balao-titulo">Versão de teste (beta)</p>
-  <p class="beta-balao-texto">Este é um ambiente de beta-teste — a ferramenta pode passar por alterações sem aviso prévio.</p>
+<div class="alfa-balao" id="alfaBalao" hidden role="status" aria-live="polite">
+  <button class="alfa-balao-fechar" id="alfaBalaoFechar" type="button" aria-label="Fechar aviso">&times;</button>
+  <p class="alfa-balao-titulo">Versão de teste (alfa)</p>
+  <p class="alfa-balao-texto">Este é um ambiente de teste alfa — a ferramenta pode passar por alterações sem aviso prévio.</p>
 </div>
 
 <!-- ============================================================
@@ -434,7 +449,7 @@
 <div class="riscos-panel">
   <div class="tool-head">
     <h3>Matriz de Alçadas</h3>
-    <button class="tool-notas-btn" id="alcadas-notasBtn" type="button">Notas da Matriz</button>
+    <button class="tool-notas-btn fase-nao-bloquear" id="alcadas-notasBtn" type="button" data-tooltip="Ver/editar notas da matriz — continua acessível (somente leitura) mesmo com a fase fechada.">Notas da Matriz</button>
   </div>
   <p class="gut-scale">
     <span>Cada critério (ex.: "Aprovação de compras") agrupa suas próprias faixas — o limite não precisa ser em R$: pode ser prazo, quantidade, nível de risco etc. Responsável e Escala para são escolhidos entre os papéis já cadastrados na Matriz RACI acima.</span>
@@ -454,7 +469,10 @@
      ============================================================ -->
 <template id="segregacao-template">
 <div class="riscos-panel">
-  <div class="tool-head"><h3>Segregação de Funções</h3></div>
+  <div class="tool-head">
+    <h3>Segregação de Funções</h3>
+    <button class="tool-notas-btn fase-nao-bloquear" id="segregacao-notasBtn" type="button" data-tooltip="Ver/editar notas da segregação de funções — continua acessível (somente leitura) mesmo com a fase fechada.">Notas da Funções</button>
+  </div>
   <p class="gut-scale">
     <span>Defina pares de atividades que não deveriam ficar sob responsabilidade do mesmo papel (ex.: quem solicita não deveria aprovar). Atividades são escolhidas entre as já cadastradas na Matriz RACI acima; o conflito é detectado automaticamente comparando os papéis com R ou A em cada uma.</span>
   </p>
@@ -1375,6 +1393,7 @@
         </table>
       </div>
       <p>As faixas de um mesmo Critério ficam agrupadas visualmente (título automático) e ordenadas do menor para o maior Limite.</p>
+      <p><b>Notas da Matriz</b> (botão no canto superior do painel): abre uma tela separada com um campo de texto rico para registrar o raciocínio por trás das faixas definidas — fica editável enquanto a fase está aberta. Ao fechar a fase, o texto vira <b>somente leitura</b> e é <b>congelado como uma versão</b> com data e hora; reabrir a fase libera a edição de novo, continuando do mesmo texto. Todas as versões anteriores ficam consultáveis na própria tela, em "Histórico de versões"; a versão mais recente é a que aparece no PDF de fechamento desta fase.</p>
       <div class="doc-callout tip">
         <b class="tag">Boas práticas</b>
         <ul>
@@ -1414,6 +1433,7 @@
         </table>
       </div>
       <p><b>Badge "Conflito" / "Sem conflito":</b> aparece automaticamente. Se algum papel tiver R ou A nas duas atividades, o badge fica vermelho e uma linha lista o(s) papel(is) conflitante(s). Se a Matriz RACI mudar depois, o status é recalculado sozinho na próxima vez que a tela abrir.</p>
+      <p><b>Notas da Funções</b> (botão no canto superior do painel): mesmo mecanismo de notas versionadas da Matriz de Alçadas, acima — texto rico, editável com a fase aberta, vira somente leitura e ganha uma versão com data/hora a cada fechamento da fase, com histórico consultável e a versão mais recente impressa no PDF de fechamento.</p>
       <div class="doc-callout tip">
         <b class="tag">Boas práticas</b>
         <ul>
@@ -2079,40 +2099,41 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.11"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.11"></script>
-<script src="js/lib/exceljs.embed.js?v=1.11"></script>
-<script src="js/core/toast.js?v=1.11"></script>
-<script src="js/core/beta-aviso.js?v=1.11"></script>
-<script src="js/core/caso-state.js?v=1.11"></script>
-<script src="js/core/docs-fase.js?v=1.11"></script>
-<script src="js/core/logo-data.js?v=1.11"></script>
-<script src="js/core/pdf-doc.js?v=1.11"></script>
-<script src="js/core/fechamento.js?v=1.11"></script>
-<script src="js/core/dossie.js?v=1.11"></script>
-<script src="js/core/nav.js?v=1.11"></script>
-<script src="js/core/richtext.js?v=1.11"></script>
-<script src="js/modules/raci-module.js?v=1.11"></script>
-<script src="js/modules/alcadas-module.js?v=1.11"></script>
-<script src="js/modules/segregacao-module.js?v=1.11"></script>
-<script src="js/modules/placeholder-module.js?v=1.11"></script>
-<script src="js/modules/w2h-module.js?v=1.11"></script>
-<script src="js/modules/fluxograma-module.js?v=1.11"></script>
-<script src="js/modules/pop-module.js?v=1.11"></script>
-<script src="js/modules/abertura-module.js?v=1.11"></script>
-<script src="js/modules/encerramento-module.js?v=1.11"></script>
-<script src="js/modules/gut-module.js?v=1.11"></script>
-<script src="js/modules/ishikawa-module.js?v=1.11"></script>
-<script src="js/modules/porques-module.js?v=1.11"></script>
-<script src="js/modules/riscos-module.js?v=1.11"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.11"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.11"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.11"></script>
-<script src="js/modules/sistemas-module.js?v=1.11"></script>
-<script src="js/modules/checklist-module.js?v=1.11"></script>
-<script src="js/modules/kpis-module.js?v=1.11"></script>
-<script src="js/modules/treinamento-module.js?v=1.11"></script>
-<script src="js/modules/fase0-module.js?v=1.11"></script>
-<script src="js/app.js?v=1.11"></script>
+<script src="js/lib/jspdf.embed.js?v=1.12"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.12"></script>
+<script src="js/lib/exceljs.embed.js?v=1.12"></script>
+<script src="js/core/toast.js?v=1.12"></script>
+<script src="js/core/alfa-aviso.js?v=1.12"></script>
+<script src="js/core/caso-state.js?v=1.12"></script>
+<script src="js/core/docs-fase.js?v=1.12"></script>
+<script src="js/core/logo-data.js?v=1.12"></script>
+<script src="js/core/pdf-doc.js?v=1.12"></script>
+<script src="js/core/fechamento.js?v=1.12"></script>
+<script src="js/core/dossie.js?v=1.12"></script>
+<script src="js/core/nav.js?v=1.12"></script>
+<script src="js/core/richtext.js?v=1.12"></script>
+<script src="js/core/notas-versionadas.js?v=1.12"></script>
+<script src="js/modules/raci-module.js?v=1.12"></script>
+<script src="js/modules/alcadas-module.js?v=1.12"></script>
+<script src="js/modules/segregacao-module.js?v=1.12"></script>
+<script src="js/modules/placeholder-module.js?v=1.12"></script>
+<script src="js/modules/w2h-module.js?v=1.12"></script>
+<script src="js/modules/fluxograma-module.js?v=1.12"></script>
+<script src="js/modules/pop-module.js?v=1.12"></script>
+<script src="js/modules/abertura-module.js?v=1.12"></script>
+<script src="js/modules/encerramento-module.js?v=1.12"></script>
+<script src="js/modules/gut-module.js?v=1.12"></script>
+<script src="js/modules/ishikawa-module.js?v=1.12"></script>
+<script src="js/modules/porques-module.js?v=1.12"></script>
+<script src="js/modules/riscos-module.js?v=1.12"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.12"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.12"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.12"></script>
+<script src="js/modules/sistemas-module.js?v=1.12"></script>
+<script src="js/modules/checklist-module.js?v=1.12"></script>
+<script src="js/modules/kpis-module.js?v=1.12"></script>
+<script src="js/modules/treinamento-module.js?v=1.12"></script>
+<script src="js/modules/fase0-module.js?v=1.12"></script>
+<script src="js/app.js?v=1.12"></script>
 </body>
 </html>

@@ -266,6 +266,21 @@ window.Fechamento = (function(){
     return {doc: doc, aprovador: aprovador, nomeArquivo: nomeArquivo};
   }
 
+  /* Notas da Matriz de Alçadas e da Segregação de Funções (Fase 2) são
+     versionadas junto com o fechamento da fase — não têm fechamento
+     próprio. Congela o rascunho atual como a versão desta fase, ANTES
+     de desenhar o PDF (desenharNoDoc de cada módulo já lê a versão
+     recém-congelada como "a atual"). Ver js/core/notas-versionadas.js. */
+  function congelarNotasDaFase(fase, versao, dataISO){
+    if(fase.id !== "governanca") return;
+    if(fase.ferramentas.alcadas && window.AlcadasModule && window.AlcadasModule.congelarNotas){
+      window.AlcadasModule.congelarNotas(fase.ferramentas.alcadas, versao, dataISO);
+    }
+    if(fase.ferramentas.segregacao && window.SegregacaoModule && window.SegregacaoModule.congelarNotas){
+      window.SegregacaoModule.congelarNotas(fase.ferramentas.segregacao, versao, dataISO);
+    }
+  }
+
   /* Fecha a fase de verdade: só é chamado quando ela está "aberta"
      (fase nova ou recém-reaberta) — cria uma versão NOVA, grava no
      histórico de fechamentos e trava a edição (ver app.js). */
@@ -275,6 +290,7 @@ window.Fechamento = (function(){
 
     var versao = fase.fechamentos.length + 1;
     var agora = new Date();
+    congelarNotasDaFase(fase, versao, agora.toISOString());
     var av = window.Fase0Module ? window.Fase0Module.buscarAprovadorRevisor(caso, faseId) : {aprovador:"", revisor:""};
     var construido = construirPdfFase(caso, fase, versao, agora, agora, av.aprovador, av.revisor);
 

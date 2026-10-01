@@ -405,7 +405,24 @@
 .tool-notas-btn:hover{background:var(--brand-tint);border-color:var(--brand);}
 .tool-notas-btn:disabled{opacity:.5;cursor:not-allowed;}
 
-.alcadas-notas-painel .richtext-editor{min-height:340px;max-height:none;}
+/* ---------- Telas de "Notas" versionadas (Alçadas, Segregação) ---------- */
+.notas-painel{margin-bottom:16px;}
+.notas-painel h3{font-size:14px;font-weight:600;margin:0 0 10px;}
+.notas-atual-painel .richtext-editor{min-height:300px;max-height:none;}
+.notas-aviso-readonly{font-size:12px;color:var(--ink-faint);font-style:italic;margin:0 0 10px;}
+.richtext-editor-readonly{background:var(--surface-alt);cursor:default;}
+.notas-vazio{color:var(--ink-faint);font-style:italic;}
+.notas-historico-vazio{font-size:12.5px;color:var(--ink-faint);margin:0;}
+.notas-historico-card{
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  margin-bottom:8px;
+  background:var(--surface);
+}
+.notas-historico-topo{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.notas-historico-topo strong{font-size:12.5px;color:var(--ink);font-weight:600;}
+.notas-historico-corpo{margin-top:10px;min-height:0;}
 .fase-docs-btn .q{
   display:flex;
   align-items:center;
@@ -1403,27 +1420,27 @@ table.doc-table.fase0-registro td input:focus{outline:2px solid var(--brand-tint
 }
 .kpis-chart-svg{width:100%;height:auto;flex:1;}
 
-/* ---------- Balão de aviso de beta-teste (js/core/beta-aviso.js) ----------
+/* ---------- Balão de aviso de versão alfa (js/core/alfa-aviso.js) ----------
    position:fixed de propósito (não sticky) — precisa ficar visível em
    QUALQUER tela, inclusive a landing (que não tem .app-shell no fluxo),
    então não pode depender de nenhum container com scroll/posição
    própria. Canto superior direito do viewport, acima de tudo (inclusive
    o toast global, z-index:100 em shell.css). */
-.beta-balao{
+.alfa-balao{
   position:fixed; top:16px; right:16px; z-index:150;
   max-width:280px; background:var(--surface); border:1px solid var(--c-i);
   border-radius:var(--radius-md); box-shadow:var(--shadow-md);
   padding:12px 30px 12px 14px;
 }
-.beta-balao-titulo{margin:0 0 4px; font-size:12.5px; font-weight:700; color:var(--c-i);}
-.beta-balao-texto{margin:0; font-size:11.5px; color:var(--ink-soft); line-height:1.4;}
-.beta-balao-fechar{
+.alfa-balao-titulo{margin:0 0 4px; font-size:12.5px; font-weight:700; color:var(--c-i);}
+.alfa-balao-texto{margin:0; font-size:11.5px; color:var(--ink-soft); line-height:1.4;}
+.alfa-balao-fechar{
   position:absolute; top:6px; right:6px; width:20px; height:20px;
   border:none; background:transparent; color:var(--ink-faint); font-size:15px; line-height:1;
   cursor:pointer; border-radius:var(--radius-sm);
 }
-.beta-balao-fechar:hover{background:var(--surface-alt); color:var(--c-a);}
-@media (max-width:520px){ .beta-balao{left:12px; right:12px; max-width:none;} }
+.alfa-balao-fechar:hover{background:var(--surface-alt); color:var(--c-a);}
+@media (max-width:520px){ .alfa-balao{left:12px; right:12px; max-width:none;} }
 
 /* ---------- Botão "voltar ao topo" (fim de cada fase) ---------- */
 .voltar-topo-wrap{display:flex; justify-content:center; margin:28px 0 8px;}

@@ -159,6 +159,17 @@
     if(faseId === "auditoria" && window.PlanoAuditoriaModule && window.PlanoAuditoriaModule.atualizarBloqueio){
       window.PlanoAuditoriaModule.atualizarBloqueio(bloqueado);
     }
+
+    /* Matriz de Alçadas e Segregação de Funções (Fase 2): "Notas" também
+       tem regra própria — o botão-gatilho fica sempre liberado (classe
+       .fase-nao-bloquear, é leitura/consulta igual export de PDF), mas o
+       CONTEÚDO vira somente-leitura quando a fase fecha. Os módulos
+       guardam esse status por fora do sweep genérico, porque a tela de
+       notas vive fora de qualquer fase-root (ver notas-versionadas.js). */
+    if(faseId === "governanca"){
+      if(window.AlcadasModule && window.AlcadasModule.atualizarBloqueio) window.AlcadasModule.atualizarBloqueio(bloqueado);
+      if(window.SegregacaoModule && window.SegregacaoModule.atualizarBloqueio) window.SegregacaoModule.atualizarBloqueio(bloqueado);
+    }
   }
 
   /* "Reabrir Processo" — melhoria contínua dentro do MESMO caso, em vez

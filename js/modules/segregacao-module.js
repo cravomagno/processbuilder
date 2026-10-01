@@ -20,6 +20,13 @@ window.SegregacaoModule = (function(){
   var onChange = null;
   var raciRef = null;
 
+  var notasCtrl = window.NotasVersionadas.criarControlador({
+    overlayId: "segregacaoNotasOverlay",
+    slotId: "segregacaoNotasSlot",
+    backBtnId: "segregacaoNotasBackBtn",
+    placeholder: "Escreva aqui observações sobre os pares de atividades ou o raciocínio por trás desta análise de segregação de funções..."
+  });
+
   function uid(){ return "seg_" + Date.now() + "_" + Math.floor(Math.random()*10000); }
 
   function roleLabel(role){
@@ -97,8 +104,17 @@ window.SegregacaoModule = (function(){
     function q(id){ return root.querySelector("#" + id); }
     return {
       addBtn: q("segregacao-addBtn"),
-      lista: q("segregacao-lista")
+      lista: q("segregacao-lista"),
+      notasBtn: q("segregacao-notasBtn")
     };
+  }
+
+  /* "Notas da Funções" — mesma tela dedicada/versionamento da Matriz de
+     Alçadas (ver js/core/notas-versionadas.js para o comportamento
+     completo: somente-leitura com a fase fechada, histórico de versões,
+     carimbo no PDF). */
+  function abrirNotas(){
+    notasCtrl.abrir(state, function(){ if(onChange) onChange(state); });
   }
 
   function renderCard(par){
@@ -207,6 +223,7 @@ window.SegregacaoModule = (function(){
 
   function wireEvents(){
     el.addBtn.addEventListener("click", addPar);
+    if(el.notasBtn) el.notasBtn.addEventListener("click", abrirNotas);
   }
 
   function mount(rootEl, initialState, onChangeCb, raciStateRef){
@@ -223,6 +240,10 @@ window.SegregacaoModule = (function(){
     renderAll();
   }
 
+  /* Repassados a partir de app.js/fechamento.js — ver notas-versionadas.js. */
+  function atualizarBloqueio(bloqueado){ notasCtrl.atualizarBloqueio(bloqueado); }
+  function congelarNotas(ferramentaState, versao, dataISO){ notasCtrl.congelar(ferramentaState, versao, dataISO); }
+
   /**
    * Desenha os pares de Segregação de Funções num documento jsPDF já
    * criado, mesmo padrão dos demais módulos. Usa `rolesConflitantes`
@@ -231,12 +252,15 @@ window.SegregacaoModule = (function(){
    */
   function desenharNoDoc(doc, docState, startY){
     var pageH = doc.internal.pageSize.getHeight();
+    var pageW = doc.internal.pageSize.getWidth();
 
     if(!docState.pares || docState.pares.length === 0){
       doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
       doc.setTextColor(80,88,100);
       doc.text("Nenhum par de atividades incompatíveis registrado.", 40, startY);
-      return startY + 16;
+      var yVazio = startY + 16;
+      if(yVazio > pageH - 80){ doc.addPage(); yVazio = 40; }
+      return notasCtrl.desenharNoDoc(doc, docState, yVazio, pageW, pageH, "Notas da Segregação de Funções");
     }
 
     function hexToRgb(hex){
@@ -275,9 +299,9 @@ window.SegregacaoModule = (function(){
     });
 
     var y = doc.lastAutoTable.finalY + 10;
-    if(y > pageH - 30){ doc.addPage(); y = 40; }
-    return y;
+    if(y > pageH - 80){ doc.addPage(); y = 40; }
+    return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Segregação de Funções");
   }
 
-  return { mount: mount, desenharNoDoc: desenharNoDoc };
+  return { mount: mount, desenharNoDoc: desenharNoDoc, atualizarBloqueio: atualizarBloqueio, congelarNotas: congelarNotas };
 })();

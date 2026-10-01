@@ -4,7 +4,7 @@
 
 🔗 **Acesse:** [cravomagno.github.io/processbuilder](https://cravomagno.github.io/processbuilder/)
 
-> **Beta-teste de produção controlada.** Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer. Veja o [`CHANGELOG.md`](CHANGELOG.md) para o histórico completo de cada versão publicada.
+> **Versão alfa de teste, em produção controlada.** Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até a versão amadurecer. Veja o [`CHANGELOG.md`](CHANGELOG.md) para o histórico completo de cada versão publicada.
 
 ## Não está vendo uma atualização recente?
 

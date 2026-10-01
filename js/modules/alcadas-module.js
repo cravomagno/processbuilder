@@ -23,6 +23,13 @@ window.AlcadasModule = (function(){
   var onChange = null;
   var raciRef = null;
 
+  var notasCtrl = window.NotasVersionadas.criarControlador({
+    overlayId: "alcadasNotasOverlay",
+    slotId: "alcadasNotasSlot",
+    backBtnId: "alcadasNotasBackBtn",
+    placeholder: "Escreva aqui observações sobre critérios, faixas ou o raciocínio por trás desta matriz de alçadas..."
+  });
+
   function uid(){ return "alc_" + Date.now() + "_" + Math.floor(Math.random()*10000); }
 
   function roleLabel(role){
@@ -61,50 +68,15 @@ window.AlcadasModule = (function(){
     };
   }
 
-  /* ---------------- Notas da Matriz (tela dedicada) ----------------
-     Mesmo mecanismo de troca de tela já usado por docs-fase.js e pela
-     execução do checklist do Plano de Auditoria: esconde a .app-shell,
-     mostra um <div> irmão (#alcadasNotasOverlay). Como esse <div> fica
-     fora de qualquer fase-root, só o botão-gatilho precisa travar com
-     o resto do card ao fechar a fase — sem ele, a tela nunca abre, então
-     não há necessidade de nenhuma outra exceção/trava especial aqui. */
-  var elNotas = null;
-
-  function buildElNotasRefs(){
-    function q(id){ return document.getElementById(id); }
-    return {
-      overlay: q("alcadasNotasOverlay"),
-      slot: q("alcadasNotasSlot"),
-      backBtn: q("alcadasNotasBackBtn")
-    };
-  }
-
-  function fecharNotas(){
-    if(!elNotas || !elNotas.overlay) return;
-    elNotas.overlay.style.display = "none";
-    var shell = document.querySelector(".app-shell");
-    if(shell) shell.style.display = "";
-  }
-
+  /* "Notas da Matriz" — tela dedicada de texto rico, versionada junto
+     com o fechamento da fase (congelar/atualizarBloqueio chamados de
+     fora: ver aplicarBloqueioFase/Fechamento.gerarPdfFechamentoFase em
+     app.js/fechamento.js). Lógica compartilhada com Segregação de
+     Funções em js/core/notas-versionadas.js — ver esse arquivo para o
+     comportamento completo (somente-leitura com a fase fechada,
+     histórico de versões, carimbo no PDF). */
   function abrirNotas(){
-    if(!elNotas){
-      elNotas = buildElNotasRefs();
-      if(!elNotas.overlay) return;
-      elNotas.backBtn.addEventListener("click", fecharNotas);
-    }
-    var shell = document.querySelector(".app-shell");
-    if(shell) shell.style.display = "none";
-    elNotas.overlay.style.display = "block";
-    window.scrollTo(0, 0);
-
-    var painel = document.createElement("div");
-    painel.className = "riscos-panel alcadas-notas-painel";
-    elNotas.slot.innerHTML = "";
-    elNotas.slot.appendChild(painel);
-    window.RichText.montarEditor(painel, state.notas || "", function(html){
-      state.notas = html;
-      if(onChange) onChange(state);
-    }, {placeholder: "Escreva aqui observações sobre critérios, faixas ou o raciocínio por trás desta matriz de alçadas..."});
+    notasCtrl.abrir(state, function(){ if(onChange) onChange(state); });
   }
 
   function popularSelectPapel(select, valorAtual, placeholderTxt){
@@ -293,12 +265,15 @@ window.AlcadasModule = (function(){
     el = buildElRefs(rootEl);
     state = initialState;
     state.itens.forEach(migrarItem);
-    if(state.notas === undefined) state.notas = ""; // backfill — campo novo, casos salvos antes dele não têm
     onChange = onChangeCb || null;
     raciRef = raciStateRef || null;
     wireEvents();
     renderAll();
   }
+
+  /* Repassados a partir de app.js/fechamento.js — ver notas-versionadas.js. */
+  function atualizarBloqueio(bloqueado){ notasCtrl.atualizarBloqueio(bloqueado); }
+  function congelarNotas(ferramentaState, versao, dataISO){ notasCtrl.congelar(ferramentaState, versao, dataISO); }
 
   /**
    * Desenha a Matriz de Alçadas num documento jsPDF já criado, um
@@ -309,13 +284,16 @@ window.AlcadasModule = (function(){
    */
   function desenharNoDoc(doc, docState, startY){
     var pageH = doc.internal.pageSize.getHeight();
+    var pageW = doc.internal.pageSize.getWidth();
     var y = startY;
 
     if(!docState.itens || docState.itens.length === 0){
       doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
       doc.setTextColor(80,88,100);
       doc.text("Nenhuma faixa de alçada registrada.", 40, y);
-      return y + 16;
+      y += 16;
+      if(y > pageH - 80){ doc.addPage(); y = 40; }
+      return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Matriz");
     }
 
     var criterios = [];
@@ -357,9 +335,9 @@ window.AlcadasModule = (function(){
       y = doc.lastAutoTable.finalY + 10;
     });
 
-    if(y > pageH - 30){ doc.addPage(); y = 40; }
-    return y;
+    if(y > pageH - 80){ doc.addPage(); y = 40; }
+    return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Matriz");
   }
 
-  return { mount: mount, desenharNoDoc: desenharNoDoc };
+  return { mount: mount, desenharNoDoc: desenharNoDoc, atualizarBloqueio: atualizarBloqueio, congelarNotas: congelarNotas };
 })();

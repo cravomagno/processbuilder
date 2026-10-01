@@ -2,7 +2,18 @@
 
 Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — o que mudou desde a versão anterior.
 
-> **Nota (23/09/2026):** o sistema está em beta-teste de produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até o beta amadurecer.
+> **Nota (23/09/2026):** o sistema está em versão alfa de teste, em produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até a versão amadurecer.
+
+## [v1.12] — 01/10/2026
+
+### Adicionado
+
+- **"Notas da Funções" na Segregação de Funções (Fase 2)**: mesmo botão/tela de notas já existente na Matriz de Alçadas, agora também na Segregação de Funções.
+- **Notas versionadas** (Matriz de Alçadas e Segregação de Funções): o campo de notas agora é editável enquanto a fase está aberta e vira **somente leitura automaticamente quando a fase fecha** — o botão continua acessível (não trava), mas só para consulta. A cada fechamento da fase, o conteúdo atual é **congelado como uma nova versão no histórico**, consultável a qualquer momento dentro da própria tela (lista "Histórico de versões", com cada versão expansível individualmente). Reabrir a fase libera a edição de novo, continuando do texto da última versão (não começa em branco). O **PDF de fechamento da fase** passou a incluir a seção de notas, sempre com a versão atual e seu carimbo de data/hora.
+
+### Corrigido
+
+- **Terminologia "beta" → "alfa"**: o estágio correto do projeto é versão alfa de teste, não beta — corrigido no balão de aviso, nesta nota do topo e no `README.md`.
 
 ## [v1.11] — 01/10/2026
 
@@ -22,7 +33,7 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 ### Adicionado
 
-- **Balão de aviso de beta-teste**: fixo no canto superior direito, visível em qualquer tela (landing, qualquer fase, documentação, execução do checklist). Fechável ("×"); reaparece sozinho 12 minutos depois de fechado.
+- **Balão de aviso de versão alfa**: fixo no canto superior direito, visível em qualquer tela (landing, qualquer fase, documentação, execução do checklist). Fechável ("×"); reaparece sozinho 12 minutos depois de fechado.
 - **Cabeçalho fixo ao rolar a página**: a barra do caso e a navegação por fases continuam visíveis no topo enquanto você rola o conteúdo de uma fase.
 - **Botão "voltar ao topo"**: ícone discreto no fim de cada fase, com tooltip, rola suavemente de volta ao início da página.
 
