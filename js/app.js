@@ -170,6 +170,13 @@
       if(window.AlcadasModule && window.AlcadasModule.atualizarBloqueio) window.AlcadasModule.atualizarBloqueio(bloqueado);
       if(window.SegregacaoModule && window.SegregacaoModule.atualizarBloqueio) window.SegregacaoModule.atualizarBloqueio(bloqueado);
     }
+
+    /* Matriz de Rastreabilidade e Sistemas (Fase 5): mesma regra de
+       "Notas" das ferramentas da Governança acima. */
+    if(faseId === "sistemas"){
+      if(window.RastreabilidadeModule && window.RastreabilidadeModule.atualizarBloqueio) window.RastreabilidadeModule.atualizarBloqueio(bloqueado);
+      if(window.SistemasModule && window.SistemasModule.atualizarBloqueio) window.SistemasModule.atualizarBloqueio(bloqueado);
+    }
   }
 
   /* "Reabrir Processo" — melhoria contínua dentro do MESMO caso, em vez

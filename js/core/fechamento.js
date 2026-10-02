@@ -272,12 +272,21 @@ window.Fechamento = (function(){
      de desenhar o PDF (desenharNoDoc de cada módulo já lê a versão
      recém-congelada como "a atual"). Ver js/core/notas-versionadas.js. */
   function congelarNotasDaFase(fase, versao, dataISO){
-    if(fase.id !== "governanca") return;
-    if(fase.ferramentas.alcadas && window.AlcadasModule && window.AlcadasModule.congelarNotas){
-      window.AlcadasModule.congelarNotas(fase.ferramentas.alcadas, versao, dataISO);
+    if(fase.id === "governanca"){
+      if(fase.ferramentas.alcadas && window.AlcadasModule && window.AlcadasModule.congelarNotas){
+        window.AlcadasModule.congelarNotas(fase.ferramentas.alcadas, versao, dataISO);
+      }
+      if(fase.ferramentas.segregacao && window.SegregacaoModule && window.SegregacaoModule.congelarNotas){
+        window.SegregacaoModule.congelarNotas(fase.ferramentas.segregacao, versao, dataISO);
+      }
     }
-    if(fase.ferramentas.segregacao && window.SegregacaoModule && window.SegregacaoModule.congelarNotas){
-      window.SegregacaoModule.congelarNotas(fase.ferramentas.segregacao, versao, dataISO);
+    if(fase.id === "sistemas"){
+      if(fase.ferramentas.rastreabilidade && window.RastreabilidadeModule && window.RastreabilidadeModule.congelarNotas){
+        window.RastreabilidadeModule.congelarNotas(fase.ferramentas.rastreabilidade, versao, dataISO);
+      }
+      if(fase.ferramentas.sistemas && window.SistemasModule && window.SistemasModule.congelarNotas){
+        window.SistemasModule.congelarNotas(fase.ferramentas.sistemas, versao, dataISO);
+      }
     }
   }
 

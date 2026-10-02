@@ -4,6 +4,20 @@ Histórico de versões publicadas no GitHub Pages. Formato: [v.MAJOR.MINOR] — 
 
 > **Nota (23/09/2026):** o sistema está em versão alfa de teste, em produção controlada. Todas as versões `v1.x` são versões de teste — correções e atualizações frequentes são esperadas até a versão amadurecer.
 
+## [v1.13] — 02/10/2026
+
+### Adicionado
+
+- **"Notas de Rastreabilidade" (Matriz de Rastreabilidade) e "Notas de Sistema" (Sistemas, Aquisição/Desenvolvimento)**, ambas na Fase 5: mesmo mecanismo de notas versionadas já existente na Matriz de Alçadas e na Segregação de Funções — editável com a fase aberta, vira somente leitura e ganha uma versão com data/hora a cada fechamento da fase, com histórico consultável e a versão mais recente impressa no PDF de fechamento.
+
+### Corrigido
+
+- **Abas de fluxo do Fluxograma do Processo (Fase 3) ficavam travadas com a fase fechada**: não dava para alternar entre os fluxos cadastrados para apenas visualizá-los — só o primeiro fluxo ficava acessível. As abas agora continuam clicáveis com a fase fechada (navegação/leitura, igual a exportar PDF/Excel); a edição de raias e etapas continua travada normalmente.
+- **Legenda da Matriz RACI sobreposta ao rodapé no PDF**: em matrizes com mais papéis/atividades, a legenda podia quebrar de página tarde demais e os últimos itens (ou o título "Legenda") ficavam desenhados em cima do rodapé da página. A quebra de página da legenda agora reserva a margem correta antes do rodapé.
+- **Cabeçalho de papel "espremido" no PDF da Matriz RACI com muitas colunas**: com muitos papéis cadastrados, o nome de cada papel quebrava letra por sílaba dentro da coluna estreita, ilegível. Com poucos papéis, nada muda. Com muitos, o texto do cabeçalho passa a ficar na vertical (mesma altura da linha do cabeçalho, não a largura da coluna) — todas as colunas de papel continuam com exatamente a mesma largura entre si.
+- **Título de critério "órfão" no PDF da Matriz de Alçadas**: em matrizes com vários critérios, o título de um critério podia ficar sozinho no fim de uma página, com a tabela correspondente já começando na página seguinte. O título e a tabela do mesmo critério agora sempre ficam juntos, na mesma página.
+- **"Notas da Matriz"/"Notas da Funções" coladas na tabela anterior no PDF**: a seção de notas começava direto em cima da última linha da tabela, sem respiro. Agora tem um espaço e uma linha divisória antes do título.
+
 ## [v1.12] — 01/10/2026
 
 ### Adicionado

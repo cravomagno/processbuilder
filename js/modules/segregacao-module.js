@@ -259,7 +259,7 @@ window.SegregacaoModule = (function(){
       doc.setTextColor(80,88,100);
       doc.text("Nenhum par de atividades incompatíveis registrado.", 40, startY);
       var yVazio = startY + 16;
-      if(yVazio > pageH - 80){ doc.addPage(); yVazio = 40; }
+      if(yVazio > pageH - 110){ doc.addPage(); yVazio = 40; } // 110 = folga da notasCtrl (divisor + título + espaço)
       return notasCtrl.desenharNoDoc(doc, docState, yVazio, pageW, pageH, "Notas da Segregação de Funções");
     }
 
@@ -299,7 +299,7 @@ window.SegregacaoModule = (function(){
     });
 
     var y = doc.lastAutoTable.finalY + 10;
-    if(y > pageH - 80){ doc.addPage(); y = 40; }
+    if(y > pageH - 110){ doc.addPage(); y = 40; } // 110 = folga da notasCtrl (divisor + título + espaço)
     return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Segregação de Funções");
   }
 

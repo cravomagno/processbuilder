@@ -22,6 +22,13 @@ window.RastreabilidadeModule = (function(){
   var fluxogramaRef = null;
   var raciRef = null;
 
+  var notasCtrl = window.NotasVersionadas.criarControlador({
+    overlayId: "rastreabilidadeNotasOverlay",
+    slotId: "rastreabilidadeNotasSlot",
+    backBtnId: "rastreabilidadeNotasBackBtn",
+    placeholder: "Escreva aqui observações sobre os campos rastreados ou o raciocínio por trás desta matriz de rastreabilidade..."
+  });
+
   function uid(){ return "rastr_" + Date.now() + "_" + Math.floor(Math.random()*10000); }
 
   function roleLabel(role){
@@ -101,8 +108,16 @@ window.RastreabilidadeModule = (function(){
     return {
       addInput: q("rastreabilidade-addInput"),
       addBtn: q("rastreabilidade-addBtn"),
-      lista: q("rastreabilidade-lista")
+      lista: q("rastreabilidade-lista"),
+      notasBtn: q("rastreabilidade-notasBtn")
     };
+  }
+
+  /* "Notas de Rastreabilidade" — mesma tela dedicada/versionamento da
+     Matriz de Alçadas e Segregação de Funções (ver
+     js/core/notas-versionadas.js para o comportamento completo). */
+  function abrirNotas(){
+    notasCtrl.abrir(state, function(){ if(onChange) onChange(state); });
   }
 
   function renderCard(item){
@@ -220,6 +235,7 @@ window.RastreabilidadeModule = (function(){
   function wireEvents(){
     el.addBtn.addEventListener("click", addItem);
     el.addInput.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); addItem(); } });
+    if(el.notasBtn) el.notasBtn.addEventListener("click", abrirNotas);
   }
 
   function mount(rootEl, initialState, onChangeCb, fluxogramaStateRef, raciStateRef){
@@ -236,6 +252,10 @@ window.RastreabilidadeModule = (function(){
     renderAll();
   }
 
+  /* Repassados a partir de app.js/fechamento.js — ver notas-versionadas.js. */
+  function atualizarBloqueio(bloqueado){ notasCtrl.atualizarBloqueio(bloqueado); }
+  function congelarNotas(ferramentaState, versao, dataISO){ notasCtrl.congelar(ferramentaState, versao, dataISO); }
+
   /**
    * Desenha a Matriz de Rastreabilidade num documento jsPDF já criado,
    * mesmo padrão dos demais módulos. Usa os nomes já resolvidos
@@ -245,12 +265,15 @@ window.RastreabilidadeModule = (function(){
    */
   function desenharNoDoc(doc, docState, startY){
     var pageH = doc.internal.pageSize.getHeight();
+    var pageW = doc.internal.pageSize.getWidth();
 
     if(!docState.itens || docState.itens.length === 0){
       doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
       doc.setTextColor(80,88,100);
       doc.text("Nenhum item de rastreabilidade registrado.", 40, startY);
-      return startY + 16;
+      var yVazio = startY + 16;
+      if(yVazio > pageH - 110){ doc.addPage(); yVazio = 40; }
+      return notasCtrl.desenharNoDoc(doc, docState, yVazio, pageW, pageH, "Notas de Rastreabilidade");
     }
 
     var head = [["Campo/Dado", "Origem", "Sistema", "Regra de validação", "Destino", "Responsável"]];
@@ -276,9 +299,9 @@ window.RastreabilidadeModule = (function(){
     });
 
     var y = doc.lastAutoTable.finalY + 10;
-    if(y > pageH - 30){ doc.addPage(); y = 40; }
-    return y;
+    if(y > pageH - 110){ doc.addPage(); y = 40; }
+    return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas de Rastreabilidade");
   }
 
-  return { mount: mount, desenharNoDoc: desenharNoDoc };
+  return { mount: mount, desenharNoDoc: desenharNoDoc, atualizarBloqueio: atualizarBloqueio, congelarNotas: congelarNotas };
 })();

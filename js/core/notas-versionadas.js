@@ -170,6 +170,15 @@ window.NotasVersionadas = (function(){
       garantirCampos(state);
       var ultima = state.notasHistorico.length ? state.notasHistorico[state.notasHistorico.length - 1] : null;
 
+      /* Respiro + linha divisória antes do título — sem isso, esta seção
+         ficava colada direto na última linha da tabela anterior (relatado
+         com print: "Notas da Matriz" grudado na tabela de faixas). Mesmo
+         estilo de divisor já usado entre diagramas no Ishikawa. */
+      y += 14;
+      doc.setDrawColor(218,223,230); doc.setLineWidth(0.8);
+      doc.line(40, y, pageW - 40, y);
+      y += 18;
+
       doc.setFont("helvetica","bold"); doc.setFontSize(10.5);
       doc.setTextColor(28,36,48);
       doc.text(tituloSecao || "Notas", 40, y);

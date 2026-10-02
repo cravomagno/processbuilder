@@ -292,7 +292,7 @@ window.AlcadasModule = (function(){
       doc.setTextColor(80,88,100);
       doc.text("Nenhuma faixa de alçada registrada.", 40, y);
       y += 16;
-      if(y > pageH - 80){ doc.addPage(); y = 40; }
+      if(y > pageH - 110){ doc.addPage(); y = 40; } // 110 = folga da notasCtrl (divisor + título + espaço)
       return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Matriz");
     }
 
@@ -301,7 +301,15 @@ window.AlcadasModule = (function(){
 
     criterios.forEach(function(criterio, idx){
       if(idx > 0) y += 6;
-      if(y > pageH - 60){ doc.addPage(); y = 40; }
+      /* Reserva espaço pro título do critério JUNTO COM pelo menos o
+         cabeçalho + 1 linha da tabela que vem logo depois — não só pro
+         título sozinho. Com a reserva antiga (só ~60pt, o suficiente
+         pro título mas não pra tabela), o título cabia no fim da
+         página mas a tabela inteira era empurrada pelo autoTable pra
+         a página seguinte, deixando o título "órfão" (relatado: título
+         de um critério aparecendo sozinho, colado no rodapé, com a
+         tabela correspondente já na próxima página). */
+      y = window.PdfDoc.garantirEspaco(doc, y, 70, 40).y;
 
       doc.setFont("helvetica","bold"); doc.setFontSize(10);
       doc.setTextColor(28,36,48);
@@ -335,7 +343,7 @@ window.AlcadasModule = (function(){
       y = doc.lastAutoTable.finalY + 10;
     });
 
-    if(y > pageH - 80){ doc.addPage(); y = 40; }
+    if(y > pageH - 110){ doc.addPage(); y = 40; } // 110 = folga da notasCtrl (divisor + título + espaço)
     return notasCtrl.desenharNoDoc(doc, docState, y, pageW, pageH, "Notas da Matriz");
   }
 

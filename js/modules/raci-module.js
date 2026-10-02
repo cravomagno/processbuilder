@@ -632,10 +632,47 @@ window.RaciModule = (function(){
     var pageH = doc.internal.pageSize.getHeight();
     var landscape = pageW > pageH;
     var col0Width = landscape ? 190 : 155;
+    var MARGEM_X = 40;
 
     function cellOf(actId, roleId){ return raciState.cells[actId+"|"+roleId]; }
 
+    var numRoles = raciState.roles.length;
+    /* Largura igual pra toda coluna de papel, calculada e FIXADA aqui
+       (columnStyles abaixo), em vez de deixar o autoTable decidir
+       sozinho — com muitos papéis, o algoritmo de largura automática do
+       autoTable podia dar colunas de tamanhos ligeiramente diferentes
+       entre si dependendo do conteúdo de cada uma. */
+    var larguraColPapel = numRoles ? (pageW - MARGEM_X*2 - col0Width) / numRoles : 0;
+
+    /* Abaixo desta largura, "Área" + "Nome · Cargo" não cabem na
+       horizontal sem quebrar palavra por sílaba (o "espremido" relatado
+       com muitas colunas de papel) — gira o texto do cabeçalho pra
+       vertical nesse caso (mesma solução clássica de planilha pra
+       muitas colunas estreitas: o texto passa a usar a ALTURA da linha
+       do cabeçalho, não a largura da coluna, então nenhuma coluna
+       precisa alargar). Com poucos papéis (coluna larga o bastante),
+       mantém o cabeçalho horizontal de sempre, sem mudar nada. */
+    var LARGURA_MINIMA_HORIZONTAL = 70;
+    var girarCabecalho = larguraColPapel > 0 && larguraColPapel < LARGURA_MINIMA_HORIZONTAL;
+
+    function rotuloPapel(role){
+      var subtext = roleSubtext(role);
+      return subtext ? (role.area + " — " + subtext) : role.area;
+    }
+
+    var ALTURA_CABECALHO_GIRADO = (function(){
+      if(!girarCabecalho) return 0;
+      doc.setFont("helvetica","bold"); doc.setFontSize(9);
+      var maior = 0;
+      raciState.roles.forEach(function(r){
+        var w = doc.getTextWidth(rotuloPapel(r));
+        if(w > maior) maior = w;
+      });
+      return Math.min(maior + 20, pageH - 160); // +20 de respiro; nunca maior que a página cabe
+    })();
+
     var head = [["Atividade"].concat(raciState.roles.map(function(r){
+      if(girarCabecalho) return ""; // desenhado manualmente em didDrawCell, girado
       var subtext = roleSubtext(r);
       return subtext ? r.area + "\n" + subtext : r.area;
     }))];
@@ -644,14 +681,20 @@ window.RaciModule = (function(){
       return [col0].concat(raciState.roles.map(function(role){ return cellOf(act.id, role.id) || ""; }));
     });
 
+    var columnStyles = {0:{halign:"left", fillColor:[238,240,244], textColor:[28,36,48], cellWidth:col0Width, fontSize:9}};
+    raciState.roles.forEach(function(r, idx){ columnStyles[idx+1] = {cellWidth: larguraColPapel}; });
+
+    var headStyles = {fillColor:[43,58,103], textColor:255, fontStyle:"bold", halign:"center", fontSize:9};
+    if(girarCabecalho) headStyles.minCellHeight = ALTURA_CABECALHO_GIRADO; // chave só existe quando precisa — "minCellHeight:undefined" explícito quebrava a altura da linha do cabeçalho mesmo no caso normal
+
     doc.autoTable({
       startY:startY,
       head:head, body:body,
       theme:"grid",
       rowPageBreak:"avoid",
       styles:{fontSize:9.5, cellPadding:6, halign:"center", valign:"middle", lineColor:[218,223,230], lineWidth:0.6, textColor:[28,36,48]},
-      headStyles:{fillColor:[43,58,103], textColor:255, fontStyle:"bold", halign:"center", fontSize:9},
-      columnStyles:{0:{halign:"left", fillColor:[238,240,244], textColor:[28,36,48], cellWidth:col0Width, fontSize:9}},
+      headStyles:headStyles,
+      columnStyles:columnStyles,
       didParseCell:function(data){
         if(data.section==="body" && data.column.index>0){
           var code = data.cell.raw;
@@ -683,11 +726,43 @@ window.RaciModule = (function(){
             doc.text(descLines, x, y);
           }
         }
+        if(girarCabecalho && data.section==="head" && data.column.index>0){
+          var role = raciState.roles[data.column.index-1];
+          if(!role) return;
+          doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(255,255,255);
+          var rotulo = rotuloPapel(role);
+          /* {align:"center"} não centraliza como esperado quando combinado
+             com {angle:90} nesta versão do jsPDF (texto saía encostado à
+             esquerda da coluna, vazando pra coluna vizinha em rótulos
+             compridos) — âncora calculada manualmente em vez disso: com
+             angle:90 e align padrão (left), (x,y) é o INÍCIO do texto, que
+             sobe a partir daí (y diminui). Pra centralizar verticalmente
+             dentro da célula, o início fica a meia-largura do texto ABAIXO
+             do centro vertical da célula; horizontalmente, a âncora é o
+             centro da coluna — como o texto fica fino (perpendicular à
+             leitura), isso já centraliza a "faixa" de texto na coluna. */
+          var larguraTexto = doc.getTextWidth(rotulo);
+          var x = data.cell.x + data.cell.width/2 + 3; // +3: ajuste ótico do baseline
+          var y = data.cell.y + data.cell.height/2 + larguraTexto/2;
+          doc.text(rotulo, x, y, {angle:90});
+        }
       }
     });
 
     var y = doc.lastAutoTable.finalY + 22;
-    if(y > pageH - 90){ doc.addPage(); y = 40; }
+
+    /* O rodapé (PdfDoc.finalizarDocumento, desenhado só no final, numa
+       passada separada sobre todas as páginas) começa em pageH-42 — os
+       dois limites abaixo ("y > pageH-90" pro título, "y > pageH-30" por
+       item) ficavam MAIS BAIXOS que isso, deixando o título e os últimos
+       itens da legenda serem desenhados em cima do rodapé antes da
+       quebra de página finalmente disparar (causa raiz do relatado:
+       legenda sobreposta ao rodapé/cabeçalho na quebra de página).
+       Trocado por PdfDoc.garantirEspaco, que já reserva margem
+       suficiente acima do rodapé — mesmo utilitário criado pra resolver
+       exatamente essa classe de bug no Fluxograma. */
+    var espacoTitulo = window.PdfDoc.garantirEspaco(doc, y, 31, 40);
+    y = espacoTitulo.y;
 
     doc.setFont("helvetica","bold"); doc.setFontSize(11);
     doc.setTextColor(28,36,48);
@@ -695,7 +770,8 @@ window.RaciModule = (function(){
     y += 16;
     doc.setFont("helvetica","normal"); doc.setFontSize(9);
     typesFor(raciState.variant).forEach(function(t){
-      if(y > pageH - 30){ doc.addPage(); y = 40; }
+      var espacoItem = window.PdfDoc.garantirEspaco(doc, y, 15, 40);
+      y = espacoItem.y;
       var rgb = hexToRgb(t.hex);
       doc.setFillColor(rgb[0],rgb[1],rgb[2]);
       doc.circle(45, y-3, 4, "F");

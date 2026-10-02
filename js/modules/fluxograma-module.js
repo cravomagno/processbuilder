@@ -394,12 +394,17 @@ window.FluxogramaModule = (function(){
   /* ============================================================
      Abas — um fluxo nomeado por vez
      ============================================================ */
+  /* Alternar entre fluxos é navegação/leitura, não edição — mesma regra
+     já usada em botões de exportar PDF/Excel. Marcada com
+     .fase-nao-bloquear pra continuar clicável com a fase fechada, senão
+     não dá pra nem visualizar um fluxograma que não seja o primeiro da
+     lista depois que a Fase 3 fecha. */
   function renderTabs(){
     el.tabs.innerHTML = "";
     state.fluxos.forEach(function(fluxo){
       var btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "fluxograma-tab" + (fluxo.id === fluxoAtivoId ? " active" : "");
+      btn.className = "fluxograma-tab fase-nao-bloquear" + (fluxo.id === fluxoAtivoId ? " active" : "");
       btn.textContent = fluxo.nome || "(sem nome)";
       btn.addEventListener("click", function(){ fluxoAtivoId = fluxo.id; renderAll(); });
       el.tabs.appendChild(btn);

@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/shell.css?v=1.12">
-<link rel="stylesheet" href="css/app.css?v=1.12">
+<link rel="stylesheet" href="css/shell.css?v=1.13">
+<link rel="stylesheet" href="css/app.css?v=1.13">
 </head>
 <body>
 
@@ -313,6 +313,31 @@
     </div>
   </div>
   <div id="segregacaoNotasSlot"></div>
+</div>
+
+<!-- Notas de Rastreabilidade / Notas de Sistema (Fase 5) — mesmo
+     mecanismo e mesmo controlador compartilhado (js/core/notas-
+     versionadas.js) dos overlays de Alçadas/Segregação acima. -->
+<div class="docs-view" id="rastreabilidadeNotasOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="rastreabilidadeNotasBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1>Notas de Rastreabilidade</h1>
+      <p>Anotações livres sobre os campos rastreados — editável com a fase aberta, congela uma versão a cada fechamento.</p>
+    </div>
+  </div>
+  <div id="rastreabilidadeNotasSlot"></div>
+</div>
+
+<div class="docs-view" id="sistemasNotasOverlay" style="display:none">
+  <div class="docs-header">
+    <button class="docs-back" id="sistemasNotasBackBtn" type="button">&larr; Voltar ao caso</button>
+    <div>
+      <h1>Notas de Sistema</h1>
+      <p>Anotações livres sobre os sistemas cadastrados — editável com a fase aberta, congela uma versão a cada fechamento.</p>
+    </div>
+  </div>
+  <div id="sistemasNotasSlot"></div>
 </div>
 
 <div class="toast" id="appToast"></div>
@@ -830,7 +855,10 @@
      ============================================================ -->
 <template id="rastreabilidade-template">
 <div class="riscos-panel">
-  <div class="tool-head"><h3>Matriz de Rastreabilidade</h3></div>
+  <div class="tool-head">
+    <h3>Matriz de Rastreabilidade</h3>
+    <button class="tool-notas-btn fase-nao-bloquear" id="rastreabilidade-notasBtn" type="button" data-tooltip="Ver/editar notas da matriz de rastreabilidade — continua acessível (somente leitura) mesmo com a fase fechada.">Notas de Rastreabilidade</button>
+  </div>
   <p class="gut-scale">
     <span>Cada linha rastreia um campo ou dado do início ao fim do processo. Origem e destino são escolhidos entre as etapas já cadastradas no Fluxograma do Processo; Responsável é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
   </p>
@@ -848,7 +876,10 @@
      ============================================================ -->
 <template id="sistemas-template">
 <div class="riscos-panel">
-  <div class="tool-head"><h3>Sistemas (Aquisição/Desenvolvimento)</h3></div>
+  <div class="tool-head">
+    <h3>Sistemas (Aquisição/Desenvolvimento)</h3>
+    <button class="tool-notas-btn fase-nao-bloquear" id="sistemas-notasBtn" type="button" data-tooltip="Ver/editar notas de sistema — continua acessível (somente leitura) mesmo com a fase fechada.">Notas de Sistema</button>
+  </div>
   <p class="gut-scale">
     <span>Cada sistema envolvido no processo — seja adquirido de um fornecedor ou desenvolvido internamente — com investimento, período de teste/piloto e status de aprovação. Responsável é escolhido entre os papéis já cadastrados na Matriz RACI da Governança.</span>
   </p>
@@ -1532,6 +1563,7 @@
           </tbody>
         </table>
       </div>
+      <p>As abas de fluxo continuam clicáveis mesmo com a Fase 3 fechada — é possível alternar entre os fluxos e visualizar cada diagrama, só não editar raias/etapas até "Reabrir fase".</p>
       <h3 style="font-size:14.5px;margin-top:14px;">Raias</h3>
       <div class="doc-table-wrap">
         <table class="doc-table">
@@ -1822,6 +1854,7 @@
           </tbody>
         </table>
       </div>
+      <p><b>Notas de Rastreabilidade</b> (botão no canto superior do painel): abre uma tela separada com um campo de texto rico para registrar o raciocínio por trás dos campos rastreados — fica editável enquanto a fase está aberta. Ao fechar a fase, o texto vira <b>somente leitura</b> e é <b>congelado como uma versão</b> com data e hora; reabrir a fase libera a edição de novo, continuando do mesmo texto. Todas as versões anteriores ficam consultáveis na própria tela, em "Histórico de versões"; a versão mais recente é a que aparece no PDF de fechamento desta fase.</p>
       <div class="doc-callout tip">
         <b class="tag">Boas práticas</b>
         <ul>
@@ -1862,6 +1895,7 @@
           </tbody>
         </table>
       </div>
+      <p><b>Notas de Sistema</b> (botão no canto superior do painel): mesmo mecanismo de notas versionadas da Matriz de Rastreabilidade, acima — texto rico, editável com a fase aberta, vira somente leitura e ganha uma versão com data/hora a cada fechamento da fase, com histórico consultável e a versão mais recente impressa no PDF de fechamento.</p>
       <div class="doc-callout tip">
         <b class="tag">Boas práticas</b>
         <ul>
@@ -2099,41 +2133,41 @@
 </div>
 </template>
 
-<script src="js/lib/jspdf.embed.js?v=1.12"></script>
-<script src="js/lib/jspdf-autotable.embed.js?v=1.12"></script>
-<script src="js/lib/exceljs.embed.js?v=1.12"></script>
-<script src="js/core/toast.js?v=1.12"></script>
-<script src="js/core/alfa-aviso.js?v=1.12"></script>
-<script src="js/core/caso-state.js?v=1.12"></script>
-<script src="js/core/docs-fase.js?v=1.12"></script>
-<script src="js/core/logo-data.js?v=1.12"></script>
-<script src="js/core/pdf-doc.js?v=1.12"></script>
-<script src="js/core/fechamento.js?v=1.12"></script>
-<script src="js/core/dossie.js?v=1.12"></script>
-<script src="js/core/nav.js?v=1.12"></script>
-<script src="js/core/richtext.js?v=1.12"></script>
-<script src="js/core/notas-versionadas.js?v=1.12"></script>
-<script src="js/modules/raci-module.js?v=1.12"></script>
-<script src="js/modules/alcadas-module.js?v=1.12"></script>
-<script src="js/modules/segregacao-module.js?v=1.12"></script>
-<script src="js/modules/placeholder-module.js?v=1.12"></script>
-<script src="js/modules/w2h-module.js?v=1.12"></script>
-<script src="js/modules/fluxograma-module.js?v=1.12"></script>
-<script src="js/modules/pop-module.js?v=1.12"></script>
-<script src="js/modules/abertura-module.js?v=1.12"></script>
-<script src="js/modules/encerramento-module.js?v=1.12"></script>
-<script src="js/modules/gut-module.js?v=1.12"></script>
-<script src="js/modules/ishikawa-module.js?v=1.12"></script>
-<script src="js/modules/porques-module.js?v=1.12"></script>
-<script src="js/modules/riscos-module.js?v=1.12"></script>
-<script src="js/modules/plano-auditoria-module.js?v=1.12"></script>
-<script src="js/modules/regras-divergencia-module.js?v=1.12"></script>
-<script src="js/modules/rastreabilidade-module.js?v=1.12"></script>
-<script src="js/modules/sistemas-module.js?v=1.12"></script>
-<script src="js/modules/checklist-module.js?v=1.12"></script>
-<script src="js/modules/kpis-module.js?v=1.12"></script>
-<script src="js/modules/treinamento-module.js?v=1.12"></script>
-<script src="js/modules/fase0-module.js?v=1.12"></script>
-<script src="js/app.js?v=1.12"></script>
+<script src="js/lib/jspdf.embed.js?v=1.13"></script>
+<script src="js/lib/jspdf-autotable.embed.js?v=1.13"></script>
+<script src="js/lib/exceljs.embed.js?v=1.13"></script>
+<script src="js/core/toast.js?v=1.13"></script>
+<script src="js/core/alfa-aviso.js?v=1.13"></script>
+<script src="js/core/caso-state.js?v=1.13"></script>
+<script src="js/core/docs-fase.js?v=1.13"></script>
+<script src="js/core/logo-data.js?v=1.13"></script>
+<script src="js/core/pdf-doc.js?v=1.13"></script>
+<script src="js/core/fechamento.js?v=1.13"></script>
+<script src="js/core/dossie.js?v=1.13"></script>
+<script src="js/core/nav.js?v=1.13"></script>
+<script src="js/core/richtext.js?v=1.13"></script>
+<script src="js/core/notas-versionadas.js?v=1.13"></script>
+<script src="js/modules/raci-module.js?v=1.13"></script>
+<script src="js/modules/alcadas-module.js?v=1.13"></script>
+<script src="js/modules/segregacao-module.js?v=1.13"></script>
+<script src="js/modules/placeholder-module.js?v=1.13"></script>
+<script src="js/modules/w2h-module.js?v=1.13"></script>
+<script src="js/modules/fluxograma-module.js?v=1.13"></script>
+<script src="js/modules/pop-module.js?v=1.13"></script>
+<script src="js/modules/abertura-module.js?v=1.13"></script>
+<script src="js/modules/encerramento-module.js?v=1.13"></script>
+<script src="js/modules/gut-module.js?v=1.13"></script>
+<script src="js/modules/ishikawa-module.js?v=1.13"></script>
+<script src="js/modules/porques-module.js?v=1.13"></script>
+<script src="js/modules/riscos-module.js?v=1.13"></script>
+<script src="js/modules/plano-auditoria-module.js?v=1.13"></script>
+<script src="js/modules/regras-divergencia-module.js?v=1.13"></script>
+<script src="js/modules/rastreabilidade-module.js?v=1.13"></script>
+<script src="js/modules/sistemas-module.js?v=1.13"></script>
+<script src="js/modules/checklist-module.js?v=1.13"></script>
+<script src="js/modules/kpis-module.js?v=1.13"></script>
+<script src="js/modules/treinamento-module.js?v=1.13"></script>
+<script src="js/modules/fase0-module.js?v=1.13"></script>
+<script src="js/app.js?v=1.13"></script>
 </body>
 </html>
